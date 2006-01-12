@@ -16,7 +16,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   
-  $Id: rtp-packet.h,v 1.3 2001/05/07 18:55:05 dreier Exp $
+  $Id:rtp-packet.h 3 2005-12-06 10:40:45Z federico $
 */
 
 #ifndef _RTP_PACKET_H

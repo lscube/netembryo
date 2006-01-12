@@ -24,7 +24,7 @@
  * documentation and/or software.
  */
 
-#include <netembryo/md5.h>
+#include <programs/md5.h>
 
 #include <string.h>
 

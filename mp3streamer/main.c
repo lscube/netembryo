@@ -30,11 +30,11 @@
 
 #include <time.h>
 #include <netembryo/wsocket.h>
-#include <netembryo/rtp.h>
-#include <netembryo/rtp-packet.h>
-#include <netembryo/rtp-audio.h>
+#include <programs/rtp.h>
+#include <programs/rtp-packet.h>
+#include <programs/rtp-audio.h>
 
-#include <netembryo/mp3streamer.h>
+#include <programs/mp3streamer.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
 #include <unistd.h> 
