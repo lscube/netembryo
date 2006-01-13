@@ -1,4 +1,4 @@
-SUBDIRS =	wsocket randomize rtp mp3streamer mpeg12streamer src var 
+SUBDIRS =	wsocket buffer sound randomize rtp mp3streamer mpeg12streamer src var 
 
 EXTRA_DIST = 	config \
 		include 

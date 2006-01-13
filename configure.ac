@@ -93,7 +93,7 @@ AC_CHECK_LIB(m, main)
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
+AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h linux/soundcard.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -219,6 +219,8 @@ AC_SUBST(netembryo_bin)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([buffer/Makefile])
+AC_CONFIG_FILES([sound/Makefile])
 AC_CONFIG_FILES([mp3streamer/Makefile])
 AC_CONFIG_FILES([mpeg12streamer/Makefile])
 AC_CONFIG_FILES([rtp/Makefile])
