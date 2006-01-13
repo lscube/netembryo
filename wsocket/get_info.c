@@ -42,17 +42,9 @@ char * get_local_host(Sock *s)
 	return addr_ntop(s, local_host, sizeof(local_host));
 }
 
-int get_local_hostname(Sock *s, char *localhostname) //return 0 if ok
+inline int get_local_hostname(Sock *s, char *localhostname, size_t len) //return 0 if ok
 {
-	char lhname[NI_MAXHOST];
-	size_t/*socklen_t*/ localaddr_len = sizeof(s->sock_stg);
-	int res;
-	
-	res=getnameinfo((struct sockaddr *)&(s->sock_stg), localaddr_len, lhname, sizeof(lhname), NULL, 0, 0);
-	if(!res)
-		localhostname = g_strdup(lhname);
-
-	return res;
+	return getnameinfo((struct sockaddr *)&(s->sock_stg), sizeof(s->sock_stg), localhostname, len, NULL, 0, 0);
 }
 
 inline char * get_remote_port(Sock *s)
