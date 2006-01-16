@@ -86,6 +86,7 @@ dnl Check for Endianess
 AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define if manchine is big-endian]),[BIGENDIAN="Little Endian"] )
 
 dnl Checks for libraries.
+AC_CHECK_LIB(pthread,pthread_create)
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
@@ -128,7 +129,7 @@ AC_DEFINE_UNQUOTED(NETEMBRYO_CERT_FILE_DEFAULT_STR, "$netembryo_cert", [Define d
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR, $netembryo_state_dir, [Define default dir for Certificate (pem format)])
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR_STR, "$netembryo_state_dir", [Define default string dir for Certificate (pem format)])
 
-AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),)
+AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),gthread)
 
 dnl test enable
 if test "x$enable_ipv6" = "xyes"; then
@@ -221,7 +222,9 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([buffer/Makefile])
 AC_CONFIG_FILES([sound/Makefile])
+AC_CONFIG_FILES([mpglib/Makefile])
 AC_CONFIG_FILES([mp3streamer/Makefile])
+AC_CONFIG_FILES([mp3receiver/Makefile])
 AC_CONFIG_FILES([mpeg12streamer/Makefile])
 AC_CONFIG_FILES([rtp/Makefile])
 AC_CONFIG_FILES([randomize/Makefile])
