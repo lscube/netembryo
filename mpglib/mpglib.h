@@ -1,3 +1,4 @@
+#include "mpg123.h"
 
 struct buf {
         unsigned char *pnt;

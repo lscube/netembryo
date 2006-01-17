@@ -1,3 +1,6 @@
+#ifndef _MPG123H
+#define _MPG123H
+
 #include        <stdio.h>
 #include        <string.h>
 #include        <signal.h>
@@ -190,4 +193,6 @@ extern real *pnts[5];
 
 extern struct parameter param;
 
+
+#endif
 

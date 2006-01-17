@@ -27,6 +27,9 @@
 
 #include <config.h>
 #include <stdio.h>
+#include <glib.h>
+#include <sys/types.h>
+#include <pthread.h>
 
 #include <netembryo/wsocket.h>
 #include <programs/thread-queue.h>
@@ -34,7 +37,44 @@
 
 void *write_side(void *arg)
 {
+	Sock *s;
+	MySlot *buf;
+	int flag=0; /*SSL, MULTICAST etc etc*/
+	int type=UDP;	
+	int sock;
+	Thread_Queue queue;
+	
+	pthread_mutex_lock( &count_mutex );
+	printf("Writer Thread is starting....\n");
+	s = Sock_bind("224.124.0.1", "1234", &sock, type, flag);	
 
+	if(s == NULL) {
+		printf("Sock_bind returns NULL\n");
+		pthread_mutex_unlock( &count_mutex );
+		
+		return NULL;
+	}		
+
+	queue = (Thread_Queue)arg;
+	buf=calloc(1,sizeof(MySlot));
+	while(1) {
+		if((buf->len=Sock_read(s,(void *)(buf->buffer),MAX_BUFFER))>0) {
+			//printf("Writer Thread: pkt received len = %d\n",bufflen);
+			thread_queue_add(queue, (gpointer)buf);	
+		}
+		else {
+			printf("Writer Thread: error while reading\n");
+			Sock_close(s);
+			pthread_mutex_destroy( &count_mutex );
+			
+			return NULL;
+		}
+		if(thread_queue_length(queue)>=DEFAULT_MIN_QUEUE)
+			pthread_mutex_unlock( &count_mutex );
+	}
+
+	pthread_mutex_destroy( &count_mutex);
+	//Sock_close(s);
 	return NULL;
 }
 

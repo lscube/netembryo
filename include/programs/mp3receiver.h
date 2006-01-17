@@ -29,8 +29,35 @@
 #define _MP3RECEIVERH
 
 #include <config.h>
+#include <sys/types.h>
+#include <programs/thread-queue.h>
+#include <netembryo/wsocket.h>
 
-void *read_side(void *arg);
+/*typedef struct WARG {
+	Thread_Queue queue;
+	Sock *sock;
+};
+
+typedef struct RARG {
+	Thread_Queue queue;
+};
+*/
+
+#include <pthread.h>
+
+#define DEFAULT_MIN_QUEUE 100 
+#define MAX_BUFFER_OUT 8192
+
+#define MAX_BUFFER 16384 
+
+typedef struct MYSLOT {
+	char buffer[MAX_BUFFER];
+	size_t len;
+}MySlot;
+
+static pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
+
 void *write_side(void *arg);
+void *read_side(void *arg);
 
 #endif
