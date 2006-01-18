@@ -45,7 +45,7 @@ typedef struct RARG {
 
 #include <pthread.h>
 
-#define DEFAULT_MIN_QUEUE 100 
+#define DEFAULT_MIN_QUEUE 10 
 #define MAX_BUFFER_OUT 8192
 
 #define MAX_BUFFER 16384 
@@ -54,8 +54,6 @@ typedef struct MYSLOT {
 	char buffer[MAX_BUFFER];
 	size_t len;
 }MySlot;
-
-static pthread_mutex_t count_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 void *write_side(void *arg);
 void *read_side(void *arg);
