@@ -33,19 +33,18 @@
 #include <programs/thread-queue.h>
 #include <netembryo/wsocket.h>
 
-/*typedef struct WARG {
+typedef struct ARG {
 	Thread_Queue queue;
 	Sock *sock;
-};
+	int min_queue;
+	int max_queue;
+} Arg;
 
-typedef struct RARG {
-	Thread_Queue queue;
-};
-*/
 
 #include <pthread.h>
 
 #define DEFAULT_MIN_QUEUE 10 
+#define DEFAULT_MAX_QUEUE ( DEFAULT_MIN_QUEUE * 2)
 #define MAX_BUFFER_OUT 8192
 
 #define MAX_BUFFER 16384 

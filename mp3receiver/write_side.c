@@ -39,22 +39,17 @@ void *write_side(void *arg)
 {
 	Sock *s;
 	MySlot *buf;
-	int flag=0; /*SSL, MULTICAST etc etc*/
-	int type=UDP;	
-	int sock;
 	Thread_Queue queue;
-	
-	s = Sock_bind("224.124.0.1", "1234", &sock, type, flag);	
+	int max_queue = ((Arg *)arg)->max_queue;
+	int min_queue = ((Arg *)arg)->min_queue;
 
-	if(s == NULL) {
-		printf("Sock_bind returns NULL\n");
-		
-		return NULL;
-	}		
-
-	queue = (Thread_Queue)arg;
+	queue = ((Arg *)arg)->queue;
+	s = ((Arg *)arg)->sock;
 	buf=calloc(1,sizeof(MySlot));
 	while(1) {
+		while(thread_queue_length(queue)> max_queue);
+		//wait the reader
+		
 		if((buf->len=Sock_read(s,(void *)(buf->buffer),MAX_BUFFER))>0) {
 			//printf("Writer Thread: pkt received len = %d\n",bufflen);
 			thread_queue_add(queue, (gpointer)buf);	

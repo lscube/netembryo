@@ -249,13 +249,13 @@ stream:
 			} while(control<=src_nbytes && retpkt>0);
 
 			/*wait*/
-			sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 950000000;//1000000000;
+			sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 1000000000;
 			ts.tv_sec=0;
 			ts.tv_nsec =sleep_time;
 			nanosleep(&ts, NULL);
 		}
-	fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f sleep_time: %ld\r",\
-			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp,sleep_time);
+	fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
+			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp);
 	} while(res!=ERR_EOF);
 
 	if(loop) {
