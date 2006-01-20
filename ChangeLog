@@ -1,1 +1,27 @@
-Nothing
+------------------------------------------------------------------------
+r18 | federico | 2006-01-19 18:36:47 +0100 (gio, 19 gen 2006) | 3 lines
+
+Alpha state, but usable yet.
+
+
+------------------------------------------------------------------------
+ | chicco | 2006-01-18 19:41:27 +0100
+
+TestPrograms:
+		- mp3streamer
+		- mp3receiver
+		- mpeg12streamer
+
+Usefull libraries:
+		- mpglib (mp3 decoder)
+		- rtp (rfc 1889)
+		- sound (OSS support)
+		- buffer (simple playout buffer)
+		- randomize
+
+------------------------------------------------------------------------
+ | chicco | 2005-12-02 20:14:59 +0100 
+
+Initial commit
+
+------------------------------------------------------------------------

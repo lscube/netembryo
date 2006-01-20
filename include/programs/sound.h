@@ -1,4 +1,3 @@
-
 /*inspired from gphone*/
 
 #ifndef _SOUND_H
