@@ -249,7 +249,7 @@ stream:
 			} while(control<=src_nbytes && retpkt>0);
 
 			/*wait*/
-			sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 1000000000;
+			sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 950000000;// 1000000000;
 			ts.tv_sec=0;
 			ts.tv_nsec =sleep_time;
 			nanosleep(&ts, NULL);

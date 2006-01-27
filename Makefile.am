@@ -1,5 +1,5 @@
 SUBDIRS =	wsocket \
-		buffer  \
+		bufferpool  \
 		sound \
 		randomize \
 		rtp mpglib \

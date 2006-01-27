@@ -27,42 +27,51 @@
 
 #include <config.h>
 #include <stdio.h>
-#include <glib.h>
 #include <sys/types.h>
 #include <pthread.h>
 
 #include <netembryo/wsocket.h>
-#include <programs/thread-queue.h>
 #include <programs/mp3receiver.h>
+#include <nemesi/bufferpool.h>
 
 void *write_side(void *arg)
 {
-	Sock *s;
-	MySlot *buf;
-	Thread_Queue queue;
-	int max_queue = ((Arg *)arg)->max_queue;
-	int min_queue = ((Arg *)arg)->min_queue;
+	int n;
+	int slot;	
+	playout_buff *po = ((Arg *)arg)->pb;
+	buffer_pool *bp = ((Arg *)arg)->bp;
 
-	queue = ((Arg *)arg)->queue;
-	s = ((Arg *)arg)->sock;
-	buf=calloc(1,sizeof(MySlot));
 	while(1) {
-		while(thread_queue_length(queue)> max_queue);
-		//wait the reader
-		
-		if((buf->len=Sock_read(s,(void *)(buf->buffer),MAX_BUFFER))>0) {
-			//printf("Writer Thread: pkt received len = %d\n",bufflen);
-			thread_queue_add(queue, (gpointer)buf);	
+		if( (slot=bpget(bp)) < 0) {
+			//nms_printf(NMSML_VERB, "No more space in Playout Buffer!"BLANK_LINE);
+			Sock_close(((Arg *)arg)->sock);
+			return NULL;
+		}
+
+		if((n=Sock_read(((Arg *)arg)->sock,(&(bp->bufferpool[slot])),BP_SLOT_SIZE))>0) {
+			switch ( poadd(po, slot, 0) ) {
+				case PKT_DUPLICATED:
+					//nms_printf(NMSML_VERB, "WARNING: Duplicate pkt found... discarded\n");
+					bpfree(bp, slot);
+				return 0;
+				break;
+				case PKT_MISORDERED:
+					//nms_printf(NMSML_VERB, "WARNING: Misordered pkt found... reordered\n");
+				break;
+				default:
+				break;
+			}
+	
+			(po->pobuff[slot]).pktlen = n;
 		}
 		else {
 			printf("Writer Thread: error while reading\n");
-			Sock_close(s);
+			Sock_close(((Arg *)arg)->sock);
 			
 			return NULL;
 		}
 	}
 
-	//Sock_close(s);
 	return NULL;
 }
 
