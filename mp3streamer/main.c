@@ -259,7 +259,7 @@ stream:
 		gettimeofday(&now,NULL);
 		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
 		if(time1>0.0) {
-			while ((mnow - time1) < ((timestamp  - timestamp1) * 1000)) {
+			while ((mnow - time1) < ((timestamp  - timestamp1) * 1000) - 2) {
 				gettimeofday(&now,NULL);
 				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
 				/*wait*/
