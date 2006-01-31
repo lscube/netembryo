@@ -48,7 +48,7 @@ typedef struct ARG {
 #define DEFAULT_MAX_QUEUE BP_SLOT_NUM
 #define MAX_BUFFER_OUT 8192
 
-#define MAX_BUFFER ( 8192 * 2 ) 
+#define MAX_BUFFER ( 8192 * 4 ) 
 
 void *write_side(void *arg);
 void *read_side(void *arg);
