@@ -144,15 +144,17 @@ void *read_side(void *arg)
 			
 		gettimeofday(&now,NULL);
 		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-		sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) * 1000;// 1000000000;
-		while ((mnow - time1) < sleep_time /*(timestamp  - timestamp1)*/) {
-			gettimeofday(&now,NULL);
-			mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-			/*wait*/
-			ts.tv_sec=0;
-			//ts.tv_nsec =sleep_time;
-			ts.tv_nsec =1;//26122;
-			nanosleep(&ts, NULL);
+		if(bp->flcount < (DEFAULT_MAX_QUEUE - 1)) { //wow fear of buffer overflow!! Don't sleep... 
+			sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) * 1000 - 5;// 1000000000;
+			while ((mnow - time1) < sleep_time /*(timestamp  - timestamp1)*/) {
+				gettimeofday(&now,NULL);
+				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
+				/*wait*/
+				ts.tv_sec=0;
+				//ts.tv_nsec =sleep_time;
+				ts.tv_nsec =1;//26122;
+				nanosleep(&ts, NULL);
+			}
 		}
 		time1=mnow;
 		//timestamp1=timestamp ;
