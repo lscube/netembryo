@@ -44,11 +44,11 @@ typedef struct ARG {
 
 #include <pthread.h>
 
-#define DEFAULT_MIN_QUEUE ( BP_SLOT_NUM / 5 ) 
+#define DEFAULT_MIN_QUEUE ( BP_SLOT_NUM / 2 ) 
 #define DEFAULT_MAX_QUEUE BP_SLOT_NUM
 #define MAX_BUFFER_OUT 8192
 
-#define MAX_BUFFER 16384 
+#define MAX_BUFFER ( 8192 * 2 ) 
 
 void *write_side(void *arg);
 void *read_side(void *arg);
