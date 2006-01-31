@@ -29,14 +29,17 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <sys/types.h>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <arpa/inet.h> //for ntohl
 
 #include <nemesi/bufferpool.h>
-#include <programs/sound.h>
 #include <programs/mp3receiver.h>
 #include <../mpglib/mpglib.h>
 #include <../mpglib/mpg123.h>
+#include <ao/ao.h>
+
 
 #define RTPHEADERSIZE 12
 #define RTPEXTENSIONSIZE 4
@@ -45,16 +48,25 @@
 void *read_side(void *arg)
 {
 	int ret;	
-	size_t size,len;
+	size_t size;
 	char out[MAX_BUFFER_OUT];
-	Sound_Handle hand;
-	int direction = O_WRONLY;
 	struct mpstr mp;
-	struct timespec ts;
-	unsigned long int sleep_time=0;
-	unsigned int frame_size;
 	playout_buff *po = ((Arg *)arg)->pb;
 	buffer_pool *bp = ((Arg *)arg)->bp;
+	int ao_id=0;
+	ao_sample_format format; //ao
+	ao_option *options=NULL; //ao
+	ao_device *ao_dev; //ao
+	int sound_in_use=0; //ao
+
+	struct timespec ts;
+	double sleep_time=0;
+	unsigned int frame_size;
+	struct timeval now;
+	double time1=0.0;
+	double mnow;
+	//double timestamp1=0.0;
+	double timestamp=0.0;
 
 	//BITRATE = tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]
 	int tabsel_123[2][3][16] = {
@@ -74,17 +86,41 @@ void *read_side(void *arg)
 	char cazzatine[4] = { '\\' , '|' , '/' , '-'};
 	unsigned short cazcount=0;
 
-	//queue = ((Arg *)arg)->queue;
-	
 	InitMP3(&mp);
-	while(1) {
+	ao_initialize(); //ao
+	if((ao_id=ao_default_driver_id())<0) //ao
+		fprintf(stderr,"ao_default_driver_id error\n");
+#if ENABLE_DEBUG
+	fprintf(stderr,"ao_id = %d\n",ao_id);
+#endif //ENABLE_DEBUG
+/*	
+	while(bp->flcount < DEFAULT_MIN_QUEUE) {
+		//fprintf(stderr,"buffer = %d\n",bp->flcount);
+		ts.tv_sec=0;
+		ts.tv_nsec = 30; //only to rescale the process
+		nanosleep(&ts, NULL);
+	}
+
+*/
+	do {
 		
-		if(((Arg *)arg)->pb->potail == -1)	
-			continue;
+		if(bp->flcount <= 1) {	
+			//prefill	
+			while(bp->flcount < DEFAULT_MIN_QUEUE) {
+				//fprintf(stderr,"buffer = %d\n",bp->flcount);
+				ts.tv_sec=0;
+				ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
+				nanosleep(&ts, NULL);
+			}
+		}
 
 		ret = decodeMP3( &mp, (char *)(&(*po->bufferpool)[po->potail]) + HEADERSIZE, (po->pobuff[po->potail]).pktlen - HEADERSIZE, out, MAX_BUFFER_OUT, &size );
-		
-	
+
+		if(ret != MP3_OK)
+			continue;
+
+		timestamp = (double)(ntohl(((rtp_pkt *)(&(*po->bufferpool)[po->potail]))->time) * 1000);
+
 		bprmv(bp,po,po->potail);
 		// packet len
 	        if (mp.fr.lay == 1) // layer 1
@@ -92,31 +128,58 @@ void *read_side(void *arg)
 		else // layer 2 or 3
 			frame_size = 1152;
 		
-		if(!sound_in_use()) {
+		if(!sound_in_use) {
 			if(mp.fr.stereo!=MPG_MD_MONO)
-				set_stereo_mode();
-			set_speed(freqs[mp.fr.sampling_frequency]);
-			hand = sound_open(direction);
+				format.channels=2;
+			else
+				format.channels=1;
+			format.bits=16;
+			format.rate=freqs[mp.fr.sampling_frequency];
+			sound_in_use=1;
+			ao_dev=ao_open_live(ao_id, &format, options);
+			
 		}
+	
 		while(ret == MP3_OK) {
-			write_samples(hand, (void *)out, size);
+			ao_play(ao_dev, (void *)out, size); 
 			ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
 		}
 
-				
-		sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) *  950000000;
-
-		fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld [%c] \r", \
+#if ENABLE_DEBUG
+		fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - time = %f - buffer: %d [%c] sleep_time: %f \r", \
 				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
-				freqs[mp.fr.sampling_frequency],\
+				freqs[mp.fr.sampling_frequency], timestamp/1000 ,bp->flcount, \
+				cazzatine[cazcount%4], sleep_time);
+#else
+		fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - time = %f - buffer: %d [%c] \r", \
+				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
+				freqs[mp.fr.sampling_frequency], timestamp/1000 ,bp->flcount, \
 				cazzatine[cazcount%4]);
+
+#endif //ENABLE_DEBUG
 		cazcount++;
 			
-		//wait
-		ts.tv_sec=0;
-		ts.tv_nsec = sleep_time;
-		nanosleep(&ts, NULL);
-	}
+		gettimeofday(&now,NULL);
+		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
+		sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) * 1000;// 1000000000;
+		while ((mnow - time1) < sleep_time /*(timestamp  - timestamp1)*/) {
+			gettimeofday(&now,NULL);
+			mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
+			/*wait*/
+			ts.tv_sec=0;
+			//ts.tv_nsec =sleep_time;
+			ts.tv_nsec =1;//26122;
+			nanosleep(&ts, NULL);
+		}
+		time1=mnow;
+		//timestamp1=timestamp ;
+
+
+	}while(ao_dev!=NULL && sound_in_use);
+	
+	fprintf(stderr,"ao_device error\n");
+	//ao_close(ao_dev);
+	ao_shutdown();
 
 	return NULL;
 }

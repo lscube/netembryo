@@ -39,7 +39,6 @@
 
 
 #include <programs/mp3receiver.h>
-#include <programs/sound.h>
 #include <nemesi/bufferpool.h>
 #include <netembryo/wsocket.h>
 
@@ -63,9 +62,6 @@ static void usage()
 			\t (LS){3} Project http://streaming.polito.it\n \
 			\t Politecnico di Torino\n\n \
 			\r")
-
-static int Half_Flag = 0;
-static int Eight_Flag = 0;
 
 int main(int argc, char **argv)
 {
@@ -207,14 +203,6 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	sound_init();
-	if (Half_Flag) {
-		set_sound_duplex(HALF_DUPLEX);
-	} else {
-		set_sound_duplex(FULL_DUPLEX);
-	}
-	set_sound_eight_bit(Eight_Flag);
-	
 	if ((rtn = pthread_create(&write_buffer_thread, NULL, write_side,
                             (void *) threadarg))) {
 		fprintf(stderr, "pthread_create talk_thread: %s\n", strerror(rtn));

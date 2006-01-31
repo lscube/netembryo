@@ -88,13 +88,20 @@ AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create)
 
+dnl te followed two checks are usefull only for mp3receiver test program
+dnl AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mpg321. See http://www.mars.org/home/rob/proj/mpeg/))
+
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h linux/soundcard.h)
+AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
+
+dnl soundcard for sound oss module
+AC_CHECK_HEADER(linux/soundcard.h)
+AC_CHECK_HEADER(ao/ao.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -130,6 +137,12 @@ AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR, $netembryo_state_dir, [Define default di
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR_STR, "$netembryo_state_dir", [Define default string dir for Certificate (pem format)])
 
 AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),gthread)
+
+dnl MP3RECEIVER NEED IT 
+XIPH_PATH_AO(,AC_MSG_ERROR(libao needed!))
+CFLAGS="$CFLAGS $AO_CFLAGS"
+LIBS="$LIBS $AO_LIBS"
+
 
 dnl test enable
 if test "x$enable_ipv6" = "xyes"; then

@@ -127,7 +127,12 @@ int main(int argc, char **argv)
 	int oflag = O_RDONLY;
 	unsigned long int sleep_time;
 	struct timespec ts;
-
+	
+	struct timeval now;
+	double time1=0.0;
+	double mnow;
+	double timestamp1=0.0;
+	
 	int n;
 	static const char short_options[] = "a:p:f:slt";
 	int32_t nerr = 0;	/*number of error */
@@ -231,6 +236,7 @@ int main(int argc, char **argv)
 
 stream:
 	do {
+
 		res = get_frame2(src, SRC_BUF_DIM, &timestamp, fd, properties, private_data);
 		if(res>0) {
 			uint32 control=0;
@@ -248,13 +254,27 @@ stream:
 
 			} while(control<=src_nbytes && retpkt>0);
 
-			/*wait*/
-			sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 950000000;// 1000000000;
-			ts.tv_sec=0;
-			ts.tv_nsec =sleep_time;
-			nanosleep(&ts, NULL);
 		}
-	fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
+			
+		gettimeofday(&now,NULL);
+		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
+		if(time1>0.0) {
+			while ((mnow - time1) < ((timestamp  - timestamp1) * 1000)) {
+				gettimeofday(&now,NULL);
+				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
+				/*wait*/
+				//sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 1000000000;
+				ts.tv_sec=0;
+				//ts.tv_nsec =sleep_time;
+				ts.tv_nsec =1;//26122;
+				nanosleep(&ts, NULL);
+			}
+		} 
+		time1=mnow;
+		timestamp1=timestamp ;
+
+
+		fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
 			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp);
 	} while(res!=ERR_EOF);
 
