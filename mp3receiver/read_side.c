@@ -36,9 +36,14 @@
 
 #include <nemesi/bufferpool.h>
 #include <programs/mp3receiver.h>
-#include <../mpglib/mpglib.h>
-#include <../mpglib/mpg123.h>
+
+#include "minimad.h" 
+
+#if ENABLE_LIBAO
 #include <ao/ao.h>
+#else
+#include <programs/sound.h>
+#endif //ENABLE_LIBAO
 
 
 #define RTPHEADERSIZE 12
@@ -47,138 +52,87 @@
 
 void *read_side(void *arg)
 {
-	int ret;	
-	size_t size;
-	char out[MAX_BUFFER_OUT];
-	char finalout[MAX_BUFFER];
-	int finalsize = 0;
-	struct mpstr mp;
 	playout_buff *po = ((Arg *)arg)->pb;
 	buffer_pool *bp = ((Arg *)arg)->bp;
+	struct timespec ts;
+	//minimad
+	struct buffer *buffer = calloc(1, sizeof(struct buffer));
+	struct mad_decoder decoder;
+	int result = 1;
+
+#if ENABLE_LIBAO
 	int ao_id=0;
 	ao_sample_format format; //ao
 	ao_option *options=NULL; //ao
 	ao_device *ao_dev; //ao
-	int sound_in_use=0; //ao
+	int sound_ao_in_use=0; //ao
 
-	struct timespec ts;
-	double sleep_time=0;
-	unsigned int frame_size;
-	struct timeval now;
-	double time1=0.0;
-	double mnow;
-	//double timestamp1=0.0;
-	//double timestamp=0.0;
-
-	//BITRATE = tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]
-	int tabsel_123[2][3][16] = {
-		{ {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,},
-		{0,32,48,56, 64, 80, 96,112,128,160,192,224,256,320,384,},
-		{0,32,40,48, 56, 64, 80, 96,112,128,160,192,224,256,320,} },
-
-		{ {0,32,48,56,64,80,96,112,128,144,160,176,192,224,256,},
-		{0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,},
-		{0,8,16,24,32,40,48,56,64,80,96,112,128,144,160,} }	
-	};
-
-	long freqs[9] = { 44100, 48000, 32000,
-                  22050, 24000, 16000 ,
-                  11025 , 12000 , 8000 };
-
-#if ENABLE_DEBUG
-	char cazzatine[4] = { '\\' , '|' , '/' , '-'};
-	unsigned short cazcount=0;
-#endif //ENABLE_DEBUG
-
-	InitMP3(&mp);
+	//audio init
+	//TODO IN MAD_OUTPUT
 	ao_initialize(); //ao
-	if((ao_id=ao_default_driver_id())<0) //ao
-		fprintf(stderr,"ao_default_driver_id error\n");
-#if ENABLE_DEBUG
-	fprintf(stderr,"ao_id = %d\n",ao_id);
-#endif //ENABLE_DEBUG
-	do {
-		
-		if(bp->flcount <= 1) {	
-			//prefill	
-			while(bp->flcount < DEFAULT_MIN_QUEUE) {
-				//fprintf(stderr,"buffer = %d\n",bp->flcount);
-				ts.tv_sec=0;
-				ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
-				nanosleep(&ts, NULL);
-			}
-		}
+	if((ao_id=ao_default_driver_id())<0) {//ao
+		fprintf(stderr,"ao_default_driver_id error using default oss\n");
+		ao_id = ao_driver_id("oss");
+	}
 
-		ret = decodeMP3( &mp, (char *)(&(*po->bufferpool)[po->potail]) + HEADERSIZE, (po->pobuff[po->potail]).pktlen - HEADERSIZE, out, MAX_BUFFER_OUT, &size );
-		finalsize=0;
+	if(!sound_ao_in_use) {
+		//TODO
+		format.channels=2;
+		//++else format.channels=1;
+		format.bits=16;
+		//TODO
+		format.rate=44100;
+		sound_ao_in_use=1;
+		ao_dev=ao_open_live(ao_id, &format, options);
+		buffer->ao_dev = ao_dev;
+	}
+#else
+	Sound_Handle hand=NULL;
+	int direction = O_WRONLY;
 
-		if(ret != MP3_OK)
-			continue;
-
-		//timestamp = (double)(ntohl(((rtp_pkt *)(&(*po->bufferpool)[po->potail]))->time) * 1000);
-
-		bprmv(bp,po,po->potail);
-		// packet len
-	        if (mp.fr.lay == 1) // layer 1
-			frame_size = 384;
-		else // layer 2 or 3
-			frame_size = 1152;
-		
-		if(!sound_in_use) {
-			if(mp.fr.stereo!=MPG_MD_MONO)
-				format.channels=2;
-			else
-				format.channels=1;
-			format.bits=16;
-			format.rate=freqs[mp.fr.sampling_frequency];
-			sound_in_use=1;
-			ao_dev=ao_open_live(ao_id, &format, options);
-			
-		}
+	//audio init
+	//TODO IN MAD_OUTPUT
+	sound_init();
+	set_sound_duplex(FULL_DUPLEX);
+	set_sound_eight_bit(0);
 	
-		while(ret == MP3_OK) {
-			if(finalsize+size > sizeof(finalout)) {
-				ao_play(ao_dev, (void *)finalout, finalsize); 
-				finalsize=0;
-			}
-			//ao_play(ao_dev, (void *)out, size); 
-			memcpy(finalout+finalsize,out,size);
-			finalsize+=size;
-			ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
+	if(!sound_in_use()) {
+		//TODO
+		set_stereo_mode();
+		//TODO
+		set_speed(44100);
+		hand = sound_open(direction);
+		buffer->hand = hand;
+	}
+#endif	
+	/* initialize our private message structure */
+	buffer->po = po;
+	buffer->bp = bp;
+	mad_timer_reset(&(buffer->timer));
+	mad_decoder_init(&decoder, buffer, madinput, madheader , 0 /* filter */ , madoutput,
+			 0 /*error*/, 0 /* message */ );
+	if(bp->flcount <= 1) {	
+		//prefill	
+		while(bp->flcount < DEFAULT_MIN_QUEUE) {
+			//fprintf(stderr,"buffer = %d\n",bp->flcount);
+			ts.tv_sec=0;
+			ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
+			nanosleep(&ts, NULL);
 		}
-		if(finalsize > 0) 
-			ao_play(ao_dev, (void *)finalout, finalsize); 
-
-#if ENABLE_DEBUG
-		 fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - buffer: %d%% [%c] \r", \
-				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
-				freqs[mp.fr.sampling_frequency], bp->flcount*100/BP_SLOT_NUM, \
-				cazzatine[cazcount%4]);
-		cazcount++;
-#endif //ENABLE_DEBUG
-		gettimeofday(&now,NULL);
-		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-		if(bp->flcount < (DEFAULT_MAX_QUEUE - 1)) { //wow fear of buffer overflow!! Don't sleep... 
-			sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) * 1000 - 5;// 1000000000;
-			while ((mnow - time1) < sleep_time /*(timestamp  - timestamp1)*/) {
-				gettimeofday(&now,NULL);
-				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-				/*wait*/
-				ts.tv_sec=0;
-				//ts.tv_nsec =sleep_time;
-				ts.tv_nsec =1;//26122;
-				nanosleep(&ts, NULL);
-			}
-		}
-		time1=mnow;
-		//timestamp1=timestamp ;
+	}
 
 
-	}while(ao_dev!=NULL && sound_in_use);
+	while(1)
+		result = mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
 	
-	fprintf(stderr,"ao_device error\n");
-	//ao_close(ao_dev);
+#if ENABLE_LIBAO
+	ao_close(ao_dev);
 	ao_shutdown();
+#endif //ENABLE_LIBAO
+
+	//minimad
+	/* release the decoder */
+	mad_decoder_finish(&decoder);
 
 	return NULL;
 }

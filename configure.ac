@@ -15,10 +15,6 @@ test "x$sysconfdir" = 'x${prefix}/etc' && sysconfdir="/etc"
 test "x$localstatedir" = 'x${prefix}/var' && localstatedir="/var"
 test "x$mandir" = 'x${prefix}/man' && mandir="${prefix}/share/man"
 
-dnl AM_CONFIG_HEADER(config.h)
-
-
- 
 
 AC_ARG_ENABLE(debug,
 [  --enable-debug          enable gcc dubugging flags [[default=no]]],,
@@ -27,6 +23,10 @@ AC_ARG_ENABLE(debug,
 AC_ARG_ENABLE(ipv6,
 [  --enable-ipv6            enable IPv6 support [[default=autodetected]]],,
         enable_ipv6="yes")
+
+AC_ARG_ENABLE(libao,
+[  --enable-libao            enable libao support [[default=yes]]],,
+        enable_libao="yes")
 
 AM_CONDITIONAL(HAVE_SSL, /bin/false)
 AC_DEFUN([CHECK_SSL],
@@ -68,6 +68,10 @@ dnl	AC_SUBST(HAVE_SSL)
 ])
 ])dnl
 
+dnl	AC_ARG_WITH(target,
+dnl	[  --with-target=TARGETNAME
+dnl		configuring target name. [I386, ARM, more to come] ])
+
 dnl Check for programs.
 AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
@@ -88,8 +92,8 @@ AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create)
 
-dnl te followed two checks are usefull only for mp3receiver test program
-dnl AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mpg321. See http://www.mars.org/home/rob/proj/mpeg/))
+dnl the followed two checks are usefull only for mp3receiver test program for using libmad
+AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mpg321. See http://www.mars.org/home/rob/proj/mpeg/))
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
@@ -99,9 +103,8 @@ AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
 
-dnl soundcard for sound oss module
+dnl soundcard for sound oss module, used in mp3receiver
 AC_CHECK_HEADER(linux/soundcard.h)
-AC_CHECK_HEADER(ao/ao.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -120,7 +123,7 @@ AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
 CHECK_SSL
-dnl CFLAGS = "$CFLAGS $SSL_CFLAG"
+
 if test "x$with_ssl" = "xyes"; then
 	netembryo_cert="${localstatedir}/local/lib/netembryo/certs/cert.pem"
 else
@@ -138,10 +141,6 @@ AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR_STR, "$netembryo_state_dir", [Define defa
 
 AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),gthread)
 
-dnl MP3RECEIVER NEED IT 
-XIPH_PATH_AO(,AC_MSG_ERROR(libao needed!))
-CFLAGS="$CFLAGS $AO_CFLAGS"
-LIBS="$LIBS $AO_LIBS"
 
 
 dnl test enable
@@ -152,7 +151,7 @@ else
 fi
 
 AM_CONDITIONAL(NETEMBRYO_DEBUG, /bin/false)
-if test "$enable_debug" = "yes"; then
+if test "x$enable_debug" = "xyes"; then
         CFLAGS="$CFLAGS -g -ggdb"
         AM_CONDITIONAL(NETEMBRYO_DEBUG, /bin/true) \
         AC_DEFINE([ENABLE_DEBUG], 1,[Debug enabled])
@@ -160,6 +159,19 @@ if test "$enable_debug" = "yes"; then
    Debuging flags enabled: welcome developer!!!"
 fi
 
+dnl MP3RECEIVER NEED IT 
+AM_CONDITIONAL(ENABLE_LIBAO, /bin/false)
+if test "x$enable_libao" = "xno"; then
+        AC_DEFINE([ENABLE_LIBAO], 0,[libao disabled])
+else
+	dnl check for libao header, used in mp3receiver
+	AC_CHECK_HEADER(ao/ao.h)
+	XIPH_PATH_AO(,AC_MSG_ERROR(libao needed!))
+	CFLAGS="$CFLAGS $AO_CFLAGS"
+	LIBS="$LIBS $AO_LIBS"
+        AM_CONDITIONAL(ENABLE_LIBAO, /bin/true) \
+        AC_DEFINE([ENABLE_LIBAO], 1,[libao enabled])
+fi
 
 case "$enable_warnings" in
         pedantic)
@@ -211,6 +223,14 @@ case "$host" in
                 ARCH_DEFINES="-DI386_ASSEM"
                 arch_type=ix86
         ;;
+        arm-*-*)
+                CFLAGS="$CFLAGS -DLINUX \
+			-DOSS -Wall -O6 -march=armv4 \
+			-fomit-frame-pointer -funroll-all-loops \
+			-finline-functions -ffast-math"
+                ARCH_DEFINES="-DARM"
+                arch_type=arm
+        ;;
         ppc-*-*)
                 arch_type=ppc
         ;;
@@ -226,7 +246,10 @@ esac
 AC_SUBST(ARCH_DEFINES)
 AM_CONDITIONAL(ARCH_X86, test "x$arch_type" = "xix86")
 AM_CONDITIONAL(ARCH_PPC, test "x$arch_type" = "xppc")
+AM_CONDITIONAL(ARCH_ARM, test "x$arch_type" = "xarm")
 AM_CONDITIONAL(HAVE_SOLARIS, test "x$have_solaris" = xyes)
+
+AC_DEFINE_UNQUOTED(ARCH, "$arch_type", [Define Arch type and host target])
 
 netembryo_bin=$PACKAGE_NAME
 AC_SUBST(netembryo_bin)
@@ -257,6 +280,8 @@ NetEmbryo Install prefix .......... : $prefix
 NetEmbryo Binary path ............. : $exec_prefix/bin/$netembyo_bin
 
 Byte order ..................... : this is a $BIGENDIAN machine
+Host arch ...................... : $host
+
 $ssl_msg
 
 $debug_msg

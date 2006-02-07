@@ -163,7 +163,7 @@ int main(int argc, char **argv)
 
 	s = Sock_bind(maddr, port, &sock, type, flag);	
 	if(s == NULL) {
-		Sock_close(s);
+		//Sock_close(s);
 		free(threadarg);
 		printf("Sock_bind returns NULL\n");
 		exit(1);
