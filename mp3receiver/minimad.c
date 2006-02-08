@@ -21,6 +21,9 @@
 
 # include <stdio.h>
 # include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 # include <mad.h>
 # include "minimad.h"
@@ -38,6 +41,7 @@
  * address and length of the mapping. When this callback is called a second
  * time, we are finished decoding.
  */
+
 
 enum mad_flow madinput(void *data, struct mad_stream *stream)
 {
@@ -61,6 +65,7 @@ enum mad_flow madinput(void *data, struct mad_stream *stream)
 			ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;	//only to rescale the process
 			nanosleep(&ts, NULL);
 		}
+		mad_timer_reset(&(buffer->timer));
 	}
 
 	if (bytes_to_preserve)
@@ -151,49 +156,76 @@ static inline signed long audio_linear_dither(unsigned int bits, mad_fixed_t sam
  * MPEG audio data has been completely decoded. The purpose of this callback
  * is to output (or play) the decoded PCM audio.
  */
+static unsigned short cazcount;
+
 enum mad_flow madoutput(void *data, struct mad_header const *header, struct mad_pcm *pcm)
 {
-	unsigned int nchannels, nsamples;
-	mad_fixed_t const *left_ch, *right_ch;
 	struct buffer *buffer = (struct buffer *) data;
-	int volume = 100;
+	int vol = 100;
+	int volume = (vol/100.0) * MAD_F_ONE;
 
-	static unsigned char stream[1152 * 4];	/* 1152 because that's what mad has as a max; *4 because
-						   there are 4 distinct bytes per sample (in 2 channel case) */
+	register int nsamples = pcm->length;
+	mad_fixed_t const *left_ch = pcm->samples[0], *right_ch = pcm->samples[1];
+
+	static unsigned char stream[1152*4]; /* 1152 because that's what mad has as a max; *4 because
+                                there are 4 distinct bytes per sample (in 2 channel case) */
 	static unsigned int rate = 0;
 	static int channels = 0;
 	static struct audio_dither dither;
 
-	register char *ptr = stream;
+	register char * ptr = stream;
 	register signed int sample;
 	register mad_fixed_t tempsample;
 
+	
+#if ENABLE_DEBUG
+	char cazzatine[4] = { '\\' , '|' , '/' , '-'};
+#endif //ENABLE_DEBUG
 
-	/* pcm->samplerate contains the sampling frequency */
-	nchannels = pcm->channels;
-	nsamples = pcm->length;
-	left_ch = pcm->samples[0];
-	right_ch = pcm->samples[1];
+#if ENABLE_LIBAO
+	int ao_id=0;
+	ao_sample_format format; //ao
+	ao_option *options=NULL; //ao
+	ao_device *ao_dev; //ao
+#else
+	Sound_Handle hand=NULL;
+	int direction = O_WRONLY;
+#endif	// ENABLE_LIBAO	
 
 
-
-	//TODO
 	/* We need to know information about the file before we can open the playdevice
 	   in some cases. So, we do it here. */
-	/*if (!playdevice)
-	   {
-	   channels = MAD_NCHANNELS(header);
-	   rate = header->samplerate;
-	   open_ao_playdevice(header);        
-	   }
+	if (!buffer->playdevice) {
+		channels = MAD_NCHANNELS(header);
+		rate = header->samplerate;
+#if ENABLE_LIBAO
+		ao_initialize(); //ao
+		if((ao_id=ao_default_driver_id())<0) {//ao
+			fprintf(stderr,"ao_default_driver_id error using default oss\n");
+			ao_id = ao_driver_id("oss");
+		}
 
-	   else if ((channels != MAD_NCHANNELS(header) || rate != header->samplerate) && playdevice_is_live())
-	   {
-	   ao_close(playdevice);
-	   channels = MAD_NCHANNELS(header);
-	   rate = header->samplerate;
-	   open_ao_playdevice(header);        
-	   } */
+		format.channels=channels;
+		format.bits=16;
+		format.rate=rate;
+		ao_dev=ao_open_live(ao_id, &format, options);
+		buffer->ao_dev = ao_dev;
+		fprintf(stderr," - libao enabled\n\n");
+#else
+		sound_init();
+		set_sound_duplex(FULL_DUPLEX);
+		set_sound_eight_bit(0);
+	
+		if(channels==2)
+			set_stereo_mode();
+		set_speed(rate);
+		hand = sound_open(direction);
+		buffer->hand = hand;
+#endif	
+		buffer->playdevice = 1;
+	}
+
+
 	if (pcm->channels == 2) {
 		while (nsamples--) {
 			tempsample = (mad_fixed_t) ((*left_ch++ * (double) volume) / MAD_F_ONE);
@@ -245,12 +277,20 @@ enum mad_flow madoutput(void *data, struct mad_header const *header, struct mad_
 #endif				//ENABLE_LIBAO
 	}
 
-//#if ENABLE_DEBUG
-		 fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - buffer: %d%% - pcm->length: %6d\r", \
+#if ENABLE_DEBUG
+		 fprintf(stderr, "[MPA] bitrate: %ld - sample rate: %d - channels: %d - pcm->length: %4d - buffer: %3d%%  [%c]\r", \
 				header->bitrate, \
-				header->samplerate, buffer->bp->flcount*100/BP_SLOT_NUM, pcm->length);
-//#endif //ENABLE_DEBUG
-	mad_timer_add(&(buffer->timer), header->duration);
+				rate, channels,\
+				pcm->length,\
+				buffer->bp->flcount*100/BP_SLOT_NUM, \
+				cazzatine[(cazcount++)%4]);
+#endif //ENABLE_DEBUG
+	/*if (buffer->bp->flcount > BP_SLOT_NUM - 2) { 
+		mad_timer_set(&(buffer->timer),0,0,0);
+		mad_timer_add(&(buffer->timer), header->duration);
+	}*/
+	
+	//fprintf(stderr,"%f\n",header->duration);
 
 	return MAD_FLOW_CONTINUE;
 }

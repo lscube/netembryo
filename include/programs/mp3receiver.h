@@ -44,7 +44,7 @@ typedef struct ARG {
 
 #include <pthread.h>
 
-#define DEFAULT_MIN_QUEUE ( BP_SLOT_NUM / 2 ) 
+#define DEFAULT_MIN_QUEUE ( BP_SLOT_NUM - BP_SLOT_NUM / 3 ) 
 #define DEFAULT_MAX_QUEUE BP_SLOT_NUM
 #define MAX_BUFFER_OUT 8192
 

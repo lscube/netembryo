@@ -47,11 +47,12 @@ static void usage()
 	fprintf(stderr, "\nmp3receiver \
 		\n\t--port=multicast-port | -p multicast-port (port) \
 		\n\t--addr=multicast_address | -a multicast_address (ip multicast address) \
-		\n\t[--minbuf=min_dim_playout_buffer | -m min_dim_playout_buffer] \
-		\n\t[--maxbuf=max_dim_playout_buffer | -M max_dim_playout_buffer] \
 		\n\t[-t | --tcp (rtp over tcp; default udp) ] \
 		\n\n\r");
 		/*\n\t[-e | --ssl (use_ssl if enable)]\n\n\r");*/
+
+		//\n\t[--minbuf=min_dim_playout_buffer | -m min_dim_playout_buffer] \
+		//\n\t[--maxbuf=max_dim_playout_buffer | -M max_dim_playout_buffer] \
 	
 	return;
 }
