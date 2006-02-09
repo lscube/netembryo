@@ -1,23 +1,29 @@
-/*
- * libmad - MPEG audio decoder library
- * Copyright (C) 2000-2003 Underbit Technologies, Inc.
+/* * 
+ *  $Id$
+ *  
+ *  This file is part of NetEmbryo 
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * NetEmbryo -- default network wrapper 
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  Copyright (C) 2005 by
+ *  	
+ *	- Federico Ridolfo	<federico.ridolfo@polito.it>
+ * 
+ *  NetEmbryo is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  NetEmbryo is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * $Id: minimad.c,v 1.2 2003/06/05 02:27:07 rob Exp $
- */
+ *  You should have received a copy of the GNU General Public License
+ *  along with NetEmbryo; if not, write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  
+ * */
 
 # include <stdio.h>
 # include <unistd.h>
@@ -48,24 +54,12 @@ enum mad_flow madinput(void *data, struct mad_stream *stream)
 	struct buffer *buffer = (struct buffer *) data;
 	playout_buff *po = buffer->po;
 	buffer_pool *bp = buffer->bp;
-	struct timespec ts;
 	int bytes_to_preserve = stream->bufend - stream->next_frame;
 	unsigned char buf[ MAX_BUFFER + MAD_BUFFER_GUARD];
 
-	if (po->potail == -1) {
+	if (po->potail  < 0) {
 		//fprintf(stderr,"po->potail= -1\n");
-		return MAD_FLOW_CONTINUE;
-	}
-
-	if (bp->flcount <= 2) {
-		//prefill    
-		while (bp->flcount < DEFAULT_MIN_QUEUE) {
-			//fprintf(stderr,"buffer = %d\n",bp->flcount);
-			ts.tv_sec = 0;
-			ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;	//only to rescale the process
-			nanosleep(&ts, NULL);
-		}
-		mad_timer_reset(&(buffer->timer));
+		return MAD_FLOW_STOP;
 	}
 
 	if (bytes_to_preserve)
