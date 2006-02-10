@@ -27,10 +27,12 @@
 
 #include <config.h>
 #include <stdio.h>
-#include <pthread.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <arpa/inet.h> //for ntohl
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <nemesi/bufferpool.h>
 #include <programs/mp3receiver.h>
@@ -67,20 +69,26 @@ void *read_side(void *arg)
 			 0 /*error*/, 0 /* message */ );
 	buffer->decoder = &decoder;
 
+	while(bp->flcount < DEFAULT_MIN_QUEUE && !((Arg *)arg)->thread_dead) {
+		//fprintf(stderr,"buffer = %d\n",bp->flcount);
+		ts.tv_sec=0;
+		ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
+		nanosleep(&ts, NULL);
+	}
+
 	while(result != MAD_FLOW_BREAK && !((Arg *)arg)->thread_dead) {
+
+		result = mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+		
 		if(bp->flcount <= 1) {	
 			//prefill	
-			while(bp->flcount < DEFAULT_MIN_QUEUE) {
+			while(bp->flcount < DEFAULT_MID_QUEUE) {
 				//fprintf(stderr,"buffer = %d\n",bp->flcount);
 				ts.tv_sec=0;
 				ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
 				nanosleep(&ts, NULL);
 			}
 		}
-
-
-	//while(result==MAD_FLOW_CONTINUE)
-		result = mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
 	}
 	
 #if ENABLE_LIBAO

@@ -279,12 +279,9 @@ enum mad_flow madoutput(void *data, struct mad_header const *header, struct mad_
 				buffer->bp->flcount*100/BP_SLOT_NUM, \
 				cazzatine[(cazcount++)%4]);
 #endif //ENABLE_DEBUG
-	/*if (buffer->bp->flcount > BP_SLOT_NUM - 2) { 
-		mad_timer_set(&(buffer->timer),0,0,0);
-		mad_timer_add(&(buffer->timer), header->duration);
-	}*/
 	
 	//fprintf(stderr,"%f\n",header->duration);
+	
 
 	return MAD_FLOW_CONTINUE;
 }
