@@ -36,7 +36,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes)
 	else {
 #endif
 		if(s->socktype == UDP)	
-			return sock_udp_read(s->fd,buffer,nbytes);
+			return sock_udp_read(s->fd,buffer,nbytes, &(s->sock_stg), sizeof(s->sock_stg));
 		if(s->socktype == TCP)	
 			return sock_tcp_read(s->fd,buffer,nbytes);
 		return 0;
