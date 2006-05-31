@@ -29,11 +29,21 @@
 
 int Sock_write(Sock *s, void *buffer, int nbytes)
 {
+	int n = 0;
+	socklen_t from_len = sizeof(struct sockaddr_storage);
 
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
-		return sock_SSL_write(s->ssl,buffer,nbytes);
-	else 
-#endif
-		return sock_write(s->fd,buffer,nbytes);
+		n = sock_SSL_write(s->ssl,buffer,nbytes);
+	else { 
+#endif		
+		if(s->socktype == TCP)	
+			n = sock_tcp_write(s->fd,buffer,nbytes);
+		else if ( s->socktype == UDP )
+			n = sock_udp_write(s->fd,buffer,nbytes, &(s->sock_stg), from_len);
+#if HAVE_SSL
+	}
+#endif		if(s->socktype == TCP)	
+	
+	return n;
 }

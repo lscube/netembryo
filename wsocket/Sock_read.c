@@ -25,22 +25,34 @@
  *  
  * */
 
+#include <glib.h>
+#include <glib/gprintf.h>
+
 #include <netembryo/wsocket.h>
 
 int Sock_read(Sock *s, void *buffer, int nbytes)
 {
-	//printf("Sock_read\n");
+	int n = 0;
+	int remote_port = 0;
+	
+	socklen_t from_len = sizeof(struct sockaddr_storage);
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
-		return sock_SSL_read(s->ssl,buffer,nbytes);
+		n = sock_SSL_read(s->ssl,buffer,nbytes);
 	else {
 #endif
-		if(s->socktype == UDP)	
-			return sock_udp_read(s->fd,buffer,nbytes, &(s->sock_stg), sizeof(s->sock_stg));
+		if(s->socktype == UDP) {	
+			n = sock_udp_read(s->fd,buffer,nbytes, &(s->sock_stg), from_len,&remote_port);
+			if (n > 0) { 
+				s->remote_port = g_strdup_printf("%d", remote_port);
+			}
+			
+		}
 		if(s->socktype == TCP)	
-			return sock_tcp_read(s->fd,buffer,nbytes);
-		return 0;
+			n = sock_tcp_read(s->fd,buffer,nbytes);
 #if HAVE_SSL
 	}
 #endif
+	
+	return n;
 }

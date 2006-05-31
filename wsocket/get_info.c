@@ -49,7 +49,8 @@ char * get_local_host(Sock *s)
 {
 	char local_host[128]; /*Unix domain is largest*/
 
-	return addr_ntop(s, local_host, sizeof(local_host));
+	//return addr_ntop(s, local_host, sizeof(local_host));
+	return sock_ntop_host((struct sockaddr *)(&(s->sock_stg)), local_host, sizeof(local_host));
 }
 
 inline int get_local_hostname(Sock *s, char *localhostname, size_t len) //return 0 if ok
@@ -57,21 +58,30 @@ inline int get_local_hostname(Sock *s, char *localhostname, size_t len) //return
 	return getnameinfo((struct sockaddr *)&(s->sock_stg), sizeof(s->sock_stg), localhostname, len, NULL, 0, 0);
 }
 
+/*doesn't work*/
 char * get_remote_port(Sock *s)
 {
 	int32_t port;
 	
 	if(s->remote_port != NULL)
 		return s->remote_port;
-	if((port = sock_get_port((struct sockaddr *)&(s->sock_stg))) < 0)
+	if((port = ntohs(sock_get_port((struct sockaddr *)&(s->sock_stg)))) < 0)
 		return NULL;
 	s->remote_port = g_strdup_printf("%d", port);
 
 	return s->remote_port;
 }
 
-inline char * get_local_port(Sock *s)
+char * get_local_port(Sock *s)
 {
+	int32_t port;
+	
+	if(s->local_port != NULL)
+		return s->local_port;
+	if((port = ntohs(sock_get_port((struct sockaddr *)&(s->sock_stg)))) < 0)
+		return NULL;
+	s->local_port = g_strdup_printf("%d", port);
+
 	return s->local_port;
 }
 

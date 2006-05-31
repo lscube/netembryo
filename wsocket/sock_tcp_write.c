@@ -27,7 +27,7 @@
 
 #include <netembryo/wsocket.h>
 
-int sock_write(int fd, void *buffer, int nbytes)
+int sock_tcp_write(int fd, void *buffer, int nbytes)
 {
         int n;
 

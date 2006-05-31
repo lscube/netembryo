@@ -37,6 +37,7 @@ Sock * Sock_bind(char *host, char *port, int *sock, enum sock_types sock_type, i
 	Sock *s;
 	struct sockaddr_storage stg;
 	socklen_t len=sizeof(struct sockaddr_storage);
+ 	char *local_port = g_strdup(port);	
 #if HAVE_SSL
 	SSL *ssl_con=NULL;
 	if((ssl_flag & USE_SSL) && sock_type==UDP) {
@@ -63,7 +64,7 @@ Sock * Sock_bind(char *host, char *port, int *sock, enum sock_types sock_type, i
 		s->ssl = ssl_con;
 #endif
 	s->flags |= ssl_flag;
-	s->local_port=g_strdup(port);
+	s->local_port=g_strdup(local_port);
 	
 	s->family=sockfd_to_family(*sock);
 
