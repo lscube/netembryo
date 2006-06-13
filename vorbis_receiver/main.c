@@ -55,7 +55,6 @@ static void usage(char *name)
 
 		//\n\t[--minbuf=min_dim_playout_buffer | -m min_dim_playout_buffer] \
 		//\n\t[--maxbuf=max_dim_playout_buffer | -M max_dim_playout_buffer] \
-	
 	return;
 }
 

@@ -41,13 +41,8 @@
 #include <netembryo/wsocket.h>
 #include <programs/vorbis_receiver.h>
 
-
-#if ENABLE_LIBAO
 #include <ao/ao.h>
-#else
-#include <programs/sound.h>
-#endif //ENABLE_LIBAO
-
+#define CONVSIZE 4096
 
 void *read_side(void *arg)
 {
@@ -55,6 +50,7 @@ void *read_side(void *arg)
 	buffer_pool *bp = ((Arg *)arg)->bp;
 	struct timespec ts;
         int result=0;
+        int16_t convbuffer[CONVSIZE];
 
 	while(bp->flcount < DEFAULT_MAX_QUEUE && !((Arg *)arg)->thread_dead) {
 		//fprintf(stderr,"buffer = %d\n",bp->flcount);
@@ -63,27 +59,58 @@ void *read_side(void *arg)
 		nanosleep(&ts, NULL);
 	}
 
-        
+	while(!((Arg *)arg)->thread_dead) {
+            float **pcm;
+            int samples;
+	    
+            if(vorbis_synthesis(&vb,&op)==0) /* test for success! */
+	        vorbis_synthesis_blockin(&vd,&vb);
 
-	while(result != -1 && !((Arg *)arg)->thread_dead) {
-
-		result = 
+	    while((samples=vorbis_synthesis_pcmout(&vd,&pcm))>0){
+	        int j;
+		int clipflag=0;
+		int bout=(samples<CONVSIZE?samples:CONVSIZE);
 		
-		if(bp->flcount <= 1) {	
-			//prefill	
-			while(bp->flcount < DEFAULT_MID_QUEUE) {
-				//fprintf(stderr,"buffer = %d\n",bp->flcount);
-				ts.tv_sec=0;
-				ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
-				nanosleep(&ts, NULL);
-			}
+		/* convert floats to 16 bit signed ints (host order) and
+		   interleave */
+                for(j=0;j<bout;j++){
+		    int16_t *ptr=convbuffer+j;
+		    float  *mono=pcm[i];
+		    for(i=0;i<vi.channels;i++){
+                        int val=mono[i]*32767.f;
+		        /* might as well guard against clipping */
+		        if(val>32767) val=32767;
+		        
+                        if(val<-32768) val=-32768;
+
+		        *ptr=val;
+		        ptr+=vi.channels;
+		    }
+		}		
+		
+        	ao_play(ao_dev, convbuffer, 2*bout*vi.channels);
+		
+		vorbis_synthesis_read(&vd,bout); /* tell libvorbis how
+						   many samples we
+						   actually consumed */	    
+	    }
+
+
+		
+	    if(bp->flcount <= 1) {	
+	    //prefill	
+    		while(bp->flcount < DEFAULT_MID_QUEUE) {
+		//fprintf(stderr,"buffer = %d\n",bp->flcount);
+    	            ts.tv_sec=0;
+    		    ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;
+                    //only to rescale the process
+		    nanosleep(&ts, NULL);
 		}
+	    }
 	}
 	
-#if ENABLE_LIBAO
-	//ao_close(ao_dev);
+	ao_close(ao_dev);
 	ao_shutdown();
-#endif //ENABLE_LIBAO
 
 	free(buffer);
 	((Arg *)arg)->thread_dead = 1;
