@@ -26,10 +26,12 @@
  *  part of code is taken from NeMeSI source code
  * */
 
-#ifndef __SOCKET_H
-#define __SOCKET_H
+#ifndef __WSOCKET_H
+#define __WSOCKET_H
 
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +42,23 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <glib.h>
+
+/** set fnc_log to "fprintf(stderr, ..." if fenice log is not available
+ * TODO: change with something embedded in netembryo 
+ */
+#ifndef FENICE_LOG_FILE_DEFAULT
+#define fnc_log fprintf
+#define FNC_LOG_FATAL stderr
+#define FNC_LOG_ERR stderr
+#define FNC_LOG_WARN stderr
+#define FNC_LOG_INFO stderr
+#define FNC_LOG_DEBUG stderr
+#define FNC_LOG_VERBOSE stderr
+#define FNC_LOG_CLIENT stderr
+#else
+#include <fenice/fnc_log.h>
+#endif
 
 #if HAVE_SSL
 #include <openssl/ssl.h>
@@ -80,19 +99,26 @@ struct sockaddr_storage
 };
 #endif // HAVE_STRUCT_SOCKADDR_STORAGE
 
-/*definition for flags*/
-/*ssl_flags*/
-#define USE_SSL		01 
-//#define USE_TLS	03 /*set also USE_SSL*/
-/*multicast*/
-#define IS_MULTICAST	04
+/** flags definition*/
+typedef enum {
+/** ssl flags */
+	USE_SSL = 0x1,
+	USE_TLS = 0x3, /* set also USE_SSL */
+/** multicast flags */
+	IS_MULTICAST = 0x4
+} sock_flags;
 
-enum sock_types {
-	TCP = 0,
-	UDP = 1
-};
+/** socket type definition */
+typedef enum {
+/** socket fd not valid */
+	SOCK_NONE,
+/** IP based protcols */
+	TCP,
+	UDP,
+	SCTP
+} sock_type;
 
-/* NOTE:
+/** NOTE:
  *	struct ip_mreq {
  *		struct in_addr imr_multiaddr;
  *		struct in_addr imr_interface;
@@ -102,7 +128,7 @@ enum sock_types {
  *		struct in6_addr	ipv6mr_multiaddr;
  *		unsigned int ipv6mr_interface;
  *	}
- * */
+ **/
 
 #if IPV6
 struct ipv6_mreq_in6 {
@@ -137,71 +163,75 @@ union ADDR {
 	#define imr_interface4 NETmreq.imr_interface
 	#define ipv4_multiaddr NETmreq.imr_multiaddr
 
-/* Developper HowTo:
+/** Developer HowTo:
  *
  * union ADDR
  * 		struct ipv6_mreq_in6 mreq_in6
- * 					struct in6_addr ipv6_multiaddr // IPv6 class D multicast address. defined =  NETmreq6.ipv6mr_multiaddr
- * 					struct in6_addr imr_interface6   // IPv6 address of local interface.
- * 					unsigned int ipv6_interface	 // interface index, or 0              
- * 					struct ipv6_mreq NETmreq6
+ * 			struct in6_addr ipv6_multiaddr	// IPv6 class D multicast address. defined =  NETmreq6.ipv6mr_multiaddr
+ * 			struct in6_addr imr_interface6	// IPv6 address of local interface.
+ * 			unsigned int ipv6_interface	// interface index, or 0
+ * 			struct ipv6_mreq NETmreq6
  * 		 struct ip_mreq_in mreq_in
- * 	 				struct in_addr ipv4_multiaddr  // IPv4 class D multicast address. defined = NETmreq.imr_multiaddr
- * 	 				struct in_addr imr_interface4    // IPv4 address of local interface. defined = NETmreq.imr_interface
- * 	 				unsigned int ipv4_interface    // interface index, or 0          
- * 	 				struct ip_mreq NETmreq
+ * 	 		struct in_addr ipv4_multiaddr 	// IPv4 class D multicast address. defined = NETmreq.imr_multiaddr
+ * 	 		struct in_addr imr_interface4	// IPv4 address of local interface. defined = NETmreq.imr_interface
+ * 	 		unsigned int ipv4_interface	// interface index, or 0
+ * 	 		struct ip_mreq NETmreq
  */
 
 typedef struct {
-	int fd;
-	struct sockaddr_storage sock_stg; /*sockname if bind or accept; peername if connect*/
-	enum sock_types socktype; /*TCP, UDP*/ 
-	sa_family_t family; 
+	int fd;	//! stores socket file descriptor
+	struct sockaddr_storage local_stg;	//! from getsockname
+	struct sockaddr_storage remote_stg;	//! from getpeername
+	sock_type socktype;
 	union ADDR addr;
-	/*flags*/
-	int flags; /*USE_SSL, USE_CRYPTO, IS_MULTICAST*/
-	/*human readable datas*/
-	char *remote_port;
-	char *local_port;
+	/** flags */
+	sock_flags flags;
+	/** human readable datas */
 	char *remote_host;
-	/**/
+	char *local_host;
+	in_port_t remote_port;	//! stored in host order
+	in_port_t local_port;	//! stored in host order
 #if HAVE_SSL
 	SSL *ssl;
 #endif
 } Sock;
-
 
 #define WSOCK_ERRORPROTONOSUPPORT -5	
 #define WSOCK_ERRORIOCTL	-4	
 #define WSOCK_ERRORINTERFACE	-3	
 #define WSOCK_ERROR	-2	
 #define WSOCK_ERRFAMILYUNKNOWN	-1
+#define WSOCK_OK 0
 #define WSOCK_ERRSIZE	1
 #define WSOCK_ERRFAMILY	2
 #define WSOCK_ERRADDR	3
 #define WSOCK_ERRPORT	4
 
-/*low level wrapper*/
+/** low level wrappers */
 int sockfd_to_family(int sockfd);
 int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints);
-int sock_connect(char *host, char *port, int *sock, enum sock_types sock_type);
+int sock_connect(char *host, char *port, int *sock, sock_type socktype);
 /*sock_connect_by_fd: connect throught an existed UDP (only!!!)binded socket*/
-int sock_connect_by_fd(char *host, char *port, int sock);
-int sock_bind(char *host, char *port, int *sock, enum sock_types sock_type);
+/* NOTE: Removed after revison */
+//int sock_connect_by_fd(char *host, char *port, int sock);
+int sock_bind(char *host, char *port, int *sock, sock_type socktype);
 int sock_accept(int sock);
 int sock_listen(int s, int backlog);
 //int sock_udp_read(int fd, void *buffer, int nbytes);
-int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len, int *remote_port);
-int sock_udp_write(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len);
+/* NOTE: Removed after revison */
+//int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len, int *remote_port);
+//int sock_udp_write(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len);
 
-int sock_tcp_read(int fd, void *buffer, int nbytes);
-int sock_tcp_write(int fd, void *buffer, int nbytes);
+//int sock_tcp_read(int fd, void *buffer, int nbytes);
+//int sock_tcp_write(int fd, void *buffer, int nbytes);
 
 int sock_close(int s);
 char *sock_ntop_host(const struct sockaddr *sa, /*socklen_t salen,*/ char *str, size_t len);
 
 /*return the port in network byte order (use ntohs to change it)*/
 int32_t sock_get_port(const struct sockaddr *sa);
+
+/*multicast*/
 int16_t is_multicast(union ADDR *addr, sa_family_t family);
 int16_t is_multicast_address(const struct sockaddr *sa, sa_family_t family);
 int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/, const char *ifname, unsigned int ifindex, union ADDR *addr);
@@ -209,53 +239,55 @@ int mcast_leave(int sockfd, const struct sockaddr *sa/*, socklen_t salen*/);
 
 #if HAVE_SSL
 /*ssl wrapper*/
-SSL_CTX *create_ssl_ctx(void); /*SERVER VERSION:*/
-SSL *get_ssl_connection(int sock); /*SERVER VERSION*/
-int sock_SSL_connect(SSL **ssl_con,char *host, char *port, int *sock, enum sock_types sock_type);
-int sock_SSL_bind(/*SSL **ssl_con, */char *host, char *port, int *sock, enum sock_types sock_type);
-int sock_SSL_listen(int s, int backlog);
-int sock_SSL_accept(SSL **ssl_con, int sock);
-int sock_SSL_read(SSL *ssl_con, void *buffer, int nbytes);
-int sock_SSL_write(SSL *ssl_con, void *buffer, int nbytes);
-int sock_SSL_close(SSL *ssl_con);
+SSL_CTX *create_ssl_ctx(void);
+SSL *get_ssl_connection(int);
+int sock_SSL_connect(SSL **, int);
+/* NOTE: Removed after revison */
+//int sock_SSL_bind(/*SSL **ssl_con, */char *host, char *port, int *sock, enum sock_types sock_type);
+//int sock_SSL_listen(int, int);
+int sock_SSL_accept(SSL **, int);
+int sock_SSL_read(SSL *, void *, int);
+int sock_SSL_write(SSL *, void *, int);
+int sock_SSL_close(SSL *);
 #endif
 
 /*medium level Interface*/
-char *addr_ntop(const Sock  *addr, char *str, size_t len);
+/* NOTE: Removed after revison */
+//char *addr_ntop(const Sock *addr, char *str, size_t len);
 
-/*------------------------------------------------- INTERFACE --------------------------------------------------------------*/
-/*TODO: doc them!!!!!*/
-/*up level wrapper*/
-Sock * Sock_connect(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag);
-/*Sock_connect_by_sock: to connect throught a binded socket*/
-Sock * Sock_bind(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag);/*usually host is NULL for unicast. 
-											       For multicast it is the multicast address.
-											       Change it (ifi_xxx, see Stevens Chap.16)*/
-Sock * Sock_accept(Sock *); /*returns the new Sock (like accept which returns the fd create for the new accepted connection*/
-int Sock_create_ssl_connection(Sock *s);
+/** ------------------------------- INTERFACE -------------------------------
+ * TODO: write API specs
+ */
+Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, sock_flags ssl_flag);
+Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag);/* usually host is NULL for unicast.
+										   * For multicast it is the multicast address.
+										   * Change it (ifi_xxx, see Stevens Chap.16) */
+Sock * Sock_accept(Sock *); /* returns pointer to a new Sock structure (generated using POSIX accept) */
+int Sock_create_ssl_connection(Sock *s); /*  */
 int Sock_listen(Sock *n, int backlog);
-int Sock_read(Sock *, void *buffer, int nbytes);
-int Sock_write(Sock *, void *buffer, int nbytes);
+int Sock_read(Sock *, void *buffer, int nbytes, void *protodata); // protodata is sock_type dependant
+int Sock_write(Sock *, void *buffer, int nbytes, void *protodata);
 int Sock_close(Sock *);
-int get_fd(Sock *);
+//int get_fd(Sock *);
+#define get_fd(A) ((A)->fd)
 void Sock_init(void);
 int Sock_compare(Sock *p, Sock *q);
 #define Sock_cmp Sock_compare
 
-/*ioctl set properties for socket
- *RETURN VALUE
- *	Usually, on success zero is returned.  
- *	A few ioctls use the return value as an output parameter and return a nonnegative value on success.  On error, -1 is returned, and errno  is  set
- *	appropriately.
- * */
-int Sock_set_props(int d, int request, int *on);
+/** ioctl set properties for socket
+ *	RETURN VALUE:
+ *	Usually, on success zero is returned. A few ioctls use the return value
+ *	as an output parameter and return a nonnegative value on success.
+ *	On error, -1 is returned, and errno is set appropriately.
+ **/
+int Sock_set_props(Sock *s, int request, int *on);
 
 /*get_info.c*/
 char * get_remote_host(Sock *);
 char * get_local_host(Sock *);
 inline int get_local_hostname(Sock *s, char *localhostname, size_t len); // return 0 if ok
-char * get_remote_port(Sock *);
-char * get_local_port(Sock *);
+in_port_t get_remote_port(Sock *);
+in_port_t get_local_port(Sock *);
 /*----------------------------------------------------------------------------------------------------------------------------*/
  
 #endif
