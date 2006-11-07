@@ -37,70 +37,34 @@
 
 Sock * Sock_accept(Sock *s)
 {
-	int res;
-	struct sockaddr_storage sock_stg;
+	int res = -1;
 	char remote_host[128]; /*Unix Domain is largest*/
-	int32_t remote_port;
-	int32_t local_port;
-	Sock * new_s;
-	socklen_t salen=sizeof(struct sockaddr_storage);
+	int32_t remote_port = -1;
+	int32_t local_port = -1;
+	Sock *new_s = NULL;
+	struct sockaddr *sa_p = NULL;
+	socklen_t sa_len = 0;
 #if HAVE_SSL
-	SSL *ssl_con;
-	if(s->flags & USE_SSL)
-		res = sock_SSL_accept(&ssl_con,s->fd);
-	else
+	SSL *ssl_con = NULL;
 #endif
-	res = sock_accept(s->fd);
 
-	if(res < 0)
-		return NULL;
-	if(getpeername(res,(struct sockaddr *)&sock_stg,&salen)!=0)
-	{
-#if HAVE_SSL
-		if(s->flags & USE_SSL) 
-			sock_SSL_close(ssl_con);	
-#endif
-		printf("Close socket accepted after getpeername\n");
-		return NULL;
-	}
-	if(!sock_ntop_host((struct sockaddr *)&sock_stg, /*sizeof(struct sockaddr_storage),*/ remote_host, sizeof(remote_host)))
-		memset(remote_host,0,sizeof(remote_host));
-
-	remote_port=sock_get_port((struct sockaddr *)&sock_stg);
-	if(remote_port<0) {
-#if HAVE_SSL
-		if(s->flags & USE_SSL) 
-			sock_SSL_close(ssl_con);
-#endif
-		printf("Close socket accepted because remote_port<0\n");
-		sock_close(res);
+	if ((res = sock_accept(s->fd)) < 0) {
+		fnc_log(FNC_LOG_ERR, "System error in sock_accept().\n");
 		return NULL;
 	}
 
-
-	memset(&sock_stg,0,salen);
-	if(getsockname(res,(struct sockaddr *)&sock_stg,&salen)!=0)
-	{
 #if HAVE_SSL
-		if(s->flags & USE_SSL) 
-			sock_SSL_close(ssl_con);	
-#endif
-		return NULL;
+	if(s->flags & USE_SSL) {
+		if(sock_SSL_accept(&ssl_con,res)) {
+			fnc_log(FNC_LOG_ERR, "Unable to accept SSL connection.\n");
+			sock_close(res);
+			return NULL;
+		}
 	}
-
-	local_port=sock_get_port((struct sockaddr *)&sock_stg);
-	if(local_port<0) {
-#if HAVE_SSL
-		if(s->flags & USE_SSL) 
-			sock_SSL_close(ssl_con);
 #endif
-		printf("Close socket accepted because local_port<0\n");
-		sock_close(res);
-		return NULL;
-	}
 
-	new_s = calloc(1,sizeof(Sock));
-	if(!new_s) {
+	if (!(new_s = g_new0(Sock, 1))) {
+		fnc_log(FNC_LOG_ERR, "Unable to allocate a Sock struct in Sock_accept().\n");
 #if HAVE_SSL
 		if(s->flags & USE_SSL) 
 			sock_SSL_close(ssl_con);
@@ -108,19 +72,58 @@ Sock * Sock_accept(Sock *s)
 		sock_close(res);
 		return NULL;
 	}
+
+	new_s->fd = res;
+	new_s->socktype = s->socktype;
+	new_s->flags = s->flags;
+
 #if HAVE_SSL
 	if(s->flags & USE_SSL) 
-		new_s->ssl=ssl_con;
+		new_s->ssl = ssl_con;
 #endif
-	new_s->remote_host=g_strdup(remote_host);
-	new_s->fd=res;
-	new_s->socktype=s->socktype;
-	new_s->flags |= s->flags;
 
-	new_s->remote_port = g_strdup_printf("%d", remote_port);
-	new_s->local_port = g_strdup_printf("%d", local_port);
+	sa_p = (struct sockaddr *) &(new_s->remote_stg);
+	sa_len = sizeof(struct sockaddr_storage);
 
-	memcpy(&(new_s->sock_stg),&sock_stg,salen); /*copy the sockname*/
+	if(getpeername(res, sa_p, &sa_len))
+	{
+		fnc_log(FNC_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
+		Sock_close(new_s);
+		return NULL;
+	}
+
+	if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
+		memset(remote_host, 0, sizeof(remote_host));
 	
+	new_s->remote_host = g_strdup(remote_host);
+
+	remote_port = sock_get_port(sa_p);
+	if(remote_port < 0) {
+		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+		Sock_close(new_s);
+		return NULL;
+	}
+	else
+		new_s->remote_port = ntohs(remote_port);
+
+	sa_p = (struct sockaddr *) &(new_s->remote_stg);
+	sa_len = sizeof(struct sockaddr_storage);
+
+	if(getsockname(res, sa_p, &sa_len))
+	{
+		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+		Sock_close(new_s);
+		return NULL;
+	}
+
+	local_port = sock_get_port(sa_p);
+	if(local_port < 0) {
+		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_accept().\n");
+		Sock_close(new_s);
+		return NULL;
+	}
+	else
+		new_s->local_port = ntohs(local_port);
+
 	return new_s;
 }

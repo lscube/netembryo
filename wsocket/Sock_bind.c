@@ -31,65 +31,64 @@
 #include <glib.h>
 #include <netembryo/wsocket.h>
 
-Sock * Sock_bind(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag)
+Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag)
 {
-	int res;
-	Sock *s;
-	struct sockaddr_storage stg;
-	socklen_t len=sizeof(struct sockaddr_storage);
- 	char *local_port = g_strdup(port);	
-#if HAVE_SSL
-	SSL *ssl_con=NULL;
-	if((ssl_flag & USE_SSL) && sock_type==UDP) {
-		/*SSL - UDP NOT ENABLED*/
-		fprintf(stderr,"SSL over UDP NOT ENABLED\n");
-		return NULL;
-	}
-	if(ssl_flag & USE_SSL) {
-		res = sock_SSL_bind(host, port, sock, sock_type);	
-	}
-	else
-#endif
-		res = sock_bind(host, port, sock, sock_type);
-		
-	if(res!=0)
-		return NULL;
-	s = calloc(1,sizeof(Sock));
-	if (s == NULL)
-		return s;
-	s->fd = *sock;
-	s->socktype = sock_type;
-#if HAVE_SSL
-	if(ssl_flag & USE_SSL) 
-		s->ssl = ssl_con;
-#endif
-	s->flags |= ssl_flag;
-	s->local_port=g_strdup(local_port);
-	
-	s->family=sockfd_to_family(*sock);
 
-	if(getsockname(*sock,(struct sockaddr *)&stg,&len) < 0) {
+	Sock *s = NULL;
+	int sockfd = -1;
+	struct sockaddr *sa_p;
+	socklen_t sa_len;
+	int32_t local_port;
+
+#if HAVE_SSL
+	if ((ssl_flag & USE_SSL) {
+		if(socktype != TCP) {
+			fnc_log(FNC_LOG_ERR, "SSL can't work on this protocol.\n");
+			return NULL;
+		}
+	}
+#endif
+
+	if (sock_bind(host, port, &sockfd, socktype)) {
+		fnc_log(FNC_LOG_ERR, "Error in low level sock_bind().\n");
+		return NULL;
+	}
+
+	if (!(s = g_new0(Sock, 1))) {
+		fnc_log(FNC_LOG_ERR, "Unable to allocate a Sock struct in Sock_bind().\n");
+		sock_close(sockfd);
+		return NULL;
+	}
+
+	s->fd = sockfd;
+	s->socktype = socktype;
+
+	s->flags = ssl_flag;
+
+	sa_p = (struct sockaddr *)&(s->local_stg);
+	sa_len = sizeof(struct sockaddr_storage);
+
+	if(getsockname(s->fd, sa_p, &sa_len) < 0) {
 		Sock_close(s);
 		return NULL;
 	}
 
-	if(is_multicast_address((struct sockaddr *)&stg,s->family)) {
-		//fprintf(stderr,"IS MULTICAST\n");
-		if(sock_type==TCP) {
-			Sock_close(s);
-			/*TCP MULTICAST IS IMPOSSIBLE*/
-			fprintf(stderr,"TCP MULTICAST IS IMPOSSIBLE\n");
-			return NULL;
-		}
+	local_port = sock_get_port(sa_p);
 
-		if(mcast_join(*sock,(struct sockaddr *)&stg,NULL,0,&(s->addr))!=0) {
+	if(local_port < 0) {
+		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_bind().\n");
+		Sock_close(s);
+		return NULL;
+	} else
+		s->local_port = ntohs(local_port);
+
+	if(is_multicast_address(sa_p, s->local_stg.ss_family)) {
+		if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr) )) {
 			Sock_close(s);
 			return NULL;
 		}
 		s->flags |= IS_MULTICAST;
 	}
 
-	memcpy(&(s->sock_stg),&stg,len); /*copy the sockname*/
-	
 	return s;
 }

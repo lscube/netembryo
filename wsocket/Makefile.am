@@ -11,14 +11,9 @@ libwsocket_la_SOURCES =		is_multicast.c \
 				sock_bind.c \
 				sock_close.c \
 				sock_connect.c \
-				sock_connect_by_fd.c \
 				sock_get_port.c \
 				sock_listen.c \
 				sock_ntop_host.c \
-				sock_tcp_read.c \
-				sock_udp_read.c \
-				sock_udp_write.c \
-				sock_tcp_write.c \
 				sockfd_to_family.c
 if HAVE_SSL				
 libwsocket_la_SOURCES +=	create_ssl_ctx.c \
@@ -33,9 +28,7 @@ libwsocket_la_SOURCES +=	create_ssl_ctx.c \
 
 endif
 
-libwsocket_la_SOURCES +=	addr_ntop.c \
-				get_fd.c \
-				get_info.c \
+libwsocket_la_SOURCES +=	get_info.c \
 				Sock_accept.c \
 				Sock_bind.c \
 				Sock_close.c \
@@ -47,6 +40,15 @@ libwsocket_la_SOURCES +=	addr_ntop.c \
 				Sock_read.c \
 				Sock_write.c \
 				Sock_create_ssl_connection.c
+
+#libwsocket_la_SOURCES +=	addr_ntop.c \
+				sock_connect_by_fd.c \
+				sock_tcp_read.c \
+				sock_udp_read.c \
+				sock_udp_write.c \
+				sock_tcp_write.c \
+				sock_connect_by_fd.c \
+				get_fd.c
 
 libwsocket_la_LDFLAGS = -static
 
