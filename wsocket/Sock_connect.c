@@ -62,7 +62,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 #if HAVE_SSL
 	if(ssl_flag & USE_SSL) {
 		if (sock_SSL_connect(&ssl_con))
-			fnc_log ("Sock_connect() failure in SSL init.\n");
+			fnc_log (FNC_LOG_ERR, "Sock_connect() failure in SSL init.\n");
 			sock_close(sockfd);
 			return NULL;
 	}
