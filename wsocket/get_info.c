@@ -34,9 +34,11 @@ char *get_remote_host(Sock *s)
 {
 	char str[128];
 
-	if(!(s->remote_host))
-		if(sock_ntop_host((struct sockaddr *)&(s->remote_stg),str,sizeof(str)))
-			s->remote_host = g_strdup(str);
+	if(!(s->remote_host)) {
+		if(!sock_ntop_host((struct sockaddr *)&(s->remote_stg),str,sizeof(str)))
+			memset(str, 0, sizeof(str));
+		s->remote_host = g_strdup(str);
+	}
 	return s->remote_host;
 }
 
@@ -44,9 +46,11 @@ char *get_local_host(Sock *s)
 {
 	char str[128]; /*Unix domain is largest*/
 
-	if(!(s->local_host))
-		if(sock_ntop_host((struct sockaddr *)&(s->local_stg),str,sizeof(str)))
-			s->local_host = g_strdup(str);
+	if(!(s->local_host)) {
+		if(!sock_ntop_host((struct sockaddr *)&(s->local_stg),str,sizeof(str)))
+			memset(str, 0, sizeof(str));
+		s->local_host = g_strdup(str);
+		}
 	return s->local_host;
 }
 
