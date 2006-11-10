@@ -60,6 +60,12 @@
 #include <fenice/fnc_log.h>
 #endif
 
+/* SSL support need revision, may be broken */
+#ifdef HAVE_SSL
+#undef HAVE_SSL
+#define HAVE_SSL 0
+#endif
+
 #if HAVE_SSL
 #include <openssl/ssl.h>
 #endif
@@ -115,7 +121,9 @@ typedef enum {
 /** IP based protcols */
 	TCP,
 	UDP,
-	SCTP
+	SCTP,
+/** Local socket */
+	LOCAL
 } sock_type;
 
 /** NOTE:
@@ -181,7 +189,7 @@ union ADDR {
 typedef struct {
 	int fd;	//! stores socket file descriptor
 	struct sockaddr_storage local_stg;	//! from getsockname
-	struct sockaddr_storage remote_stg;	//! from getpeername
+	struct sockaddr_storage remote_stg;	//! from getpeername or forced
 	sock_type socktype;
 	union ADDR addr;
 	/** flags */
@@ -211,75 +219,64 @@ typedef struct {
 int sockfd_to_family(int sockfd);
 int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints);
 int sock_connect(char *host, char *port, int *sock, sock_type socktype);
-/*sock_connect_by_fd: connect throught an existed UDP (only!!!)binded socket*/
-/* NOTE: Removed after revison */
-//int sock_connect_by_fd(char *host, char *port, int sock);
 int sock_bind(char *host, char *port, int *sock, sock_type socktype);
 int sock_accept(int sock);
 int sock_listen(int s, int backlog);
-//int sock_udp_read(int fd, void *buffer, int nbytes);
-/* NOTE: Removed after revison */
-//int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len, int *remote_port);
-//int sock_udp_write(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len);
-
-//int sock_tcp_read(int fd, void *buffer, int nbytes);
-//int sock_tcp_write(int fd, void *buffer, int nbytes);
-
 int sock_close(int s);
-const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
 
-/*return the port in network byte order (use ntohs to change it)*/
+/** host & port wrappers */
+/* return the address in human readable string format */
+const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
+/* return the port in network byte order (use ntohs to change it) */
 int32_t sock_get_port(const struct sockaddr *sa);
 
-/*multicast*/
+/** multicast*/
 int16_t is_multicast(union ADDR *addr, sa_family_t family);
 int16_t is_multicast_address(const struct sockaddr *sa, sa_family_t family);
 int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/, const char *ifname, unsigned int ifindex, union ADDR *addr);
 int mcast_leave(int sockfd, const struct sockaddr *sa/*, socklen_t salen*/);
 
 #if HAVE_SSL
-/*ssl wrapper*/
+/** ssl wrappers */
 SSL_CTX *create_ssl_ctx(void);
 SSL *get_ssl_connection(int);
 int sock_SSL_connect(SSL **, int);
-/* NOTE: Removed after revison */
-//int sock_SSL_bind(/*SSL **ssl_con, */char *host, char *port, int *sock, enum sock_types sock_type);
-//int sock_SSL_listen(int, int);
 int sock_SSL_accept(SSL **, int);
 int sock_SSL_read(SSL *, void *, int);
 int sock_SSL_write(SSL *, void *, int);
 int sock_SSL_close(SSL *);
 #endif
 
-/*medium level Interface*/
-/* NOTE: Removed after revison */
-//char *addr_ntop(const Sock *addr, char *str, size_t len);
-
 /** ------------------------------- INTERFACE -------------------------------
  * TODO: write API specs
  */
 Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, sock_flags ssl_flag);
-Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag);/* usually host is NULL for unicast.
-										   * For multicast it is the multicast address.
-										   * Change it (ifi_xxx, see Stevens Chap.16) */
-Sock * Sock_accept(Sock *); /* returns pointer to a new Sock structure (generated using POSIX accept) */
-int Sock_create_ssl_connection(Sock *s); /*  */
+/* usually host is NULL for unicast. For multicast it is the multicast address.
+* Change it (ifi_xxx, see Stevens Chap.16) */
+Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag);
+/* returns pointer to a new Sock structure (generated using POSIX accept) */
+Sock * Sock_accept(Sock *); 
+int Sock_create_ssl_connection(Sock *s);
 int Sock_listen(Sock *n, int backlog);
 int Sock_read(Sock *, void *buffer, int nbytes, void *protodata); // protodata is sock_type dependant
 int Sock_write(Sock *, void *buffer, int nbytes, void *protodata);
 int Sock_close(Sock *);
-//int get_fd(Sock *);
-#define get_fd(A) ((A)->fd)
 void Sock_init(void);
-int Sock_compare(Sock *p, Sock *q);
+int Sock_compare(Sock *, Sock *);
 #define Sock_cmp Sock_compare
+int Sock_socketpair(Sock *[]);
+int Sock_set_dest(Sock *, struct sockaddr *);
+
+/** low level access macro */
+#define Sock_fd(A) ((A)->fd)
+#define Sock_type(A) ((A)->socktype)
 
 /** ioctl set properties for socket
  *	RETURN VALUE:
  *	Usually, on success zero is returned. A few ioctls use the return value
  *	as an output parameter and return a nonnegative value on success.
  *	On error, -1 is returned, and errno is set appropriately.
- **/
+ */
 int Sock_set_props(Sock *s, int request, int *on);
 
 /*get_info.c*/
