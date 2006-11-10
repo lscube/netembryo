@@ -60,6 +60,9 @@ socklen_t sa_len = sizeof(struct sockaddr_storage);
 				 0, (struct sctp_sndrcvinfo *) protodata, NULL);
 #endif
 			break;
+		case LOCAL:
+			return recv(s->fd, buffer, nbytes, 0);
+			break;
 		default:
 			break;
 		}
