@@ -30,7 +30,7 @@
 
 #include <netembryo/wsocket.h>
 
-int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata)
+int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 {
 
 socklen_t sa_len = sizeof(struct sockaddr_storage);
@@ -45,11 +45,11 @@ socklen_t sa_len = sizeof(struct sockaddr_storage);
 			if (!protodata) {
 				return -1;
 			}
-			return recvfrom(s->fd, buffer, nbytes, 0,
+			return recvfrom(s->fd, buffer, nbytes, flags,
 				(struct sockaddr *) protodata, &sa_len);
 			break;
 		case TCP:
-			return read(s->fd, buffer, nbytes);
+			return recv(s->fd, buffer, nbytes, flags);
 			break;
 		case SCTP:
 #ifdef HAVE_SCTP_FENICE
@@ -57,11 +57,16 @@ socklen_t sa_len = sizeof(struct sockaddr_storage);
 				return -1;
 			}
 			return sctp_recvmsg(transport->fd, buffer, nbytes, NULL,
-				 0, (struct sctp_sndrcvinfo *) protodata, NULL);
+				 0, (struct sctp_sndrcvinfo *) protodata, &flags);
+			/* flags is discarted: usage may include detection of
+			 * incomplete packet due to small buffer or detection of
+			 * notification data (this last should be probably
+			 * handled inside netembryo).
+			 */
 #endif
 			break;
 		case LOCAL:
-			return recv(s->fd, buffer, nbytes, 0);
+			return recv(s->fd, buffer, nbytes, flags);
 			break;
 		default:
 			break;

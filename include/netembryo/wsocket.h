@@ -258,8 +258,8 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 Sock * Sock_accept(Sock *); 
 int Sock_create_ssl_connection(Sock *s);
 int Sock_listen(Sock *n, int backlog);
-int Sock_read(Sock *, void *buffer, int nbytes, void *protodata); // protodata is sock_type dependant
-int Sock_write(Sock *, void *buffer, int nbytes, void *protodata);
+int Sock_read(Sock *, void *buffer, int nbytes, void *protodata, int flags); // protodata is sock_type dependant
+int Sock_write(Sock *, void *buffer, int nbytes, void *protodata, int flags);
 int Sock_close(Sock *);
 void Sock_init(void);
 int Sock_compare(Sock *, Sock *);

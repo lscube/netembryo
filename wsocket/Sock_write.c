@@ -27,7 +27,7 @@
 
 #include <netembryo/wsocket.h>
 
-int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata)
+int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 {
 #ifdef HAVE_SCTP_FENICE
 	struct sctp_sndrcvinfo sinfo;
@@ -40,13 +40,13 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata)
 #endif		
 		switch (s->socktype) {
 		case TCP:
-			return write(s->fd, buffer, nbytes);
+			return send(s->fd, buffer, nbytes, flags);
 			break;
 		case UDP:
 			if (!protodata) {
 				protodata = &(s->remote_stg);
 			}
-			return sendto(s->fd, buffer, nbytes, 0, (struct sockaddr *) 
+			return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *) 
 					protodata, sizeof(struct sockaddr_storage));
 			break;
 		case SCTP:
@@ -56,11 +56,11 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata)
 				memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
 			}
 			return sctp_send(s->fd, buffer, nbytes, 
-				(struct sctp_sndrcvinfo *) protodata, MSG_EOR);
+				(struct sctp_sndrcvinfo *) protodata, flags);
 #endif
 			break;
 		case LOCAL:
-			return send(s->fd, buffer, nbytes, MSG_DONTWAIT | MSG_EOR);
+			return send(s->fd, buffer, nbytes, flags);
 			break;
 		default:
 			break;
