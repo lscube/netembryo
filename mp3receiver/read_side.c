@@ -69,7 +69,7 @@ void *read_side(void *arg)
 			 0 /*error*/, 0 /* message */ );
 	buffer->decoder = &decoder;
 
-	while(bp->flcount < DEFAULT_MIN_QUEUE && !((Arg *)arg)->thread_dead) {
+	while(bp->flcount < DEFAULT_MAX_QUEUE && !((Arg *)arg)->thread_dead) {
 		//fprintf(stderr,"buffer = %d\n",bp->flcount);
 		ts.tv_sec=0;
 		ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process

@@ -264,7 +264,7 @@ stream:
 		if(time1>0.0 ) {
 			while((mnow - time1) < pktlen * 1000) {
 				ts.tv_sec=0;
-				ts.tv_nsec = 1;pktlen * 1000000;
+				ts.tv_nsec = pktlen * 1000000;
 				//nanosleep(&ts, NULL);
 				gettimeofday(&now,NULL);
 				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
@@ -277,7 +277,7 @@ stream:
 
 
 		fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
-			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp);
+			maddr, port, properties->bit_rate, properties->sample_rate, timestamp);
 	} while(res!=ERR_EOF);
 
 	if(loop) {
