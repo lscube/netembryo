@@ -11,7 +11,7 @@ mp3receiver_SOURCES =	main.c \
 mp3receiver_LDADD =		$(top_srcdir)/rtp/librtp.la 
 mp3receiver_LDADD +=		$(top_srcdir)/wsocket/libwsocket.la 
 mp3receiver_LDADD +=		$(top_srcdir)/mpglib/libmpglib.la 
-mp3receiver_LDADD +=		$(top_srcdir)/buffer/libbuffer.la 
+mp3receiver_LDADD +=		$(top_srcdir)/bufferpool/libbuffpool.la 
 mp3receiver_LDADD +=		$(top_srcdir)/sound/libsound.la 
 
 mp3receiver_LDADD += @GLIB_LIBS@

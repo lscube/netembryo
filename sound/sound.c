@@ -117,6 +117,8 @@ static int sound_oss_open(int direction)
 {
 	int soundfd;
 	int format;
+	//chicco
+	int arg = 0x7fff0004; //http://www.opensound.com/pguide/index.html
 
 	soundfd = open("/dev/dsp", direction);
 	if (soundfd == -1) {
@@ -147,6 +149,12 @@ static int sound_oss_open(int direction)
 	if (ioctl(soundfd, SNDCTL_DSP_SPEED, &speed) < 0) {
 		//gphone_perror_exit("*** sound_open : SNDCTL_DSP_SPEED", 2);
 	}
+
+	//chicco
+	if (ioctl(soundfd, SNDCTL_DSP_SETFRAGMENT, &arg)) { 
+		//fprintf(stderr,"ioctl error for sound card fd\n");
+	}
+
 
 	return soundfd;
 }

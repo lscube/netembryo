@@ -29,7 +29,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <glib.h>
 #include <getopt.h>
 
 #include <unistd.h>
@@ -40,8 +39,8 @@
 
 
 #include <programs/mp3receiver.h>
-#include <programs/thread-queue.h>
 #include <programs/sound.h>
+#include <nemesi/bufferpool.h>
 #include <netembryo/wsocket.h>
 
 static void usage()
@@ -49,7 +48,7 @@ static void usage()
 	fprintf(stderr, "\nmp3receiver \
 		\n\t--port=multicast-port | -p multicast-port (port) \
 		\n\t--addr=multicast_address | -a multicast_address (ip multicast address) \
-		\n\t[--minbuf=min_dim_playout_buffer | -m min dim playout buffer] \
+		\n\t[--minbuf=min_dim_playout_buffer | -m min_dim_playout_buffer] \
 		\n\t[--maxbuf=max_dim_playout_buffer | -M max_dim_playout_buffer] \
 		\n\t[-t | --tcp (rtp over tcp; default udp) ] \
 		\n\n\r");
@@ -77,6 +76,15 @@ int main(int argc, char **argv)
 	int n;
 	static const char short_options[] = "a:p:m:M:st";
 	int32_t nerr = 0;	/*number of error */
+	//NETWORK OPTIONS
+	int type=UDP;	
+	int flag;
+	char port[6];
+	char maddr[128];
+	Sock *s;
+	int sock;
+	int min_queue=0, max_queue=0;
+	Arg *threadarg;
 
 #ifdef HAVE_GETOPT_LONG
 	static struct option long_options[] = {
@@ -89,16 +97,6 @@ int main(int argc, char **argv)
 		{"help",   0, 0, '?'},
 		{0, 0, 0, 0}
 	};
-	
-	//NETWORK OPTIONS
-	int type=UDP;	
-	int flag;
-	char port[6];
-	char maddr[128];
-	Sock *s;
-	int sock;
-	int min_queue=0, max_queue=0;
-	Arg *threadarg;
 
 	while ((n = getopt_long(argc, argv, short_options, long_options, NULL)) != -1)
 #else
@@ -165,14 +163,50 @@ int main(int argc, char **argv)
 	threadarg->min_queue = min_queue;
 	threadarg->max_queue = max_queue;
 
-	if (!g_thread_supported ()) 
-		g_thread_init (NULL);//g_thread is used in buffer module
-	else {
-		fprintf(stderr,"gthread not supported \n");
+	Sock_init();
+
+	s = Sock_bind(maddr, port, &sock, type, flag);	
+	if(s == NULL) {
+		Sock_close(s);
+		free(threadarg);
+		printf("Sock_bind returns NULL\n");
+		exit(1);
+	}		
+	threadarg->sock=s;
+
+	if((threadarg->bp=calloc(1,sizeof(buffer_pool))) == NULL) {
+		Sock_close(s);
+		free(threadarg);
+		printf("Memory error: it is impossible to allocate memory for bufferpool\n");
+		exit(1);
+	
+	}
+	if(bpinit(threadarg->bp)) {
+		Sock_close(s);
+		free(threadarg->bp);
+		free(threadarg);
+		printf("Memory error: it is impossible to allocate memory for bufferpool\n");
+		exit(1);
+	}
+		
+	if((threadarg->pb=calloc(1,sizeof(playout_buff))) == NULL) {
+		bpkill(threadarg->bp);
+		free(threadarg->bp);
+		Sock_close(s);
+		free(threadarg);
+		printf("Memory error: it is impossible to allocate memory for playout buffer\n");
 		exit(1);
 	}
 
-	Sock_init();
+	if(poinit(threadarg->pb,threadarg->bp)) {
+		bpkill(threadarg->bp);
+		free(threadarg->bp);
+		free(threadarg->pb);
+		Sock_close(s);
+		free(threadarg);
+		exit(1);
+	}
+
 	sound_init();
 	if (Half_Flag) {
 		set_sound_duplex(HALF_DUPLEX);
@@ -180,34 +214,36 @@ int main(int argc, char **argv)
 		set_sound_duplex(FULL_DUPLEX);
 	}
 	set_sound_eight_bit(Eight_Flag);
-
-	threadarg->queue = thread_queue_new();
 	
-	s = Sock_bind(maddr, port, &sock, type, flag);	
-	if(s == NULL) {
-		printf("Sock_bind returns NULL\n");
-		exit(1);
-	}		
-	threadarg->sock=s;
-
 	if ((rtn = pthread_create(&write_buffer_thread, NULL, write_side,
                             (void *) threadarg))) {
 		fprintf(stderr, "pthread_create talk_thread: %s\n", strerror(rtn));
+		bpkill(threadarg->bp);
+		free(threadarg->bp);
+		free(threadarg->pb);
+		Sock_close(s);
+		free(threadarg);
 		exit(1);
 	}
-	while(thread_queue_length(threadarg->queue)<=threadarg->min_queue);
-	//wait for prefilling
 
 	if ((rtn = pthread_create(&read_buffer_thread, NULL, read_side,
                             (void *) threadarg))) {
 		fprintf(stderr, "pthread_create listen_thread: %s\n", strerror(rtn));
+		bpkill(threadarg->bp);
+		free(threadarg->bp);
+		free(threadarg->pb);
+		Sock_close(s);
+		free(threadarg);
 		exit(1);
 	}
 
   	pthread_join(write_buffer_thread, NULL);
 	pthread_join(read_buffer_thread, NULL);
 
-	thread_queue_free(threadarg->queue);
+	Sock_close(s);
+	bpkill(threadarg->bp);
+	free(threadarg->bp);
+	free(threadarg->pb);
 	free(threadarg);
 
 	return 0;

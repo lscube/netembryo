@@ -30,11 +30,12 @@
 
 #include <config.h>
 #include <sys/types.h>
-#include <programs/thread-queue.h>
 #include <netembryo/wsocket.h>
+#include <nemesi/bufferpool.h>
 
 typedef struct ARG {
-	Thread_Queue queue;
+	buffer_pool *bp;
+	playout_buff *pb;
 	Sock *sock;
 	int min_queue;
 	int max_queue;
@@ -48,11 +49,6 @@ typedef struct ARG {
 #define MAX_BUFFER_OUT 8192
 
 #define MAX_BUFFER 16384 
-
-typedef struct MYSLOT {
-	char buffer[MAX_BUFFER];
-	size_t len;
-}MySlot;
 
 void *write_side(void *arg);
 void *read_side(void *arg);

@@ -1,8 +1,8 @@
+
 ------------------------------------------------------------------------
-r18 | federico | 2006-01-19 18:36:47 +0100 (gio, 19 gen 2006) | 3 lines
+ | chicco | 2006-01-27 19:41:27 +0100
 
-Alpha state, but usable yet.
-
+New bufferpool (used as playoutbuffer in mp3receiver) taken from NeMeSI
 
 ------------------------------------------------------------------------
  | chicco | 2006-01-18 19:41:27 +0100

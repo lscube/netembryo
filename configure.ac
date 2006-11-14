@@ -220,7 +220,7 @@ AC_SUBST(netembryo_bin)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([buffer/Makefile])
+AC_CONFIG_FILES([bufferpool/Makefile])
 AC_CONFIG_FILES([sound/Makefile])
 AC_CONFIG_FILES([mpglib/Makefile])
 AC_CONFIG_FILES([mp3streamer/Makefile])

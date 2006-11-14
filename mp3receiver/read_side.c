@@ -27,14 +27,13 @@
 
 #include <config.h>
 #include <stdio.h>
-#include <glib.h>
 #include <pthread.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#include <nemesi/bufferpool.h>
 #include <programs/sound.h>
-#include <programs/thread-queue.h>
 #include <programs/mp3receiver.h>
 #include <../mpglib/mpglib.h>
 #include <../mpglib/mpg123.h>
@@ -45,9 +44,6 @@
 
 void *read_side(void *arg)
 {
-	Thread_Queue queue;
-	gpointer buffer;
-	MySlot *buf;
 	int ret;	
 	size_t size,len;
 	char out[MAX_BUFFER_OUT];
@@ -57,8 +53,8 @@ void *read_side(void *arg)
 	struct timespec ts;
 	unsigned long int sleep_time=0;
 	unsigned int frame_size;
-	int max_queue = ((Arg *)arg)->max_queue;
-	int min_queue = ((Arg *)arg)->min_queue;
+	playout_buff *po = ((Arg *)arg)->pb;
+	buffer_pool *bp = ((Arg *)arg)->bp;
 
 	//BITRATE = tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]
 	int tabsel_123[2][3][16] = {
@@ -78,62 +74,48 @@ void *read_side(void *arg)
 	char cazzatine[4] = { '\\' , '|' , '/' , '-'};
 	unsigned short cazcount=0;
 
-	queue = ((Arg *)arg)->queue;
+	//queue = ((Arg *)arg)->queue;
 	
 	InitMP3(&mp);
 	while(1) {
-		if(thread_queue_length(queue) ) {
-			buffer=thread_queue_head(queue);
-			thread_queue_remove(queue);
-			buf=(MySlot *)buffer;
+		
+		if(((Arg *)arg)->pb->potail == -1)	
+			continue;
 
-			len =buf->len; 
-			if(len <= 0)
-				continue;
-
-			ret = decodeMP3( &mp, (buf->buffer) + HEADERSIZE, len - HEADERSIZE, out, MAX_BUFFER_OUT, &size );
-			
-			// packet len
-		        if (mp.fr.lay == 1) // layer 1
-				frame_size = 384;
-			else // layer 2 or 3
-				frame_size = 1152;
-			
-			if(!sound_in_use()) {
-				if(mp.fr.stereo!=MPG_MD_MONO)
-					set_stereo_mode();
-				set_speed(freqs[mp.fr.sampling_frequency]);
-				hand = sound_open(direction);
-			}
-			while(ret == MP3_OK) {
-				write_samples(hand, (void *)out, size);
-				ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
-			}
+		ret = decodeMP3( &mp, (char *)(&(*po->bufferpool)[po->potail]) + HEADERSIZE, (po->pobuff[po->potail]).pktlen - HEADERSIZE, out, MAX_BUFFER_OUT, &size );
+		
+	
+		bprmv(bp,po,po->potail);
+		// packet len
+	        if (mp.fr.lay == 1) // layer 1
+			frame_size = 384;
+		else // layer 2 or 3
+			frame_size = 1152;
+		
+		if(!sound_in_use()) {
+			if(mp.fr.stereo!=MPG_MD_MONO)
+				set_stereo_mode();
+			set_speed(freqs[mp.fr.sampling_frequency]);
+			hand = sound_open(direction);
+		}
+		while(ret == MP3_OK) {
+			write_samples(hand, (void *)out, size);
+			ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
+		}
 
 				
-			sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) * 1000000000;
-#if ENABLE_DEBUG
-			fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld buffer: %d [%c] \r", \
-					tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
-					freqs[mp.fr.sampling_frequency],\
-					thread_queue_length(queue), cazzatine[cazcount%4]);
-#else
-			fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld [%c] \r", \
-					tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
-					freqs[mp.fr.sampling_frequency],\
-					cazzatine[cazcount%4]);
-#endif
-			cazcount++;
+		sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) *  950000000;
+
+		fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld [%c] \r", \
+				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
+				freqs[mp.fr.sampling_frequency],\
+				cazzatine[cazcount%4]);
+		cazcount++;
 			
-			//wait
-			ts.tv_sec=0;
-			ts.tv_nsec = sleep_time;
-			nanosleep(&ts, NULL);
-		}	
-		else {
-			while(thread_queue_length(queue)<= min_queue + 1);
-			//wait for prefilling
-		}
+		//wait
+		ts.tv_sec=0;
+		ts.tv_nsec = sleep_time;
+		nanosleep(&ts, NULL);
 	}
 
 	return NULL;
