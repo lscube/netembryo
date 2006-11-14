@@ -190,7 +190,9 @@ int sock_connect_by_fd(char *host, char *port, int sock);
 int sock_bind(char *host, char *port, int *sock, enum sock_types sock_type);
 int sock_accept(int sock);
 int sock_listen(int s, int backlog);
-int sock_udp_read(int fd, void *buffer, int nbytes);
+//int sock_udp_read(int fd, void *buffer, int nbytes);
+int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, int from_len);
+
 int sock_tcp_read(int fd, void *buffer, int nbytes);
 int sock_write(int fd, void *buffer, int nbytes);
 int sock_close(int s);
