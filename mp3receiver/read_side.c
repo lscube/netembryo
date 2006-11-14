@@ -50,6 +50,8 @@ void *read_side(void *arg)
 	int ret;	
 	size_t size;
 	char out[MAX_BUFFER_OUT];
+	char finalout[MAX_BUFFER];
+	int finalsize = 0;
 	struct mpstr mp;
 	playout_buff *po = ((Arg *)arg)->pb;
 	buffer_pool *bp = ((Arg *)arg)->bp;
@@ -106,6 +108,7 @@ void *read_side(void *arg)
 		}
 
 		ret = decodeMP3( &mp, (char *)(&(*po->bufferpool)[po->potail]) + HEADERSIZE, (po->pobuff[po->potail]).pktlen - HEADERSIZE, out, MAX_BUFFER_OUT, &size );
+		finalsize=0;
 
 		if(ret != MP3_OK)
 			continue;
@@ -132,16 +135,25 @@ void *read_side(void *arg)
 		}
 	
 		while(ret == MP3_OK) {
-			ao_play(ao_dev, (void *)out, size); 
+			if(finalsize+size > sizeof(finalout)) {
+				ao_play(ao_dev, (void *)finalout, finalsize); 
+				finalsize=0;
+			}
+			//ao_play(ao_dev, (void *)out, size); 
+			memcpy(finalout+finalsize,out,size);
+			finalsize+=size;
 			ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
 		}
+		if(finalsize > 0) 
+			ao_play(ao_dev, (void *)finalout, finalsize); 
 
-		fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - buffer: %d%% [%c] \r", \
+		/*
+		 fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - buffer: %d%% [%c] \r", \
 				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
 				freqs[mp.fr.sampling_frequency], bp->flcount*100/BP_SLOT_NUM, \
 				cazzatine[cazcount%4]);
 		cazcount++;
-			
+		*/	
 		gettimeofday(&now,NULL);
 		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
 		if(bp->flcount < (DEFAULT_MAX_QUEUE - 1)) { //wow fear of buffer overflow!! Don't sleep... 
