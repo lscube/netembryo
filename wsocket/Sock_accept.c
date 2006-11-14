@@ -1,5 +1,5 @@
 /* * 
- *  $Id$
+ *  $Id: Sock_accept.c 46 2006-11-10 15:50:54Z dario $
  *  
  *  This file is part of NetEmbryo 
  *
@@ -120,7 +120,7 @@ Sock * Sock_accept(Sock *s)
 	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
 		memset(local_host, 0, sizeof(local_host));
 
-	s->local_host = g_strdup(local_host);
+	new_s->local_host = g_strdup(local_host);
 
 	local_port = sock_get_port(sa_p);
 	if(local_port < 0) {
@@ -132,8 +132,8 @@ Sock * Sock_accept(Sock *s)
 		new_s->local_port = ntohs(local_port);
 
 	fnc_log(FNC_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
-		"remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
-		s->remote_port);
+		"remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
+		new_s->remote_host, new_s->remote_port);
 
 	return new_s;
 }
