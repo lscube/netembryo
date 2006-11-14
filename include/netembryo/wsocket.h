@@ -226,7 +226,7 @@ int sock_listen(int s, int backlog);
 //int sock_tcp_write(int fd, void *buffer, int nbytes);
 
 int sock_close(int s);
-char *sock_ntop_host(const struct sockaddr *sa, /*socklen_t salen,*/ char *str, size_t len);
+const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
 
 /*return the port in network byte order (use ntohs to change it)*/
 int32_t sock_get_port(const struct sockaddr *sa);
@@ -285,7 +285,7 @@ int Sock_set_props(Sock *s, int request, int *on);
 /*get_info.c*/
 char * get_remote_host(Sock *);
 char * get_local_host(Sock *);
-inline int get_local_hostname(Sock *s, char *localhostname, size_t len); // return 0 if ok
+inline int get_local_hostname(char *localhostname, size_t len); // return 0 if ok
 in_port_t get_remote_port(Sock *);
 in_port_t get_local_port(Sock *);
 /*----------------------------------------------------------------------------------------------------------------------------*/
