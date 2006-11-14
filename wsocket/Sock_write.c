@@ -36,7 +36,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata)
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
 		return sock_SSL_write(s->ssl, buffer, nbytes);
-	else { 
+	else {
 #endif		
 		switch (s->socktype) {
 		case TCP:
@@ -58,6 +58,9 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata)
 			return sctp_send(s->fd, buffer, nbytes, 
 				(struct sctp_sndrcvinfo *) protodata, MSG_EOR);
 #endif
+			break;
+		case LOCAL:
+			return send(s->fd, buffer, nbytes, MSG_DONTWAIT | MSG_EOR);
 			break;
 		default:
 			break;
