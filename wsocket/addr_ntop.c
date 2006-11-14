@@ -25,35 +25,28 @@
  *  
  * */
 
-#ifndef _MP3RECEIVERH
-#define _MP3RECEIVERH
-
-#include <config.h>
-#include <sys/types.h>
 #include <netembryo/wsocket.h>
-#include <nemesi/bufferpool.h>
 
-typedef struct ARG {
-	buffer_pool *bp;
-	playout_buff *pb;
-	Sock *sock;
-	int min_queue;
-	int max_queue;
-	int thread_dead;
-} Arg;
-
-
-#include <pthread.h>
-
-#define DEFAULT_MIN_QUEUE ( (BP_SLOT_NUM < 10)?(BP_SLOT_NUM) : (BP_SLOT_NUM / 10) ) 
-#define DEFAULT_MAX_QUEUE BP_SLOT_NUM
-#define DEFAULT_MID_QUEUE ( DEFAULT_MAX_QUEUE / 2 )
-
-#define MAX_BUFFER_OUT 8192
-
-#define MAX_BUFFER ( 8192 * 4 ) 
-
-void *write_side(void *arg);
-void *read_side(void *arg);
-
+char *addr_ntop(const Sock  *addr, char *str, size_t len)
+{
+        switch (addr->family) {
+                case AF_INET:
+                        if (inet_ntop(AF_INET, &addr->addr.mreq_in.imr_interface4, str, len) == NULL)
+                                return(NULL);
+                        return(str);
+                        break;
+#ifdef  IPV6
+                case AF_INET6:
+                        if (inet_ntop(AF_INET6, &addr->addr.mreq_in6.imr_interface6, str, len) == NULL)
+                                return(NULL);
+                        return(str);
+                        break;
 #endif
+
+                default:
+                        //snprintf(str, len, "addr_ntop: unknown AF_xxx: %d", addr->family);
+                        return(str);
+        }
+        return (NULL);
+}
+

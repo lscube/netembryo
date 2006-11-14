@@ -1,14 +1,14 @@
-/* *
+/* * 
+ *  $Id$
+ *  
+ *  This file is part of NetEmbryo 
  *
+ * NetEmbryo -- default network wrapper 
  *
- *  This file is part of NetEmbryo
- *
- *  NetEmbryo -- default network wrapper
- *
- *  Copyright (C) 2006 by
- *
- *      - Dario Gallucci	<dario.gallucci@gmail.com>
- *
+ *  Copyright (C) 2005 by
+ *  	
+ *	- Federico Ridolfo	<federico.ridolfo@polito.it>
+ * 
  *  NetEmbryo is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -22,27 +22,17 @@
  *  You should have received a copy of the GNU General Public License
  *  along with NetEmbryo; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ *  
  * */
 
 #include <netembryo/wsocket.h>
 
-int Sock_set_dest(Sock *s, struct sockaddr *sa) {
+int sock_write(int fd, void *buffer, int nbytes)
+{
+        int n;
 
-	if (s->socktype != UDP) {
-		fnc_log(FNC_LOG_ERR, "Only UDP socket can change destination address\n");
-		return -1;
-	}
+        n = write(fd, buffer, nbytes);
 
-	switch (sa->sa_family) {
-	case AF_INET:
-		memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in));
-		break;
-	case AF_INET6:
-		memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in6));
-		break;
-	default:
-		break;
-	}
-	return 0;
+        return n;
 }
+

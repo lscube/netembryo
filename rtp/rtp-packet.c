@@ -16,15 +16,15 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   
-  $Id:rtp-packet.c 3 2005-12-06 10:40:45Z federico $
+  $Id: rtp-packet.c,v 1.3 2001/05/07 18:55:06 dreier Exp $
 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#include <programs/rtp-packet.h>
-#include <programs/rtp.h>
+#include <netembryo/rtp-packet.h>
+#include <netembryo/rtp.h>
 #include <netembryo/wsocket.h>
 
 #include <stdlib.h>

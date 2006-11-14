@@ -25,29 +25,28 @@
  *  
  * */
 
-#include <glib.h>
+//#include <openssl/ssl.h>
 #include <netembryo/wsocket.h>
-#include <netinet/in.h>
 
-inline char * get_remote_host(Sock *s)
+int sock_SSL_bind(/*SSL **ssl_con, */char *host, char *port, int *sock, enum sock_types sock_type)
 {
-	return s->remote_host;
+	int res=0;
+	//SSL_CTX *ssl_ctx = NULL;
+	
+	if((res=sock_bind(host,port,sock,sock_type))!=0)
+		return WSOCK_ERROR;
+/*	
+	ssl_ctx=create_ssl_ctx();
+	if(!ssl_ctx)
+		return WSOCK_ERROR;
+	*ssl_con = SSL_new(ssl_ctx);
+	if(!(*ssl_con)) {
+		SSL_CTX_free(ssl_ctx);
+		return WSOCK_ERROR;
+	}
+	SSL_set_fd (*ssl_con, *sock);
+	
+	SSL_get_cipher (*ssl_con);
+*/
+	return res; 
 }
-
-char * get_local_host(Sock *s)
-{
-	char local_host[128]; /*Unix domain is largest*/
-
-	return addr_ntop(s, local_host, sizeof(local_host));
-}
-
-inline char * get_remote_port(Sock *s)
-{
-	return s->remote_port;
-}
-
-inline char * get_local_port(Sock *s)
-{
-	return s->local_port;
-}
-

@@ -1,8 +1,7 @@
 CREDITS
-	- some pieces of code are taken from NeMeSI streaming client (http://streaming.polito.it/client). Thanks shawill and mancho!!!
+	- some pieces of code are taken from NeMeSI streaming client (http://streaming.polito.it/client). Thanks shawill an mancho!!!
 	- a great smack to shawill for his indispensable help
 	- some pieces of code are taken from Richard Stevens source code of UNIX Network Programming, Volume 1 and/or Volume 2, Second Edition, Prentice Hall, 1998.
-	- rtp library is taken from librtp-0.1 (with some modifications)  
 
 AUTHORS
 	- Federico Ridolfo (chicco) federico_dot_ridolfo_at_polito_dot_it

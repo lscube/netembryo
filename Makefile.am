@@ -1,27 +1,8 @@
-SUBDIRS =	wsocket \
-		sound \
-		bufferpool \
-		randomize \
-		rtp mpglib \
-		mp3receiver \
-		mp3streamer \
-		mpeg12streamer \
-		src \
-		var 
-
-ACLOCAL_AMFLAGS = -I m4
-
-#if HAVE_VORBIS
-#SUBDIRS += 	vorbis_receiver \
-#		vorbis_streamer 
-#endif
-#if HAVE_THEORA
-#SUBDIRS +=	theora_streamer \
-#		theora_receiver
-#endif
+SUBDIRS =	wsocket randomize rtp mp3streamer mpeg12streamer src var 
 
 EXTRA_DIST = 	config \
 		include 
+
 
 install-exec-hook:
 
@@ -38,7 +19,7 @@ distclean-local:
 		rm -rf autom4te.cache; \
 	fi
 
-MAINTAINER_FILES = acinclude.m4 aclocal.m4 config.h.in* configure Makefile.in mkinstalldirs error.log m4/* 
+MAINTAINER_FILES = acinclude.m4 aclocal.m4 config.h.in* configure Makefile.in mkinstalldirs error.log 
 MAINTAINER_DIRS = config
 
 maintainer-clean-local:

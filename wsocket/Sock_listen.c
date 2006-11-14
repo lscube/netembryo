@@ -29,5 +29,11 @@
 
 int Sock_listen(Sock *s, int backlog)
 {
-	return sock_listen(s->fd, backlog);
+
+#if HAVE_SSL
+	if(s->flags & USE_SSL)
+		return sock_SSL_listen(s->fd,backlog);
+	else
+#endif
+	return sock_listen(s->fd,backlog);
 }

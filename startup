@@ -2,4 +2,4 @@
 
 user=`/usr/bin/whoami`
 #./autogen.sh && ./configure --prefix=/home/$user/netembryo --localstatedir=/home/$user/netembryo/var --with-ssl --enable-warnings --enable-debug && ./build
-./autogen.sh && ./configure --prefix=/home/$user/netembryo --localstatedir=/home/$user/netembryo/var --enable-warnings --enable-debug --enable-libao=no && ./build
+./autogen.sh && ./configure --prefix=/home/$user/netembryo --localstatedir=/home/$user/netembryo/var --enable-warnings --enable-debug && ./build

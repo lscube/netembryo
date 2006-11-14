@@ -16,7 +16,7 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   
-  $Id:rtp-audio.h 3 2005-12-06 10:40:45Z federico $
+  $Id: rtp-audio.h,v 1.3 2000/02/27 21:03:34 dreier Exp $
 */
 
 #ifndef _RTP_AUDIO_H

@@ -1,15 +1,1 @@
-
-What is it?
-===========
-
-NetEmbryo (NEuTrino for the friends) is a collection of network tools
-developed on the wsocket library.
-
-
-Main Library
-===========
-
-NetEmbryo package contains an powerfull library called wsocket.
-This library performs a network wrapper with ssl, multicast and ipv6
-supports.
-
+Nothing

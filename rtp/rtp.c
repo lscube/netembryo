@@ -2,14 +2,14 @@
   This is a hacked up version of some of the sample code from RFC
   1889.  I hope there aren't any legal issues in redistributing it.
 
-  $Id:rtp.c 3 2005-12-06 10:40:45Z federico $
+  $Id: rtp.c,v 1.2 2000/12/02 03:42:23 dreier Exp $
 */
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
-#include <programs/rtp.h>
+#include <netembryo/rtp.h>
 
 #include <stdlib.h>
 #include <math.h>

@@ -29,7 +29,7 @@
 
 #include <netembryo/wsocket.h>
 
-int sock_bind(char *host, char *port, int *sock, sock_type socktype)
+int sock_bind(char *host, char *port, int *sock, enum sock_types sock_type)
 {
 	int n;
 	struct addrinfo *res, *ressave;
@@ -37,47 +37,26 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 
-	if (host == NULL)
-		hints.ai_flags = AI_PASSIVE;
-	else
-		hints.ai_flags = AI_CANONNAME;
+	hints.ai_flags = AI_PASSIVE;
+	//hints.ai_flags = AI_CANONNAME;
 #ifdef IPV6
 	hints.ai_family = AF_UNSPEC;
 #else
 	hints.ai_family = AF_INET;
 #endif
-
-	switch (socktype) {
-	case SCTP:
-#ifndef HAVE_SCTP_FENICE
-		fnc_log(FNC_LOG_ERR, "SCTP protocol not compiled in\n");
-		return WSOCK_ERROR;
-		break;
-#endif	// else go down to TCP case (SCTP and TCP are both SOCK_STREAM type)
-	case TCP:
+	if (sock_type == TCP)
 		hints.ai_socktype = SOCK_STREAM;
-		break;
-	case UDP:
+	else if (sock_type == UDP)
 		hints.ai_socktype = SOCK_DGRAM;
-		break;
-	default:
-		fnc_log(FNC_LOG_ERR, "Unknown socket type specified\n");
-		return WSOCK_ERROR;
-		break;
-	}
 
 	if ((n = gethostinfo(&res, host, port, &hints)) != 0) {
-		fnc_log(FNC_LOG_ERR, "%s\n", gai_strerror(n));	
+		fprintf(stderr,"%s\n",gai_strerror(n));	
 		return WSOCK_ERRADDR;
 	}
 	
 	ressave = res;
 
 	do {
-#ifdef HAVE_SCTP_FENICE
-		if (socktype == SCTP)
-			res->ai_protocol = IPPROTO_SCTP;
-#endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
 		if ((*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
 			continue;
 

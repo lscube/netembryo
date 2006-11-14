@@ -30,10 +30,12 @@
 
 int sock_SSL_read(SSL *ssl_con, void *buffer, int nbytes)
 {
-	if(ssl_con)
-		return SSL_read(ssl_con, buffer, nbytes);
-	//SSL_get_error(ssl_con,n); 
+        int n=0;
 
-	return -1;
+	if(ssl_con)
+		n = SSL_read(ssl_con, buffer, nbytes);
+	//SSL_get_error(ssl_con,n); 
+        
+	return n;
 }
 

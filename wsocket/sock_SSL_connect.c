@@ -29,37 +29,41 @@
 #include <openssl/ssl.h>
 #include <netembryo/wsocket.h>
 
-int sock_SSL_connect(SSL **ssl_con, int sockfd)
+int sock_SSL_connect(SSL **ssl_con,char *host, char *port, int *sock, enum sock_types sock_type)
 {
 	int ssl_err;
 	SSL_CTX *ssl_ctx = NULL;
+	
+	if(sock_connect(host,port,sock,sock_type)!=0) {
+		fprintf(stderr,"sock_SSL_connect: !sock_connect\n");
+		return WSOCK_ERROR;
+	}
 
 	ssl_ctx = SSL_CTX_new(SSLv3_client_method());
 	if(!ssl_ctx) {
-		fnc_log(FNC_LOG_ERR, "sock_SSL_connect: !ssl_ctx\n");
+		fprintf(stderr,"sock_SSL_connect: !ssl_ctx\n");
 		return WSOCK_ERROR;
 	}
 
 	*ssl_con = SSL_new(ssl_ctx);
-
 	if(!(*ssl_con)) {
-		fnc_log(FNC_LOG_ERR, "sock_SSL_connect: SSL_new() failed.\n");
+		fprintf(stderr,"sock_SSL_connect: !ssl_con\n");
 		SSL_CTX_free(ssl_ctx);
 		return WSOCK_ERROR;
 	}
 	
-	SSL_set_fd (*ssl_con, sockfd);
+	SSL_set_fd (*ssl_con, *sock);
 	SSL_set_connect_state(*ssl_con);
 	ssl_err = SSL_connect(*ssl_con);
 
-	if(ssl_err < 0) 
+	if(ssl_err<0) 
 		SSL_set_shutdown(*ssl_con,SSL_SENT_SHUTDOWN);
-	if(ssl_err <= 0) {
-		fnc_log(FNC_LOG_ERR, "sock_SSL_connect: SSL_connect() failed.\n");
+	if(ssl_err<=0) {
+		fprintf(stderr,"sock_SSL_connect: ssl_err<=0\n");
 		SSL_free(*ssl_con);
 		SSL_CTX_free(ssl_ctx);
 		return WSOCK_ERROR;
 	}
 
-	return WSOCK_OK;
+	return 0;
 }

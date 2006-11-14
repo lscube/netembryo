@@ -34,7 +34,7 @@
 #include <config.h>
 #include <alloca.h>
 
-#include <programs/mp3streamer.h>
+#include <netembryo/mp3streamer.h>
 
 static MediaParserInfo info = {
 	"MPA",

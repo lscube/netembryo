@@ -29,25 +29,12 @@
 
 int Sock_close(Sock *s)
 {
-	int res;
 
-	if(s->flags & IS_MULTICAST) {
-		if (s->remote_host)
-			mcast_leave(s->fd,(struct sockaddr *) &(s->remote_stg));
-		else
-			mcast_leave(s->fd,(struct sockaddr *) &(s->local_stg));
-	}
-
+	if(s->flags & IS_MULTICAST) 
+		mcast_leave(s->fd,(struct sockaddr *)&(s->sock_stg));
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
 		sock_SSL_close(s->ssl);
 #endif
-
-	res = sock_close(s->fd);
-
-	g_free(s->remote_host);
-	g_free(s->local_host);
-	g_free(s);
-
-	return res;
+	return sock_close(s->fd);
 }

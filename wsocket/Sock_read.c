@@ -25,55 +25,22 @@
  *  
  * */
 
-#include <glib.h>
-#include <glib/gprintf.h>
-
 #include <netembryo/wsocket.h>
 
-int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
+int Sock_read(Sock *s, void *buffer, int nbytes)
 {
-
-socklen_t sa_len = sizeof(struct sockaddr_storage);
-
+	//printf("Sock_read\n");
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
-		n = sock_SSL_read(s->ssl,buffer,nbytes);
+		return sock_SSL_read(s->ssl,buffer,nbytes);
 	else {
 #endif
-		switch(s->socktype) {
-		case UDP:
-			if (!protodata) {
-				return -1;
-			}
-			return recvfrom(s->fd, buffer, nbytes, flags,
-				(struct sockaddr *) protodata, &sa_len);
-			break;
-		case TCP:
-			return recv(s->fd, buffer, nbytes, flags);
-			break;
-		case SCTP:
-#ifdef HAVE_SCTP_FENICE
-			if (!protodata) {
-				return -1;
-			}
-			return sctp_recvmsg(transport->fd, buffer, nbytes, NULL,
-				 0, (struct sctp_sndrcvinfo *) protodata, &flags);
-			/* flags is discarted: usage may include detection of
-			 * incomplete packet due to small buffer or detection of
-			 * notification data (this last should be probably
-			 * handled inside netembryo).
-			 */
-#endif
-			break;
-		case LOCAL:
-			return recv(s->fd, buffer, nbytes, flags);
-			break;
-		default:
-			break;
-		}
+		if(s->socktype == UDP)	
+			return sock_udp_read(s->fd,buffer,nbytes);
+		if(s->socktype == TCP)	
+			return sock_tcp_read(s->fd,buffer,nbytes);
+		return 0;
 #if HAVE_SSL
 	}
 #endif
-
-	return -1;
 }

@@ -15,6 +15,10 @@ test "x$sysconfdir" = 'x${prefix}/etc' && sysconfdir="/etc"
 test "x$localstatedir" = 'x${prefix}/var' && localstatedir="/var"
 test "x$mandir" = 'x${prefix}/man' && mandir="${prefix}/share/man"
 
+dnl AM_CONFIG_HEADER(config.h)
+
+
+ 
 
 AC_ARG_ENABLE(debug,
 [  --enable-debug          enable gcc dubugging flags [[default=no]]],,
@@ -23,10 +27,6 @@ AC_ARG_ENABLE(debug,
 AC_ARG_ENABLE(ipv6,
 [  --enable-ipv6            enable IPv6 support [[default=autodetected]]],,
         enable_ipv6="yes")
-
-AC_ARG_ENABLE(libao,
-[  --enable-libao            enable libao support [[default=yes]]],,
-        enable_libao="yes")
 
 AM_CONDITIONAL(HAVE_SSL, /bin/false)
 AC_DEFUN([CHECK_SSL],
@@ -68,10 +68,6 @@ dnl	AC_SUBST(HAVE_SSL)
 ])
 ])dnl
 
-dnl	AC_ARG_WITH(target,
-dnl	[  --with-target=TARGETNAME
-dnl		configuring target name. [I386, ARM, more to come] ])
-
 dnl Check for programs.
 AC_PROG_CC
 AC_PROG_GCC_TRADITIONAL
@@ -90,28 +86,6 @@ dnl Check for Endianess
 AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define if manchine is big-endian]),[BIGENDIAN="Little Endian"] )
 
 dnl Checks for libraries.
-AC_CHECK_LIB(pthread,pthread_create)
-
-dnl the following two checks are usefull only for mp3receiver test program for using libmad
-AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mp3receiver. See http://www.mars.org/home/rob/proj/mpeg/))
-
-dnl check for vorbis and theora support
-XIPH_PATH_OGG(
-  [ XIPH_PATH_VORBIS(
-    AC_DEFINE(HAVE_VORBIS,1,[Define this if you have vorbis]),
-    AC_MSG_RESULT([*** All Ogg/Vorbis dependent parts will be disabled ***]))
-    AM_PATH_THEORA(
-    AC_DEFINE(HAVE_THEORA,1,[Define this if you have theora]),
-    AC_MSG_RESULT([*** All Ogg/Theora dependent parts will be disabled ***])) 
-  ],
-    AC_MSG_RESULT([*** All of Ogg/Vorbis and Ogg/Theora dependent parts will be disabled ***])
-  )
-    
-AM_CONDITIONAL(HAVE_VORBIS, 
-                [test x"$no_ogg" != "xyes" -a x"$no_vorbis" != "xyes"])
-
-AM_CONDITIONAL(HAVE_THEORA, 
-                [test x"$no_ogg" != "xyes" -a x"$no_theora" != "xyes"])
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
@@ -120,9 +94,6 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
-
-dnl soundcard for sound oss module, used in mp3receiver
-AC_CHECK_HEADER(linux/soundcard.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -141,7 +112,7 @@ AC_FUNC_MMAP
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
 CHECK_SSL
-
+dnl CFLAGS = "$CFLAGS $SSL_CFLAG"
 if test "x$with_ssl" = "xyes"; then
 	netembryo_cert="${localstatedir}/local/lib/netembryo/certs/cert.pem"
 else
@@ -157,10 +128,7 @@ AC_DEFINE_UNQUOTED(NETEMBRYO_CERT_FILE_DEFAULT_STR, "$netembryo_cert", [Define d
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR, $netembryo_state_dir, [Define default dir for Certificate (pem format)])
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR_STR, "$netembryo_state_dir", [Define default string dir for Certificate (pem format)])
 
-dnl AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),gthread)
 AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),)
-
-
 
 dnl test enable
 if test "x$enable_ipv6" = "xyes"; then
@@ -170,7 +138,7 @@ else
 fi
 
 AM_CONDITIONAL(NETEMBRYO_DEBUG, /bin/false)
-if test "x$enable_debug" = "xyes"; then
+if test "$enable_debug" = "yes"; then
         CFLAGS="$CFLAGS -g -ggdb"
         AM_CONDITIONAL(NETEMBRYO_DEBUG, /bin/true) \
         AC_DEFINE([ENABLE_DEBUG], 1,[Debug enabled])
@@ -178,19 +146,6 @@ if test "x$enable_debug" = "xyes"; then
    Debuging flags enabled: welcome developer!!!"
 fi
 
-dnl MP3RECEIVER NEED IT 
-AM_CONDITIONAL(ENABLE_LIBAO, /bin/false)
-if test "x$enable_libao" = "xno"; then
-        AC_DEFINE([ENABLE_LIBAO], 0,[libao disabled])
-else
-	dnl check for libao header, used in mp3receiver
-	AC_CHECK_HEADER(ao/ao.h)
-	XIPH_PATH_AO(,AC_MSG_ERROR(libao needed!))
-	CFLAGS="$CFLAGS $AO_CFLAGS"
-	LIBS="$LIBS $AO_LIBS"
-        AM_CONDITIONAL(ENABLE_LIBAO, /bin/true) \
-        AC_DEFINE([ENABLE_LIBAO], 1,[libao enabled])
-fi
 
 case "$enable_warnings" in
         pedantic)
@@ -242,14 +197,6 @@ case "$host" in
                 ARCH_DEFINES="-DI386_ASSEM"
                 arch_type=ix86
         ;;
-        arm-*-*)
-                CFLAGS="$CFLAGS -DLINUX \
-			-DOSS -Wall -O6 -march=armv4 \
-			-fomit-frame-pointer -funroll-all-loops \
-			-finline-functions -ffast-math"
-                ARCH_DEFINES="-DARM"
-                arch_type=arm
-        ;;
         ppc-*-*)
                 arch_type=ppc
         ;;
@@ -265,23 +212,14 @@ esac
 AC_SUBST(ARCH_DEFINES)
 AM_CONDITIONAL(ARCH_X86, test "x$arch_type" = "xix86")
 AM_CONDITIONAL(ARCH_PPC, test "x$arch_type" = "xppc")
-AM_CONDITIONAL(ARCH_ARM, test "x$arch_type" = "xarm")
 AM_CONDITIONAL(HAVE_SOLARIS, test "x$have_solaris" = xyes)
-
-AC_DEFINE_UNQUOTED(ARCH, "$arch_type", [Define Arch type and host target])
 
 netembryo_bin=$PACKAGE_NAME
 AC_SUBST(netembryo_bin)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([bufferpool/Makefile])
-AC_CONFIG_FILES([sound/Makefile])
-AC_CONFIG_FILES([mpglib/Makefile])
 AC_CONFIG_FILES([mp3streamer/Makefile])
-AC_CONFIG_FILES([mp3receiver/Makefile])
-AC_CONFIG_FILES([vorbis_streamer/Makefile])
-AC_CONFIG_FILES([vorbis_receiver/Makefile])
 AC_CONFIG_FILES([mpeg12streamer/Makefile])
 AC_CONFIG_FILES([rtp/Makefile])
 AC_CONFIG_FILES([randomize/Makefile])
@@ -290,9 +228,9 @@ AC_CONFIG_FILES([var/Makefile])
 
 AC_OUTPUT
 
-ssl_msg="ssl support ..................... : no"
+ssl_msg="";
 if test x_$found_ssl == x_yes; then
-ssl_msg="ssl support ..................... : yes"
+ssl_msg="libssl activeted ..................... : yes"
 fi
 
 AC_MSG_NOTICE([config files successfully generated!
@@ -301,8 +239,6 @@ NetEmbryo Install prefix .......... : $prefix
 NetEmbryo Binary path ............. : $exec_prefix/bin/$netembyo_bin
 
 Byte order ..................... : this is a $BIGENDIAN machine
-Host arch ...................... : $host
-
 $ssl_msg
 
 $debug_msg

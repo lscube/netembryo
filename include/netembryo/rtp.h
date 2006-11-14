@@ -2,7 +2,7 @@
   This is a hacked up version of the rtp.h file from RFC 1889.  I hope 
   there aren't any legal issues in redistributing it.
 
-  $Id:rtp.h 3 2005-12-06 10:40:45Z federico $
+  $Id: rtp.h,v 1.4 2001/05/07 19:07:05 dreier Exp $
 */
 
 #ifndef _RTP_H

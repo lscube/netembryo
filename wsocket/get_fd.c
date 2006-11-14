@@ -25,29 +25,9 @@
  *  
  * */
 
-#include <glib.h>
 #include <netembryo/wsocket.h>
-#include <netinet/in.h>
 
-inline char * get_remote_host(Sock *s)
+int get_fd(Sock *s)
 {
-	return s->remote_host;
+	return s->fd;
 }
-
-char * get_local_host(Sock *s)
-{
-	char local_host[128]; /*Unix domain is largest*/
-
-	return addr_ntop(s, local_host, sizeof(local_host));
-}
-
-inline char * get_remote_port(Sock *s)
-{
-	return s->remote_port;
-}
-
-inline char * get_local_port(Sock *s)
-{
-	return s->local_port;
-}
-

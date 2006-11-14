@@ -36,120 +36,75 @@
 #endif
 
 
-Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, sock_flags ssl_flag)
+Sock * Sock_connect(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag)
 {
+	int res;
 	Sock *s;
-	char remote_host[128]; /*Unix Domain is largest*/
-	char local_host[128]; /*Unix Domain is largest*/
-	int sockfd = -1;
-	struct sockaddr *sa_p = NULL;
-	socklen_t sa_len = 0;
+	struct sockaddr_storage sock_stg;
+	socklen_t salen =sizeof(struct sockaddr_storage);
 	int32_t local_port;
-	int32_t remote_port;
 #if HAVE_SSL
 	SSL *ssl_con;
-#endif
-
-	if(binded) {
-		sockfd = binded->fd;
-	}
-
-	if (sock_connect(host, port, &sockfd, socktype)) {
-			fnc_log(FNC_LOG_ERR, "Sock_connect() failure.\n");
-			return NULL;
-	}
-
-#if HAVE_SSL
 	if(ssl_flag & USE_SSL) {
-		if (sock_SSL_connect(&ssl_con))
-			fnc_log (FNC_LOG_ERR, "Sock_connect() failure in SSL init.\n");
-			sock_close(sockfd);
-			return NULL;
+		res = sock_SSL_connect(&ssl_con,host, port, sock, sock_type);	
 	}
 	else
 #endif
-
-	if (binded) {
-		s = binded;
-		g_free(s->local_host);
-		g_free(s->remote_host);
-	} else if (!(s = g_new0(Sock, 1))) {
-		fnc_log(FNC_LOG_ERR, "Unable to allocate a Sock struct in Sock_connect().\n");
-#if HAVE_SSL
-		if(ssl_flag & USE_SSL) 
-			sock_SSL_close(ssl_con);
-#endif
-		sock_close (sockfd);
+		res = sock_connect(host, port, sock, sock_type);
+		
+	if(res!=0) { 
+		fprintf(stderr,"Sock_connect res!=0\n");
 		return NULL;
 	}
-
-	s->fd = sockfd;
-	s->socktype = socktype;
+	if(getsockname(*sock,(struct sockaddr *)&sock_stg,&salen)!=0)
+	{
+#if HAVE_SSL
+		if(ssl_flag & USE_SSL) 
+			sock_SSL_close(ssl_con);	
+#endif
+		fprintf(stderr,"Sock_connect getsockname error\n");
+		return NULL;
+	}
+	s = calloc(1,sizeof(Sock));
+	if (s == NULL)
+		return s;
+	s->fd = *sock;
+	s->socktype = sock_type;
 #if HAVE_SSL
 	if(ssl_flag & USE_SSL) 
 		s->ssl = ssl_con;
 #endif
-	s->flags = ssl_flag;
+	s->flags |= ssl_flag;
 
-	sa_p = (struct sockaddr *) &(s->local_stg);
-	sa_len = sizeof(struct sockaddr_storage);
+	s->remote_host=g_strdup(host);
+	s->remote_port=g_strdup(port);
+	s->family=sockfd_to_family(*sock);
 
-	if(getsockname(s->fd, sa_p, &sa_len))
-	{
-		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
+	local_port=sock_get_port((struct sockaddr *)&sock_stg);
+	s->local_port = g_strdup_printf("%d", local_port);
+
+	memset(&sock_stg,0,salen);
+
+	if(getpeername(*sock,(struct sockaddr *)&sock_stg,&salen) < 0) {
 		Sock_close(s);
 		return NULL;
 	}
 
-	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
-		memset(local_host, 0, sizeof(local_host));
-
-	s->local_host = g_strdup(local_host);
-
-	local_port = sock_get_port(sa_p);
-
-	if(local_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_connect().\n");
-		Sock_close(s);
-		return NULL;
-	} else
-		s->local_port = ntohs(local_port);
-
-	sa_p = (struct sockaddr *) &(s->remote_stg);
-	sa_len = sizeof(struct sockaddr_storage);
-
-	if(getpeername(s->fd, sa_p, &sa_len))
-	{
-		fnc_log(FNC_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
-		Sock_close(s);
-		return NULL;
-	}
-
-	if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
-		memset(remote_host, 0, sizeof(remote_host));
-	
-	s->remote_host = g_strdup(remote_host);
-
-	remote_port = sock_get_port(sa_p);
-	if(remote_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
-		Sock_close(s);
-		return NULL;
-	} else
-		s->remote_port = ntohs(remote_port);
-
-	fnc_log(FNC_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
-		"remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
-		s->remote_port);
-
-	if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
+	if(is_multicast_address((struct sockaddr *)&sock_stg,s->family)) {
 		//fprintf(stderr,"IS MULTICAST\n");
-		if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr))!=0) {
+		if(sock_type==TCP) {
+			Sock_close(s);
+			/*TCP MULTICAST IS IMPOSSIBLE*/
+			return NULL;
+		}
+
+		if(mcast_join(*sock,(struct sockaddr *)&sock_stg,NULL,0,&(s->addr))!=0) {
 			Sock_close(s);
 			return NULL;
 		}
 		s->flags |= IS_MULTICAST;
 	}
+	memcpy(&(s->sock_stg),&sock_stg,salen); /*copy the peername*/
 
 	return s;
 }

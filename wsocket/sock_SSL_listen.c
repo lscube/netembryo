@@ -1,14 +1,14 @@
-/* *
+/* * 
  *  $Id$
+ *  
+ *  This file is part of NetEmbryo 
  *
- *  This file is part of NetEmbryo
- *
- * NetEmbryo -- default network wrapper
+ * NetEmbryo -- default network wrapper 
  *
  *  Copyright (C) 2005 by
- *
- *      - Federico Ridolfo      <federico.ridolfo@polito.it>
- *
+ *  	
+ *	- Federico Ridolfo	<federico.ridolfo@polito.it>
+ * 
  *  NetEmbryo is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
@@ -22,13 +22,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with NetEmbryo; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
+ *  
  * */
 
-#include <sys/ioctl.h>
 #include <netembryo/wsocket.h>
 
-int Sock_set_props(Sock *s, int request, int *on)
+int sock_SSL_listen(int s, int backlog)
 {
-	return ioctl(s->fd, request, on);
+	return sock_listen(s, backlog);
 }

@@ -25,10 +25,20 @@
  *  
  * */
 
-#include <string.h>
 #include <netembryo/wsocket.h>
 
-int Sock_compare(Sock *p, Sock *q)
+int sock_udp_read(int fd, void *buffer, int nbytes)
 {
-	return memcmp(p, q, sizeof(Sock));
+	int n;
+ 	/*struct sockaddr_storage from;
+	int *from_len=0;
+
+	*from_len = sizeof(struct sockaddr_storage);
+	
+	n = recvfrom(fd, buffer, nbytes, 0, (struct sockaddr *)&from, from_len);
+	*/
+	n = read(fd, buffer, nbytes);
+
+	return n;
 }
+

@@ -30,11 +30,11 @@
 
 #include <time.h>
 #include <netembryo/wsocket.h>
-#include <programs/rtp.h>
-#include <programs/rtp-packet.h>
-#include <programs/rtp-audio.h>
+#include <netembryo/rtp.h>
+#include <netembryo/rtp-packet.h>
+#include <netembryo/rtp-audio.h>
 
-#include <programs/mp3streamer.h>
+#include <netembryo/mp3streamer.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
 #include <unistd.h> 
@@ -125,15 +125,9 @@ int main(int argc, char **argv)
 	int sock; /*socket descriptor*/
 	mpa_data *mpa;	
 	int oflag = O_RDONLY;
-	unsigned long int sleep_time = 0;
+	unsigned long int sleep_time;
 	struct timespec ts;
-	
-	struct timeval now;
-	double time1=0.0;
-	double mnow=0.0;
-	double timestamp1=0.0;
-	double pktlen=0;
-	
+
 	int n;
 	static const char short_options[] = "a:p:f:slt";
 	int32_t nerr = 0;	/*number of error */
@@ -237,7 +231,6 @@ int main(int argc, char **argv)
 
 stream:
 	do {
-
 		res = get_frame2(src, SRC_BUF_DIM, &timestamp, fd, properties, private_data);
 		if(res>0) {
 			uint32 control=0;
@@ -255,29 +248,14 @@ stream:
 
 			} while(control<=src_nbytes && retpkt>0);
 
+			/*wait*/
+			sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 950000000;//1000000000;
+			ts.tv_sec=0;
+			ts.tv_nsec =sleep_time;
+			nanosleep(&ts, NULL);
 		}
-			
-		pktlen=(double)mpa->frame_size/(double)properties->sample_rate;// * 1000000000;
-		
-		gettimeofday(&now,NULL);
-		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-		if(time1>0.0 ) {
-			while((mnow - time1) < pktlen * 1000) {
-				ts.tv_sec=0;
-				ts.tv_nsec = pktlen * 1000000;
-				//nanosleep(&ts, NULL);
-				gettimeofday(&now,NULL);
-				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-				//fprintf(stderr,"pktlen  = %f - (mnow - time1) = %f\n",pktlen, (mnow - time1));
-			}
-		} 
-
-		time1=mnow;
-		timestamp1=timestamp ;
-
-
-		fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
-			maddr, port, properties->bit_rate, properties->sample_rate, timestamp);
+	fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
+			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp);
 	} while(res!=ERR_EOF);
 
 	if(loop) {

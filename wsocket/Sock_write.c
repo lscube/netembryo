@@ -27,46 +27,13 @@
 
 #include <netembryo/wsocket.h>
 
-int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
+int Sock_write(Sock *s, void *buffer, int nbytes)
 {
-#ifdef HAVE_SCTP_FENICE
-	struct sctp_sndrcvinfo sinfo;
-#endif
 
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
-		return sock_SSL_write(s->ssl, buffer, nbytes);
-	else {
-#endif		
-		switch (s->socktype) {
-		case TCP:
-			return send(s->fd, buffer, nbytes, flags);
-			break;
-		case UDP:
-			if (!protodata) {
-				protodata = &(s->remote_stg);
-			}
-			return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *) 
-					protodata, sizeof(struct sockaddr_storage));
-			break;
-		case SCTP:
-#ifdef HAVE_SCTP_FENICE
-			if (!protodata) {
-				protodata = &sinfo;
-				memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
-			}
-			return sctp_send(s->fd, buffer, nbytes, 
-				(struct sctp_sndrcvinfo *) protodata, flags);
+		return sock_SSL_write(s->ssl,buffer,nbytes);
+	else 
 #endif
-			break;
-		case LOCAL:
-			return send(s->fd, buffer, nbytes, flags);
-			break;
-		default:
-			break;
-		}
-#if HAVE_SSL
-	}
-#endif		
-	return -1;
+		return sock_write(s->fd,buffer,nbytes);
 }

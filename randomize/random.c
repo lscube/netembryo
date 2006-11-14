@@ -2,7 +2,7 @@
   This is a hacked up version of some of the sample code from RFC
   1889.  I hope there aren't any legal issues in redistributing it.
 
-  $Id:random.c 3 2005-12-06 10:40:45Z federico $
+  $Id: random.c,v 1.1.1.1 2000/01/07 22:44:03 dreier Exp $
 */
 
 #ifdef HAVE_CONFIG_H
@@ -16,7 +16,7 @@
 #include <time.h>        /* clock() */
 #include <sys/utsname.h> /* uname() */
 #include <glib.h>
-#include <programs/md5.h>	/* from RFC 1321 */
+#include <netembryo/md5.h>	/* from RFC 1321 */
 
 #define MD_CTX MD5_CTX
 #define MDInit MD5Init
