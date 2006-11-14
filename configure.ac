@@ -92,8 +92,26 @@ AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define 
 dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create)
 
-dnl the followed two checks are usefull only for mp3receiver test program for using libmad
+dnl the following two checks are usefull only for mp3receiver test program for using libmad
 AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mp3receiver. See http://www.mars.org/home/rob/proj/mpeg/))
+
+dnl check for vorbis and theora support
+XIPH_PATH_OGG(
+  [ XIPH_PATH_VORBIS(
+    AC_DEFINE(HAVE_VORBIS,1,[Define this if you have vorbis]),
+    AC_MSG_RESULT([*** All Ogg/Vorbis dependent parts will be disabled ***]))
+    AM_PATH_THEORA(
+    AC_DEFINE(HAVE_THEORA,1,[Define this if you have theora]),
+    AC_MSG_RESULT([*** All Ogg/Theora dependent parts will be disabled ***])) 
+  ],
+    AC_MSG_RESULT([*** All of Ogg/Vorbis and Ogg/Theora dependent parts will be disabled ***])
+  )
+    
+AM_CONDITIONAL(HAVE_VORBIS, 
+                [test x"$no_ogg" != "xyes" -a x"$no_vorbis" != "xyes"])
+
+AM_CONDITIONAL(HAVE_THEORA, 
+                [test x"$no_ogg" != "xyes" -a x"$no_theora" != "xyes"])
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
@@ -262,6 +280,8 @@ AC_CONFIG_FILES([sound/Makefile])
 AC_CONFIG_FILES([mpglib/Makefile])
 AC_CONFIG_FILES([mp3streamer/Makefile])
 AC_CONFIG_FILES([mp3receiver/Makefile])
+AC_CONFIG_FILES([vorbis_streamer/Makefile])
+AC_CONFIG_FILES([vorbis_receiver/Makefile])
 AC_CONFIG_FILES([mpeg12streamer/Makefile])
 AC_CONFIG_FILES([rtp/Makefile])
 AC_CONFIG_FILES([randomize/Makefile])
