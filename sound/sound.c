@@ -230,20 +230,14 @@ sound_oss_open(int direction)
     //gphone_print_exit("*** sound_open : 16 bit signed samples not supported..\n", 2);
   }
 
-  stereo = 0;                   /* mono */
+  stereo = 1;                   /* stereo */
   if (ioctl(soundfd, SNDCTL_DSP_STEREO, &stereo) < 0) {
    //gphone_perror_exit("*** sound_open : SNDCTL_DSP_STEREO", 2);
   }
-  if (stereo != 0) {
-    //gphone_print_exit("*** sound_open : mono not supported.\n", 2);
-  }
 
-  speed = 8000;
+  speed = 44100; //8000;
   if (ioctl(soundfd, SNDCTL_DSP_SPEED, &speed) < 0) {
     //gphone_perror_exit("*** sound_open : SNDCTL_DSP_SPEED", 2);
-  }
-  if (speed < 7950 || speed > 8050) {
-    //gphone_print_exit("*** sound_open : 8khz sampling not supported.\n", 2);
   }
 
   return soundfd;

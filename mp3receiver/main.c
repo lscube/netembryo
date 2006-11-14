@@ -42,6 +42,7 @@
 #include <programs/mp3receiver.h>
 #include <programs/thread-queue.h>
 #include <programs/sound.h>
+#include <netembryo/wsocket.h>
 
 static void usage()
 {
@@ -71,12 +72,13 @@ int main(int argc, char **argv)
 	PRINT_HEADER;
 
 	if (!g_thread_supported ()) 
-		g_thread_init (NULL);
+		g_thread_init (NULL);//g_thread is used in buffer module
 	else {
 		fprintf(stderr,"gthread not supported \n");
 		exit(1);
 	}
 
+	Sock_init();
 	sound_init();
 	if (Half_Flag) {
 		set_sound_duplex(HALF_DUPLEX);
