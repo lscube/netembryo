@@ -180,5 +180,33 @@ int bpkill(buffer_pool *);
 int bpget(buffer_pool *);
 int bpfree(buffer_pool *, int);
 int bprmv(buffer_pool *, playout_buff *, int);
+
+
+//chicco
+typedef struct {
+#ifdef WORDS_BIGENDIAN
+	uint32 ver:2;
+	uint32 pad:1;
+	uint32 ext:1;
+	uint32 cc:4;
+#else
+	uint32 cc:4;	/* source count */
+	uint32 ext:1;	/* extension flag */
+	uint32 pad:1;	/* padding flag */
+	uint32 ver:2;	/* version */
+#endif
+#ifdef WORDS_BIGENDIAN
+	uint32 mark:1;
+	uint32 pt:7;
+#else
+	uint32 pt:7;	/* payload type */
+	uint32 mark:1;	/* marker flag */
+#endif
+	uint32 seq:16;	/* sequence number */
+	uint32 time;	/* timestamp */
+	uint32 ssrc;	/* synchronization source identifier */
+	uint8 data[1];	/* beginning of RTP data */
+} rtp_pkt; //chicco: taken from nemesi/rtp.h
+
 #endif
 /* @} */
