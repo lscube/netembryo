@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <config.h>
 
 #include "mpg123.h"
 #include "mpglib.h"
@@ -213,7 +214,9 @@ int set_pointer(long backstep)
 {
   unsigned char *bsbufold;
   if(gmp->fsizeold < 0 && backstep > 0) {
+#if ENABLE_DEBUG
     fprintf(stderr,"Can't step back %ld!\n",backstep);
+#endif
     return MP3_ERR;
   }
   bsbufold = gmp->bsspace[gmp->bsnum] + 512;

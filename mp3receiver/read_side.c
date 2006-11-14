@@ -39,6 +39,9 @@
 #include <../mpglib/mpglib.h>
 #include <../mpglib/mpg123.h>
 
+#define RTPHEADERSIZE 12
+#define RTPEXTENSIONSIZE 4
+#define HEADERSIZE ( RTPHEADERSIZE + RTPEXTENSIONSIZE )
 
 void *read_side(void *arg)
 {
@@ -52,8 +55,11 @@ void *read_side(void *arg)
 	int direction = O_WRONLY;
 	struct mpstr mp;
 	struct timespec ts;
-	unsigned long int sleep_time;
-	
+	unsigned long int sleep_time=0;
+	unsigned int frame_size;
+	int max_queue = ((Arg *)arg)->max_queue;
+	int min_queue = ((Arg *)arg)->min_queue;
+
 	//BITRATE = tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]
 	int tabsel_123[2][3][16] = {
 		{ {0,32,64,96,128,160,192,224,256,288,320,352,384,416,448,},
@@ -69,8 +75,10 @@ void *read_side(void *arg)
                   22050, 24000, 16000 ,
                   11025 , 12000 , 8000 };
 
+	char cazzatine[4] = { '\\' , '|' , '/' , '-'};
+	unsigned short cazcount=0;
 
-	queue = (Thread_Queue)arg;
+	queue = ((Arg *)arg)->queue;
 	
 	InitMP3(&mp);
 	while(1) {
@@ -82,7 +90,15 @@ void *read_side(void *arg)
 			len =buf->len; 
 			if(len <= 0)
 				continue;
-			ret = decodeMP3(&mp,(buf->buffer)+16,len-16,out,MAX_BUFFER_OUT,&size);
+
+			ret = decodeMP3( &mp, (buf->buffer) + HEADERSIZE, len - HEADERSIZE, out, MAX_BUFFER_OUT, &size );
+			
+			// packet len
+		        if (mp.fr.lay == 1) // layer 1
+				frame_size = 384;
+			else // layer 2 or 3
+				frame_size = 1152;
+			
 			if(!sound_in_use()) {
 				if(mp.fr.stereo!=MPG_MD_MONO)
 					set_stereo_mode();
@@ -94,18 +110,30 @@ void *read_side(void *arg)
 				ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
 			}
 
-			
-			sleep_time=24816326;/*(double)(mp.fr.framesize)/(double)(freqs[mp.fr.sampling_frequency]) * 10000000000;*/
-			fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld buffer: %d - sleep: %ld\r", \
+				
+			sleep_time=(double)(frame_size)/(double)(freqs[mp.fr.sampling_frequency]) * 1000000000;
+#if ENABLE_DEBUG
+			fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld buffer: %d [%c] \r", \
 					tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
 					freqs[mp.fr.sampling_frequency],\
-					thread_queue_length(queue), sleep_time);
+					thread_queue_length(queue), cazzatine[cazcount%4]);
+#else
+			fprintf(stderr, "[MPA] bitrate: %d; sample rate: %ld [%c] \r", \
+					tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
+					freqs[mp.fr.sampling_frequency],\
+					cazzatine[cazcount%4]);
+#endif
+			cazcount++;
+			
 			//wait
 			ts.tv_sec=0;
 			ts.tv_nsec = sleep_time;
 			nanosleep(&ts, NULL);
+		}	
+		else {
+			while(thread_queue_length(queue)<= min_queue + 1);
+			//wait for prefilling
 		}
-		
 	}
 
 	return NULL;

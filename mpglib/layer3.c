@@ -6,6 +6,7 @@
  */ 
 
 #include <stdlib.h>
+#include <config.h>
 #include "mpg123.h"
 #include "mpglib.h"
 #include "huffman.h"
@@ -953,7 +954,9 @@ static int III_dequantize_sample(real xr[SBLIMIT][SSLIMIT],int *scf,
   if(part2remain > 0)
     getbits(part2remain);
   else if(part2remain < 0) {
+#if ENABLE_DEBUG
     fprintf(stderr,"mpg123: Can't rewind stream by %d bits!\n",-part2remain);
+#endif //ENABLE_DEBUG
     return 1; /* -> error */
   }
   return 0;
@@ -1364,7 +1367,9 @@ static int III_dequantize_sample_ms(real xr[2][SBLIMIT][SSLIMIT],int *scf,
   if(part2remain > 0 )
     getbits(part2remain);
   else if(part2remain < 0) {
+#if ENABLE_DEBUG
     fprintf(stderr,"mpg123_ms: Can't rewind stream by %d bits!\n",-part2remain);
+#endif
     return 1; /* -> error */
   }
   return 0;
