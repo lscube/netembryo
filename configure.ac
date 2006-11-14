@@ -139,7 +139,8 @@ AC_DEFINE_UNQUOTED(NETEMBRYO_CERT_FILE_DEFAULT_STR, "$netembryo_cert", [Define d
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR, $netembryo_state_dir, [Define default dir for Certificate (pem format)])
 AC_DEFINE_UNQUOTED(NETEMBRYO_STATE_DIR_STR, "$netembryo_state_dir", [Define default string dir for Certificate (pem format)])
 
-AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),gthread)
+dnl AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),gthread)
+AM_PATH_GLIB_2_0(2.0.0,CFLAGS="$CFLAGS $GLIB_CFLAGS",AC_MSG_ERROR([NetEmbryo uses Glib. Please install it (you need devel files).]),)
 
 
 

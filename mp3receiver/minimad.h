@@ -23,10 +23,12 @@
  */
 
 struct buffer {
+	struct mad_decoder *decoder;	
 	playout_buff *po;
 	buffer_pool *bp;
 	Sound_Handle hand;
 	mad_timer_t timer;
+	int playdevice;
 #if ENABLE_LIBAO	
 	ao_device *ao_dev; //ao	
 #endif //ENABLE_LIBAO
