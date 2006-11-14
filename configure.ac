@@ -270,9 +270,9 @@ AC_CONFIG_FILES([var/Makefile])
 
 AC_OUTPUT
 
-ssl_msg="";
+ssl_msg="ssl support ..................... : no"
 if test x_$found_ssl == x_yes; then
-ssl_msg="libssl activeted ..................... : yes"
+ssl_msg="ssl support ..................... : yes"
 fi
 
 AC_MSG_NOTICE([config files successfully generated!
