@@ -85,8 +85,10 @@ void *read_side(void *arg)
                   22050, 24000, 16000 ,
                   11025 , 12000 , 8000 };
 
+#if ENABLE_DEBUG
 	char cazzatine[4] = { '\\' , '|' , '/' , '-'};
 	unsigned short cazcount=0;
+#endif //ENABLE_DEBUG
 
 	InitMP3(&mp);
 	ao_initialize(); //ao
@@ -147,13 +149,13 @@ void *read_side(void *arg)
 		if(finalsize > 0) 
 			ao_play(ao_dev, (void *)finalout, finalsize); 
 
-		/*
+#if ENABLE_DEBUG
 		 fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - buffer: %d%% [%c] \r", \
 				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
 				freqs[mp.fr.sampling_frequency], bp->flcount*100/BP_SLOT_NUM, \
 				cazzatine[cazcount%4]);
 		cazcount++;
-		*/	
+#endif //ENABLE_DEBUG
 		gettimeofday(&now,NULL);
 		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
 		if(bp->flcount < (DEFAULT_MAX_QUEUE - 1)) { //wow fear of buffer overflow!! Don't sleep... 
