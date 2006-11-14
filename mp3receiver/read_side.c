@@ -66,7 +66,7 @@ void *read_side(void *arg)
 	double time1=0.0;
 	double mnow;
 	//double timestamp1=0.0;
-	double timestamp=0.0;
+	//double timestamp=0.0;
 
 	//BITRATE = tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]
 	int tabsel_123[2][3][16] = {
@@ -93,15 +93,6 @@ void *read_side(void *arg)
 #if ENABLE_DEBUG
 	fprintf(stderr,"ao_id = %d\n",ao_id);
 #endif //ENABLE_DEBUG
-/*	
-	while(bp->flcount < DEFAULT_MIN_QUEUE) {
-		//fprintf(stderr,"buffer = %d\n",bp->flcount);
-		ts.tv_sec=0;
-		ts.tv_nsec = 30; //only to rescale the process
-		nanosleep(&ts, NULL);
-	}
-
-*/
 	do {
 		
 		if(bp->flcount <= 1) {	
@@ -119,7 +110,7 @@ void *read_side(void *arg)
 		if(ret != MP3_OK)
 			continue;
 
-		timestamp = (double)(ntohl(((rtp_pkt *)(&(*po->bufferpool)[po->potail]))->time) * 1000);
+		//timestamp = (double)(ntohl(((rtp_pkt *)(&(*po->bufferpool)[po->potail]))->time) * 1000);
 
 		bprmv(bp,po,po->potail);
 		// packet len
@@ -145,18 +136,10 @@ void *read_side(void *arg)
 			ret = decodeMP3(&mp,NULL,0,out,MAX_BUFFER_OUT,&size);
 		}
 
-#if ENABLE_DEBUG
-		fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - time = %f - buffer: %d [%c] sleep_time: %f \r", \
+		fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - buffer: %d%% [%c] \r", \
 				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
-				freqs[mp.fr.sampling_frequency], timestamp/1000 ,bp->flcount, \
-				cazzatine[cazcount%4], sleep_time);
-#else
-		fprintf(stderr, "[MPA] bitrate: %d - sample rate: %ld - time = %f - buffer: %d [%c] \r", \
-				tabsel_123[mp.fr.lsf][mp.fr.lay-1][mp.fr.bitrate_index]*1000, \
-				freqs[mp.fr.sampling_frequency], timestamp/1000 ,bp->flcount, \
+				freqs[mp.fr.sampling_frequency], bp->flcount*100/BP_SLOT_NUM, \
 				cazzatine[cazcount%4]);
-
-#endif //ENABLE_DEBUG
 		cazcount++;
 			
 		gettimeofday(&now,NULL);
