@@ -191,12 +191,16 @@ int sock_bind(char *host, char *port, int *sock, enum sock_types sock_type);
 int sock_accept(int sock);
 int sock_listen(int s, int backlog);
 //int sock_udp_read(int fd, void *buffer, int nbytes);
-int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, int from_len);
+int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len, int *remote_port);
+int sock_udp_write(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, socklen_t from_len);
 
 int sock_tcp_read(int fd, void *buffer, int nbytes);
-int sock_write(int fd, void *buffer, int nbytes);
+int sock_tcp_write(int fd, void *buffer, int nbytes);
+
 int sock_close(int s);
 char *sock_ntop_host(const struct sockaddr *sa, /*socklen_t salen,*/ char *str, size_t len);
+
+/*return the port in network byte order (use ntohs to change it)*/
 int32_t sock_get_port(const struct sockaddr *sa);
 int16_t is_multicast(union ADDR *addr, sa_family_t family);
 int16_t is_multicast_address(const struct sockaddr *sa, sa_family_t family);
@@ -224,7 +228,6 @@ char *addr_ntop(const Sock  *addr, char *str, size_t len);
 /*up level wrapper*/
 Sock * Sock_connect(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag);
 /*Sock_connect_by_sock: to connect throught a binded socket*/
-int Sock_connect_by_sock(Sock *s,char *host, char *port);
 Sock * Sock_bind(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag);/*usually host is NULL for unicast. 
 											       For multicast it is the multicast address.
 											       Change it (ifi_xxx, see Stevens Chap.16)*/
