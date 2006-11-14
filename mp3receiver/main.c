@@ -94,6 +94,9 @@ int main(int argc, char **argv)
 		fprintf(stderr, "pthread_create talk_thread: %s\n", strerror(rtn));
 		exit(1);
 	}
+	while(thread_queue_length(queue)<=DEFAULT_MIN_QUEUE);
+	//wait for prefilling
+
 	if ((rtn = pthread_create(&read_buffer_thread, NULL, read_side,
                             (void *) queue))) {
 		fprintf(stderr, "pthread_create listen_thread: %s\n", strerror(rtn));

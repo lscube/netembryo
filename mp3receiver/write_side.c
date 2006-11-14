@@ -44,13 +44,10 @@ void *write_side(void *arg)
 	int sock;
 	Thread_Queue queue;
 	
-	pthread_mutex_lock( &count_mutex );
-	printf("Writer Thread is starting....\n");
 	s = Sock_bind("224.124.0.1", "1234", &sock, type, flag);	
 
 	if(s == NULL) {
 		printf("Sock_bind returns NULL\n");
-		pthread_mutex_unlock( &count_mutex );
 		
 		return NULL;
 	}		
@@ -65,15 +62,11 @@ void *write_side(void *arg)
 		else {
 			printf("Writer Thread: error while reading\n");
 			Sock_close(s);
-			pthread_mutex_destroy( &count_mutex );
 			
 			return NULL;
 		}
-		if(thread_queue_length(queue)>=DEFAULT_MIN_QUEUE)
-			pthread_mutex_unlock( &count_mutex );
 	}
 
-	pthread_mutex_destroy( &count_mutex);
 	//Sock_close(s);
 	return NULL;
 }

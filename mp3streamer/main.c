@@ -254,8 +254,8 @@ stream:
 			ts.tv_nsec =sleep_time;
 			nanosleep(&ts, NULL);
 		}
-	fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f \r",\
-			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp);
+	fprintf(stderr, "[NET] address: %s; port: %s; \t [MPA] bitrate: %d; sample rate: %3.0f; time: %f sleep_time: %ld\r",\
+			maddr,		port,		properties->bit_rate, properties->sample_rate,timestamp,sleep_time);
 	} while(res!=ERR_EOF);
 
 	if(loop) {

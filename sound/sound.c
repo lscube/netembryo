@@ -1,38 +1,11 @@
-/*
-  Gnome-o-Phone - A program for internet telephony
-  Copyright (C) 1999  Roland Dreier
-  
-  This program is free software; you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public License
-  along with this program; if not, write to the Free Software
-  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-  
-  $Id: sound.c 1.15 Sat, 11 Dec 1999 23:53:26 -0600 dreier $
-*/
+
+/*inspired from gphone*/
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
 
 #include <programs/sound.h>
-/*
-#ifdef HAVE_LINUX_TELEPHONY_H
-#include <linux/telephony.h>
-#endif
-*/
-/*#ifdef HAVE_LINUX_IXJUSER_H
-#include <linux/ixjuser.h>
-#endif
-*/
 #include <linux/soundcard.h>
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -40,272 +13,177 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <glib.h>
-/*
-#if defined (HAVE_GSM_H)
-#include <gsm.h>
-#elif defined (HAVE_GSM_GSM_H)
-#include <gsm/gsm.h>
-#else
-#error "GSM header file not found."
-#endif
-#include "gphone.h"
-#include "gphone-lib.h"
-*/
 #include <errno.h>
 #include <string.h>
 
 
 struct Sound_Handle {
-  int fd;
+	int fd;
 };
 
 enum {
-  RAW_FRAME_LENGTH = 160        /* samples in an uncompressed GSM frame */
+	RAW_FRAME_LENGTH = 160        
 };
 
 static int Sound_Use_Count = 0;
 static Duplex_Type Duplex;
 static Sound_Device_Type Device;
-//static int Ixj_Port;
 static int Eight_Bit;
 static int Sound_FD = -1;
 static int Sound_Direction;
 static int Mic_Mute = 0;
+static int stereo=0, speed=8000;
 
 G_LOCK_DEFINE_STATIC(Sound_Access);
 
-void
-sound_init(void)
+void sound_init(void)
 {
-/*
-#ifdef HAVE_LINUX_TELEPHONY_H
-#ifdef HAVE_LINUX_IXJUSER_H
-  set_sound_ixj_port(PORT_POTS);
-#endif
-#endif
-*/
 }
 
-static Sound_Handle
-sound_handle_new(void)
+static Sound_Handle sound_handle_new(void)
 {
-  Sound_Handle handle;
+	Sound_Handle handle;
+	
+	handle = g_malloc(sizeof *handle);
 
-  handle = g_malloc(sizeof *handle);
-
-  return handle;
+	return handle;
 }
 
-static void
-sound_handle_free(Sound_Handle handle)
+static void sound_handle_free(Sound_Handle handle)
 {
-  g_return_if_fail(handle != NULL);
+	g_return_if_fail(handle != NULL);
 
-  g_free(handle);
+	g_free(handle);
 }
 
-size_t
-get_enc_frame_length(void)
+
+Duplex_Type get_sound_duplex(void)
 {
-  //return(sizeof(gsm_frame));
-  return 1; //TODO chicco
+	Duplex_Type ret;
+
+	G_LOCK(Sound_Access);
+	ret = Duplex;
+	G_UNLOCK(Sound_Access);
+
+	return ret;
 }
 
-size_t
-get_raw_frame_length(void)
+void set_sound_duplex(Duplex_Type dup)
 {
-  //return(RAW_FRAME_LENGTH * sizeof (gsm_signal));
-  return 1; //TODO chicco
+	if (!sound_in_use()) {
+		G_LOCK(Sound_Access);
+		Duplex = dup;
+		G_UNLOCK(Sound_Access);
+	}
 }
 
-Duplex_Type
-get_sound_duplex(void)
+Sound_Device_Type get_sound_device(void)
 {
-  Duplex_Type ret;
+	Sound_Device_Type ret;
 
-  G_LOCK(Sound_Access);
-  ret = Duplex;
-  G_UNLOCK(Sound_Access);
+	G_LOCK(Sound_Access);
+	ret = Device;
+	G_UNLOCK(Sound_Access);
 
-  return ret;
+	return ret;
 }
 
-void
-set_sound_duplex(Duplex_Type dup)
+void set_sound_device(Sound_Device_Type dev)
 {
-  if (!sound_in_use()) {
-    G_LOCK(Sound_Access);
-    Duplex = dup;
-    G_UNLOCK(Sound_Access);
-  }
+	if (!sound_in_use()) {
+		G_LOCK(Sound_Access);
+		Device = dev;
+		G_UNLOCK(Sound_Access);
+	}
 }
 
-Sound_Device_Type
-get_sound_device(void)
+void set_sound_eight_bit(int eight)
 {
-  Sound_Device_Type ret;
-
-  G_LOCK(Sound_Access);
-  ret = Device;
-  G_UNLOCK(Sound_Access);
-
-  return ret;
+	if (!sound_in_use()) {
+		G_LOCK(Sound_Access);
+		Eight_Bit = eight;
+		G_UNLOCK(Sound_Access);
+	}
 }
 
-void
-set_sound_device(Sound_Device_Type dev)
+void sound_mute_mic(int mute)
 {
-  if (!sound_in_use()) {
-    G_LOCK(Sound_Access);
-    Device = dev;
-    G_UNLOCK(Sound_Access);
-  }
-}
-/*
-int
-get_sound_ixj_port(void)
-{
-  int ret;
-
-  G_LOCK(Sound_Access);
-  ret = Ixj_Port;
-  G_UNLOCK(Sound_Access);
-
-  return ret;
+	G_LOCK(Sound_Access);
+	Mic_Mute = mute;
+	G_UNLOCK(Sound_Access);
 }
 
-void
-set_sound_ixj_port(int port)
+static int sound_oss_open(int direction)
 {
-  if (!sound_in_use()) {
-    G_LOCK(Sound_Access);
-    Ixj_Port = port;
-    G_UNLOCK(Sound_Access);
-  }
-}
-*/
-void
-set_sound_eight_bit(int eight)
-{
-  if (!sound_in_use()) {
-    G_LOCK(Sound_Access);
-    Eight_Bit = eight;
-    G_UNLOCK(Sound_Access);
-  }
-}
+	int soundfd;
+	int format;
 
-void
-sound_mute_mic(int mute)
-{
-  G_LOCK(Sound_Access);
-  Mic_Mute = mute;
-  G_UNLOCK(Sound_Access);
-}
+	soundfd = open("/dev/dsp", direction);
+	if (soundfd == -1) {
+		return soundfd;
+	}
 
-static int
-sound_oss_open(int direction)
-{
-  int soundfd;
-  int format, stereo, speed;
+	if (!Eight_Bit) {
+		format = AFMT_S16_LE;
+	} else {
+		format = AFMT_U8;
+	}
 
-  soundfd = open("/dev/dsp", direction);
-  if (soundfd == -1) {
-    return soundfd;
-  }
+	if (ioctl(soundfd, SNDCTL_DSP_SETFMT, &format) < 0) {
+		  //gphone_perror_exit("*** sound_open : SNDCTL_DSP_SETFMT", 2);
+	}
 
-  if (!Eight_Bit) {
-    format = AFMT_S16_LE;
-  } else {
-    format = AFMT_U8;
-  }
+	if ((Eight_Bit) && (format != AFMT_U8)) {
+	  //gphone_print_exit("*** sound_open : 8 bit unsigned samples not supported.\n", 2);
+	}
+	if ((!Eight_Bit) && (format != AFMT_S16_LE)) {
+	  //gphone_print_exit("*** sound_open : 16 bit signed samples not supported..\n", 2);
+	}
 
-  if (ioctl(soundfd, SNDCTL_DSP_SETFMT, &format) < 0) {
-    //gphone_perror_exit("*** sound_open : SNDCTL_DSP_SETFMT", 2);
-  }
+	if (ioctl(soundfd, SNDCTL_DSP_STEREO, &stereo) < 0) {
+	 //gphone_perror_exit("*** sound_open : SNDCTL_DSP_STEREO", 2);
+	}
 
-  if ((Eight_Bit) && (format != AFMT_U8)) {
-    //gphone_print_exit("*** sound_open : 8 bit unsigned samples not supported.\n", 2);
-  }
-  if ((!Eight_Bit) && (format != AFMT_S16_LE)) {
-    //gphone_print_exit("*** sound_open : 16 bit signed samples not supported..\n", 2);
-  }
+	if (ioctl(soundfd, SNDCTL_DSP_SPEED, &speed) < 0) {
+	  //gphone_perror_exit("*** sound_open : SNDCTL_DSP_SPEED", 2);
+	}
 
-  stereo = 1;                   /* stereo */
-  if (ioctl(soundfd, SNDCTL_DSP_STEREO, &stereo) < 0) {
-   //gphone_perror_exit("*** sound_open : SNDCTL_DSP_STEREO", 2);
-  }
-
-  speed = 44100; //8000;
-  if (ioctl(soundfd, SNDCTL_DSP_SPEED, &speed) < 0) {
-    //gphone_perror_exit("*** sound_open : SNDCTL_DSP_SPEED", 2);
-  }
-
-  return soundfd;
+	return soundfd;
 }
 
-#if 0
-static int
-sound_ixj_open(int direction)
+
+static int sound_open_device(int direction)
 {
-  int soundfd;
-  int codec;
-
-  soundfd = open("/dev/phone0", O_RDWR); /* ignore direction param */
-  if (soundfd == -1) {
-    return soundfd;
-  }
-
-#ifdef HAVE_LINUX_TELEPHONY_H
-#ifdef HAVE_LINUX_IXJUSER_H
-  if (!Eight_Bit) {
-    codec = LINEAR16;
-  } else {
-    codec = LINEAR8;
-  }
-
-  ioctl(soundfd, IXJCTL_PORT, Ixj_Port);
-
-  ioctl(soundfd, IXJCTL_AEC_START, AEC_HIGH);
-  ioctl(soundfd, IXJCTL_DAA_AGAIN, AGRR06DB | AGX00DB);
-  ioctl(soundfd, PHONE_REC_CODEC, codec);
-  ioctl(soundfd, PHONE_PLAY_CODEC, codec);
-
-  if (!ioctl(soundfd, PHONE_RING)) {
-    g_warning("Cannot issue a RING to Quicknet/POTS device");
-  }
-
-  ioctl(soundfd, PHONE_REC_START);
-  ioctl(soundfd, PHONE_PLAY_START);
-#else
-  g_warning("Compiled without Quicknet support and tried to open Quicknet device.");
-#endif /* HAVE_LINUX_IXJUSER_H */
-#else
-  g_warning("Compiled without Quicknet support and tried to open Quicknet device.");
-#endif /* HAVE_LINUX_TELEPHONY_H */
-
-  return soundfd;
-}
-#endif // 0
-
-static
-int sound_open_device(int direction)
-{
-  switch (Device) {
-  case OSS_DEVICE:
-    return sound_oss_open(Sound_Direction);
-    break;
-  /*case IXJ_DEVICE:
-    return sound_ixj_open(Sound_Direction);
-    break;*/
-  default:
-    g_warning("Unknown sound device type: %d", Device);
-    return -1;
-    break;
-  }
+	switch (Device) {
+		case OSS_DEVICE:
+			return sound_oss_open(Sound_Direction);
+			break;
+		default:
+			g_warning("Unknown sound device type: %d", Device);
+			return -1;
+			break;
+	}
 }
 
-Sound_Handle
-sound_open(int direction)
+void set_stereo_mode()
+{
+	if (!sound_in_use()) {
+		G_LOCK(Sound_Access);
+		stereo = 1;                   /* stereo */
+		G_UNLOCK(Sound_Access);
+	}
+}
+	
+void set_speed(int s)
+{
+	if (!sound_in_use()) {
+		G_LOCK(Sound_Access);
+		speed = s;                   /* stereo */
+		G_UNLOCK(Sound_Access);
+	}
+}
+
+Sound_Handle sound_open(int direction)
 {
   int fd;
   Sound_Handle hand;
@@ -492,8 +370,3 @@ find_power_level(void *buf, int buflen)
 }
 
 
-/*
- * Local variables:
- *  compile-command: "make -k libgphone.a"
- * End:
- */
