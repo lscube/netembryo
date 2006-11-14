@@ -26,12 +26,22 @@
  * */
 
 #include <glib.h>
+#include <glib/gprintf.h>
 #include <netembryo/wsocket.h>
 #include <netinet/in.h>
 #include <netdb.h> // for getnameinfo()
 
-inline char * get_remote_host(Sock *s)
+char * get_remote_host(Sock *s)
 {
+	char str[128];
+	int len = sizeof(str);
+
+	if(s->remote_host != NULL)
+		return s->remote_host;
+	
+	if((sock_ntop_host((struct sockaddr *)&(s->sock_stg),str,len)) != NULL)
+		s->remote_host=g_strdup(str);	
+		
 	return s->remote_host;
 }
 
@@ -47,8 +57,16 @@ inline int get_local_hostname(Sock *s, char *localhostname, size_t len) //return
 	return getnameinfo((struct sockaddr *)&(s->sock_stg), sizeof(s->sock_stg), localhostname, len, NULL, 0, 0);
 }
 
-inline char * get_remote_port(Sock *s)
+char * get_remote_port(Sock *s)
 {
+	int32_t port;
+	
+	if(s->remote_port != NULL)
+		return s->remote_port;
+	if((port = sock_get_port((struct sockaddr *)&(s->sock_stg))) < 0)
+		return NULL;
+	s->remote_port = g_strdup_printf("%d", port);
+
 	return s->remote_port;
 }
 
