@@ -138,6 +138,10 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	} else
 		s->remote_port = ntohs(remote_port);
 
+	fnc_log(FNC_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
+		"remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
+		s->remote_port);
+
 	if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
 		//fprintf(stderr,"IS MULTICAST\n");
 		if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr))!=0) {

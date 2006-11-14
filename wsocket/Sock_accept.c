@@ -39,6 +39,7 @@ Sock * Sock_accept(Sock *s)
 {
 	int res = -1;
 	char remote_host[128]; /*Unix Domain is largest*/
+	char local_host[128]; /*Unix Domain is largest*/
 	int32_t remote_port = -1;
 	int32_t local_port = -1;
 	Sock *new_s = NULL;
@@ -116,6 +117,11 @@ Sock * Sock_accept(Sock *s)
 		return NULL;
 	}
 
+	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
+		memset(local_host, 0, sizeof(local_host));
+
+	s->local_host = g_strdup(local_host);
+
 	local_port = sock_get_port(sa_p);
 	if(local_port < 0) {
 		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_accept().\n");
@@ -124,6 +130,10 @@ Sock * Sock_accept(Sock *s)
 	}
 	else
 		new_s->local_port = ntohs(local_port);
+
+	fnc_log(FNC_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
+		"remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
+		s->remote_port);
 
 	return new_s;
 }
