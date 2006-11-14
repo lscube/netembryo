@@ -125,13 +125,14 @@ int main(int argc, char **argv)
 	int sock; /*socket descriptor*/
 	mpa_data *mpa;	
 	int oflag = O_RDONLY;
-	unsigned long int sleep_time;
+	unsigned long int sleep_time = 0;
 	struct timespec ts;
 	
 	struct timeval now;
 	double time1=0.0;
-	double mnow;
+	double mnow=0.0;
 	double timestamp1=0.0;
+	double pktlen=0;
 	
 	int n;
 	static const char short_options[] = "a:p:f:slt";
@@ -256,20 +257,21 @@ stream:
 
 		}
 			
+		pktlen=(double)mpa->frame_size/(double)properties->sample_rate;// * 1000000000;
+		
 		gettimeofday(&now,NULL);
 		mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-		if(time1>0.0) {
-			while ((mnow - time1) < ((timestamp  - timestamp1) * 1000) - 2) {
+		if(time1>0.0 ) {
+			while((mnow - time1) < pktlen * 1000) {
+				ts.tv_sec=0;
+				ts.tv_nsec = 1;pktlen * 1000000;
+				//nanosleep(&ts, NULL);
 				gettimeofday(&now,NULL);
 				mnow=(double)now.tv_sec*1000+(double)now.tv_usec/1000;
-				/*wait*/
-				//sleep_time=(double)mpa->frame_size/(double)properties->sample_rate * 1000000000;
-				ts.tv_sec=0;
-				//ts.tv_nsec =sleep_time;
-				ts.tv_nsec =1;//26122;
-				nanosleep(&ts, NULL);
+				//fprintf(stderr,"pktlen  = %f - (mnow - time1) = %f\n",pktlen, (mnow - time1));
 			}
 		} 
+
 		time1=mnow;
 		timestamp1=timestamp ;
 

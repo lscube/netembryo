@@ -28,7 +28,10 @@
 #include <config.h>
 #include <stdio.h>
 #include <sys/types.h>
-#include <pthread.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 
 #include <netembryo/wsocket.h>
 #include <programs/mp3receiver.h>
@@ -40,6 +43,7 @@ void *write_side(void *arg)
 	int slot;	
 	playout_buff *po = ((Arg *)arg)->pb;
 	buffer_pool *bp = ((Arg *)arg)->bp;
+	struct timespec ts;
 
 	while(!((Arg *)arg)->thread_dead) {
 		if( (slot=bpget(bp)) < 0) {
@@ -73,6 +77,13 @@ void *write_side(void *arg)
 			
 			return NULL;
 		}
+		if(bp->flcount > DEFAULT_MAX_QUEUE - 1) {	
+			//fprintf(stderr,"buffer = %d\n",bp->flcount);
+			ts.tv_sec=0;
+			ts.tv_nsec = 26122;
+			nanosleep(&ts, NULL);
+		}
+
 	}
 	
 	((Arg *)arg)->thread_dead = 1;
