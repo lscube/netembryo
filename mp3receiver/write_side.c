@@ -41,10 +41,12 @@ void *write_side(void *arg)
 	playout_buff *po = ((Arg *)arg)->pb;
 	buffer_pool *bp = ((Arg *)arg)->bp;
 
-	while(1) {
+	while(!((Arg *)arg)->thread_dead) {
 		if( (slot=bpget(bp)) < 0) {
 			//nms_printf(NMSML_VERB, "No more space in Playout Buffer!"BLANK_LINE);
 			Sock_close(((Arg *)arg)->sock);
+			((Arg *)arg)->thread_dead = 1;
+
 			return NULL;
 		}
 
@@ -67,11 +69,14 @@ void *write_side(void *arg)
 		else {
 			printf("Writer Thread: error while reading\n");
 			Sock_close(((Arg *)arg)->sock);
+			((Arg *)arg)->thread_dead = 1;
 			
 			return NULL;
 		}
 	}
-
+	
+	((Arg *)arg)->thread_dead = 1;
+	
 	return NULL;
 }
 

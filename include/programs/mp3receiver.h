@@ -39,6 +39,7 @@ typedef struct ARG {
 	Sock *sock;
 	int min_queue;
 	int max_queue;
+	int thread_dead;
 } Arg;
 
 

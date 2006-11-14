@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 	int32_t nerr = 0;	/*number of error */
 	//NETWORK OPTIONS
 	int type=UDP;	
-	int flag;
+	int flag = 0;
 	char port[6];
 	char maddr[128];
 	Sock *s;
@@ -157,6 +157,7 @@ int main(int argc, char **argv)
 	}
 
 	threadarg=calloc(1,sizeof(Arg));
+	threadarg->thread_dead = 0;
 	threadarg->min_queue = min_queue;
 	threadarg->max_queue = max_queue;
 
@@ -234,6 +235,7 @@ int main(int argc, char **argv)
 	free(threadarg->bp);
 	free(threadarg->pb);
 	free(threadarg);
+	printf("\n\t MP3RECEIVER IS GOING TO SHUTDOWN ... \n");
 
 	return 0;
 }

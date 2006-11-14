@@ -66,19 +66,22 @@ void *read_side(void *arg)
 	mad_decoder_init(&decoder, buffer, madinput, madheader , 0 /* filter */ , madoutput,
 			 0 /*error*/, 0 /* message */ );
 	buffer->decoder = &decoder;
-	if(bp->flcount <= 1) {	
-		//prefill	
-		while(bp->flcount < DEFAULT_MIN_QUEUE) {
-			//fprintf(stderr,"buffer = %d\n",bp->flcount);
-			ts.tv_sec=0;
-			ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
-			nanosleep(&ts, NULL);
+
+	while(result != MAD_FLOW_BREAK && !((Arg *)arg)->thread_dead) {
+		if(bp->flcount <= 1) {	
+			//prefill	
+			while(bp->flcount < DEFAULT_MIN_QUEUE) {
+				//fprintf(stderr,"buffer = %d\n",bp->flcount);
+				ts.tv_sec=0;
+				ts.tv_nsec = 26122 * DEFAULT_MIN_QUEUE * 1000;  //only to rescale the process
+				nanosleep(&ts, NULL);
+			}
 		}
-	}
 
 
 	//while(result==MAD_FLOW_CONTINUE)
 		result = mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
+	}
 	
 #if ENABLE_LIBAO
 	//ao_close(ao_dev);
@@ -89,7 +92,8 @@ void *read_side(void *arg)
 	/* release the decoder */
 	mad_decoder_finish(&decoder);
 	free(buffer);
-
+	((Arg *)arg)->thread_dead = 1;
+	
 	return NULL;
 }
 

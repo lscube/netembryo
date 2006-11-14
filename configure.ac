@@ -93,7 +93,7 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create)
 
 dnl the followed two checks are usefull only for mp3receiver test program for using libmad
-AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mpg321. See http://www.mars.org/home/rob/proj/mpeg/))
+AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mp3receiver. See http://www.mars.org/home/rob/proj/mpeg/))
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
