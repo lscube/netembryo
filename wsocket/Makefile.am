@@ -17,7 +17,8 @@ libwsocket_la_SOURCES =		is_multicast.c \
 				sock_ntop_host.c \
 				sock_tcp_read.c \
 				sock_udp_read.c \
-				sock_write.c \
+				sock_udp_write.c \
+				sock_tcp_write.c \
 				sockfd_to_family.c
 if HAVE_SSL				
 libwsocket_la_SOURCES +=	create_ssl_ctx.c \
@@ -40,7 +41,6 @@ libwsocket_la_SOURCES +=	addr_ntop.c \
 				Sock_close.c \
 				Sock_compare.c \
 				Sock_connect.c \
-				Sock_connect_by_sock.c \
 				Sock_init.c \
 				Sock_listen.c \
 				Sock_set_props.c \

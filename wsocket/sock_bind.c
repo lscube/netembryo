@@ -37,8 +37,10 @@ int sock_bind(char *host, char *port, int *sock, enum sock_types sock_type)
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 
-	hints.ai_flags = AI_PASSIVE;
-	//hints.ai_flags = AI_CANONNAME;
+	if (host == NULL)
+		hints.ai_flags = AI_PASSIVE;
+	else
+		hints.ai_flags = AI_CANONNAME;
 #ifdef IPV6
 	hints.ai_family = AF_UNSPEC;
 #else

@@ -27,12 +27,13 @@
 
 #include <netembryo/wsocket.h>
 
-int Sock_connect_by_sock(Sock *s,char *host, char *port)
+int sock_udp_write(int fd, void *buffer, int nbytes, struct sockaddr_storage *from,  socklen_t from_len)
 {
-	if(s->socktype == TCP)
-		return 0; /*ok, nothing to do*/
-	if(s == NULL)
-		return -1; /*not binded socket. Use Sock_connect instead*/
+	int n;
 
-	return sock_connect_by_fd(host, port, get_fd(s));
+	n = sendto(fd, buffer, nbytes, 0, (struct sockaddr *)(from), from_len);
+
+	
+	return n;
 }
+

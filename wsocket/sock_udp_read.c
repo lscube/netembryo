@@ -27,15 +27,17 @@
 
 #include <netembryo/wsocket.h>
 
-int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from, int from_len)
+int sock_udp_read(int fd, void *buffer, int nbytes, struct sockaddr_storage *from,  socklen_t from_len, int *remote_port)
 {
 	int n;
- 	/*struct sockaddr_storage from;*/
-	/*int from_len = sizeof(from);*/
 
-	n = recvfrom(fd, buffer, nbytes, 0, (struct sockaddr *)&from, &from_len);
+	n = recvfrom(fd, buffer, nbytes, 0, (struct sockaddr *)(from), &from_len);
 	/*n = read(fd, buffer, nbytes);*/
 
+	if (n > 0) {
+		*remote_port = ntohs(((struct sockaddr_in *)(from))->sin_port);
+	}
+	
 	return n;
 }
 
