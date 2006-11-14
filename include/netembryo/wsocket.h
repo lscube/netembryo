@@ -185,6 +185,8 @@ typedef struct {
 int sockfd_to_family(int sockfd);
 int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints);
 int sock_connect(char *host, char *port, int *sock, enum sock_types sock_type);
+/*sock_connect_by_fd: connect throught an existed UDP (only!!!)binded socket*/
+int sock_connect_by_fd(char *host, char *port, int sock);
 int sock_bind(char *host, char *port, int *sock, enum sock_types sock_type);
 int sock_accept(int sock);
 int sock_listen(int s, int backlog);
@@ -219,6 +221,8 @@ char *addr_ntop(const Sock  *addr, char *str, size_t len);
 /*TODO: doc them!!!!!*/
 /*up level wrapper*/
 Sock * Sock_connect(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag);
+/*Sock_connect_by_sock: to connect throught a binded socket*/
+int Sock_connect_by_sock(Sock *s,char *host, char *port);
 Sock * Sock_bind(char *host, char *port, int *sock, enum sock_types sock_type, int ssl_flag);/*usually host is NULL for unicast. 
 											       For multicast it is the multicast address.
 											       Change it (ifi_xxx, see Stevens Chap.16)*/
