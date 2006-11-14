@@ -30,7 +30,7 @@
 
 #include <time.h>
 
-#include <netembryo/mpeg.h>
+#include <programs/mpeg.h>
 #include <sys/time.h> 
 #include <sys/types.h> 
 #include <unistd.h> 

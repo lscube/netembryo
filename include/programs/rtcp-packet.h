@@ -16,13 +16,13 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
   
-  $Id: rtcp-packet.h,v 1.3 2001/05/07 18:55:05 dreier Exp $
+  $Id:rtcp-packet.h 3 2005-12-06 10:40:45Z federico $
 */
 
 #ifndef _RTCP_PACKET_H
 #define _RTCP_PACKET_H 
 
-#include <netembryo/rtp.h>
+#include <programs/rtp.h>
 #include <netembryo/wsocket.h>
 #include <stdlib.h>
 #include <glib.h>

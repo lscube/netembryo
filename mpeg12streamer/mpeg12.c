@@ -28,7 +28,7 @@
  *  
  * */
 
-#include <netembryo/mpeg.h>
+#include <programs/mpeg.h>
 
 static MediaParserInfo info = {
 	"MPV",
