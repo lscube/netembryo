@@ -81,7 +81,7 @@ struct sockaddr_storage
 /*definition for flags*/
 /*ssl_flags*/
 #define USE_SSL		01 
-//#define USE_CRYPTO	03 /*set also USE_SSL*/
+//#define USE_TLS	03 /*set also USE_SSL*/
 /*multicast and ipv6 flags*/
 #define IS_MULTICAST	04
 
@@ -221,6 +221,7 @@ int Sock_write(Sock *, void *buffer, int nbytes);
 int Sock_close(Sock *);
 int get_fd(Sock *);
 void Sock_init(void);
+int Sock_compare(Sock *p, Sock *q);
 
 /*get_info.c*/
 char * get_remote_host(Sock *);
