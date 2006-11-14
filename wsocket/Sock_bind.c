@@ -38,6 +38,7 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 	int sockfd = -1;
 	struct sockaddr *sa_p;
 	socklen_t sa_len;
+	char local_host[128];
 	int32_t local_port;
 
 #if HAVE_SSL
@@ -73,6 +74,11 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 		return NULL;
 	}
 
+	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
+		memset(local_host, 0, sizeof(local_host));
+
+	s->local_host = g_strdup(local_host);
+
 	local_port = sock_get_port(sa_p);
 
 	if(local_port < 0) {
@@ -81,6 +87,8 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 		return NULL;
 	} else
 		s->local_port = ntohs(local_port);
+
+	fnc_log(FNC_LOG_DEBUG, "Socket bound with addr=\"%s\" and port=\"%u\".\n", s->local_host, s->local_port);
 
 	if(is_multicast_address(sa_p, s->local_stg.ss_family)) {
 		if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr) )) {
