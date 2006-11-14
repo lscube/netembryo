@@ -11,6 +11,7 @@ libwsocket_la_SOURCES =		is_multicast.c \
 				sock_bind.c \
 				sock_close.c \
 				sock_connect.c \
+				sock_connect_by_fd.c \
 				sock_get_port.c \
 				sock_listen.c \
 				sock_ntop_host.c \
@@ -39,6 +40,7 @@ libwsocket_la_SOURCES +=	addr_ntop.c \
 				Sock_close.c \
 				Sock_compare.c \
 				Sock_connect.c \
+				Sock_connect_by_sock.c \
 				Sock_init.c \
 				Sock_listen.c \
 				Sock_set_props.c \
