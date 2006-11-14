@@ -29,5 +29,5 @@
 
 int get_fd(Sock *s)
 {
-	return s->fd;
+	return (s->fd);
 }

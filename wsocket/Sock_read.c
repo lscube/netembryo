@@ -30,29 +30,42 @@
 
 #include <netembryo/wsocket.h>
 
-int Sock_read(Sock *s, void *buffer, int nbytes)
+int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata)
 {
-	int n = 0;
-	int remote_port = 0;
-	
-	socklen_t from_len = sizeof(struct sockaddr_storage);
+
+socklen_t sa_len = sizeof(struct sockaddr_storage);
+
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
 		n = sock_SSL_read(s->ssl,buffer,nbytes);
 	else {
 #endif
-		if(s->socktype == UDP) {	
-			n = sock_udp_read(s->fd,buffer,nbytes, &(s->sock_stg), from_len,&remote_port);
-			if (n > 0) { 
-				s->remote_port = g_strdup_printf("%d", remote_port);
+		switch(s->socktype) {
+		case UDP:
+			if (!protodata) {
+				return -1;
 			}
-			
+			return recvfrom(s->fd, buffer, nbytes, 0,
+				(struct sockaddr *) protodata, &sa_len);
+			break;
+		case TCP:
+			return read(s->fd, buffer, nbytes);
+			break;
+		case SCTP:
+#ifdef HAVE_SCTP_FENICE
+			if (!protodata) {
+				return -1;
+			}
+			return sctp_recvmsg(transport->fd, buffer, nbytes, NULL,
+				 0, (struct sctp_sndrcvinfo *) protodata, NULL);
+#endif
+			break;
+		default:
+			break;
 		}
-		if(s->socktype == TCP)	
-			n = sock_tcp_read(s->fd,buffer,nbytes);
 #if HAVE_SSL
 	}
 #endif
-	
-	return n;
+
+	return -1;
 }

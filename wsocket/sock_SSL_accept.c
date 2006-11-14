@@ -30,35 +30,26 @@
 #include <netembryo/wsocket.h>
 #include <openssl/ssl.h>
 
-int sock_SSL_accept(SSL **ssl_con, int sock)
+int sock_SSL_accept(SSL **ssl_con, int new_fd)
 {
 	int ssl_err;
-	int new_fd;
-	//SSL_CTX *ssl_ctx = NULL;
 	X509 * client_cert;
-	char *    str;
+	char * str;
 	
-	if(!(new_fd=sock_accept(sock)))
-		return WSOCK_ERROR;
-/*
-	ssl_ctx=create_ssl_ctx();
-	if(!ssl_ctx)
-		return WSOCK_ERROR;
-	*ssl_con = SSL_new(ssl_ctx);
+	*ssl_con = get_ssl_connection(new_fd);
+
 	if(!(*ssl_con)) {
-		SSL_CTX_free(ssl_ctx);
+		fnc_log(FNC_LOG_ERR, "sock_SSL_accept: get_ssl_connection() returned NULL.\n");
 		return WSOCK_ERROR;
 	}
-	SSL_set_fd (*ssl_con, new_fd);
-	
-	SSL_get_cipher (*ssl_con);
-*/
-	*ssl_con=get_ssl_connection(new_fd);
-	if(!(*ssl_con)) {
-		printf("sock_SSL_accept: get_ssl_connection returns NULL");
+
+	if (SSL_accept(*ssl_con) <= 0) {
+		fnc_log(FNC_LOG_ERR, "sock_SSL_accept: SSL_accept() failed.\n");
+		sock_SSL_close(*ssl_con);
 		return WSOCK_ERROR;
 	}
-	ssl_err=SSL_accept(*ssl_con);
+
+#if 0
 	/*Client Cert. Not used*/
 	client_cert = SSL_get_peer_certificate (*ssl_con);
 	if (client_cert != NULL) {
@@ -72,6 +63,7 @@ int sock_SSL_accept(SSL **ssl_con, int sock)
 		X509_free (client_cert);
 	}
 	/*---------------------*/
-	
-	return new_fd;
+#endif
+
+	return WSOCK_OK;
 }

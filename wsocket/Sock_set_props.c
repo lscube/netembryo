@@ -28,7 +28,7 @@
 #include <sys/ioctl.h>
 #include <netembryo/wsocket.h>
 
-int Sock_set_props(int d, int request, int *on)
+int Sock_set_props(Sock *s, int request, int *on)
 {
-	return ioctl(d,request,on);
+	return ioctl(s->fd, request, on);
 }

@@ -27,23 +27,43 @@
 
 #include <netembryo/wsocket.h>
 
-int Sock_write(Sock *s, void *buffer, int nbytes)
+int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata)
 {
-	int n = 0;
-	socklen_t from_len = sizeof(struct sockaddr_storage);
+#ifdef HAVE_SCTP_FENICE
+	struct sctp_sndrcvinfo sinfo;
+#endif
 
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
-		n = sock_SSL_write(s->ssl,buffer,nbytes);
+		return sock_SSL_write(s->ssl, buffer, nbytes);
 	else { 
 #endif		
-		if(s->socktype == TCP)	
-			n = sock_tcp_write(s->fd,buffer,nbytes);
-		else if ( s->socktype == UDP )
-			n = sock_udp_write(s->fd,buffer,nbytes, &(s->sock_stg), from_len);
+		switch (s->socktype) {
+		case TCP:
+			return write(s->fd, buffer, nbytes);
+			break;
+		case UDP:
+			if (!protodata) {
+				protodata = &(s->remote_stg);
+			}
+			return sendto(s->fd, buffer, nbytes, 0, (struct sockaddr *) 
+					protodata, sizeof(struct sockaddr_storage));
+			break;
+		case SCTP:
+#ifdef HAVE_SCTP_FENICE
+			if (!protodata) {
+				protodata = &sinfo;
+				memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
+			}
+			return sctp_send(s->fd, buffer, nbytes, 
+				(struct sctp_sndrcvinfo *) protodata, MSG_EOR);
+#endif
+			break;
+		default:
+			break;
+		}
 #if HAVE_SSL
 	}
-#endif		if(s->socktype == TCP)	
-	
-	return n;
+#endif		
+	return -1;
 }
