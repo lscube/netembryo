@@ -34,108 +34,100 @@
 */
 
 struct Thread_Queue {
-  GMutex *mutex;
-  GSList *list;
+	GMutex *mutex;
+	GSList *list;
 };
 
-Thread_Queue
-thread_queue_new(void)
+Thread_Queue thread_queue_new(void)
 {
-  Thread_Queue queue;
+	Thread_Queue queue;
 
-  queue = g_malloc(sizeof *queue);
-  queue -> mutex = g_mutex_new();
-  queue -> list = NULL;
+	queue = g_malloc(sizeof *queue);
+	queue->mutex = g_mutex_new();
+	queue->list = NULL;
 
-  return queue;
+	return queue;
 }
 
-void
-thread_queue_free(Thread_Queue queue)
+void thread_queue_free(Thread_Queue queue)
 {
-  if (queue != NULL) {
-    g_mutex_lock(queue -> mutex);
-    if (g_slist_length(queue -> list) != 0) {
-      g_warning("Freeing a thread-queue with nonempty list.");
-    }
-    g_free(queue -> mutex);
-    g_free(queue);
-  } else {
-    g_warning("Freeing a NULL thread-queue.");
-  }
+	if (queue != NULL) {
+		g_mutex_lock(queue->mutex);
+		if (g_slist_length(queue->list) != 0) {
+			g_warning("Freeing a thread-queue with nonempty list.");
+		}
+		g_free(queue->mutex);
+		g_free(queue);
+	} else {
+		g_warning("Freeing a NULL thread-queue.");
+	}
 }
 
-gboolean
-thread_queue_empty(Thread_Queue queue)
+gboolean thread_queue_empty(Thread_Queue queue)
 {
-  gboolean empty;
+	gboolean empty;
 
-  g_assert(queue != NULL);
+	g_assert(queue != NULL);
 
-  g_mutex_lock(queue -> mutex);
-  empty = ((queue -> list) == NULL) ? TRUE : FALSE;
-  g_mutex_unlock(queue -> mutex);
-  
-  return empty;
+	g_mutex_lock(queue->mutex);
+	empty = ((queue->list) == NULL) ? TRUE : FALSE;
+	g_mutex_unlock(queue->mutex);
+
+	return empty;
 }
 
-guint
-thread_queue_length(Thread_Queue queue)
+guint thread_queue_length(Thread_Queue queue)
 {
-  guint length;
-  
-  g_assert(queue != NULL);
-  
-  g_mutex_lock(queue -> mutex);
-  length = g_slist_length(queue -> list);
-  g_mutex_unlock(queue -> mutex);
-  
-  return length;
+	guint length;
+
+	g_assert(queue != NULL);
+
+	g_mutex_lock(queue->mutex);
+	length = g_slist_length(queue->list);
+	g_mutex_unlock(queue->mutex);
+
+	return length;
 }
 
-gpointer
-thread_queue_head(Thread_Queue queue)
+gpointer thread_queue_head(Thread_Queue queue)
 {
-  gpointer item;
-  
-  g_mutex_lock(queue -> mutex);
-  if (g_slist_length(queue -> list) != 0) {
-    item = queue -> list -> data;
-  } else {
-    item = NULL;
-  }
-  g_mutex_unlock(queue -> mutex);
-  
-  return item;
+	gpointer item;
+
+	g_mutex_lock(queue->mutex);
+	if (g_slist_length(queue->list) != 0) {
+		item = queue->list->data;
+	} else {
+		item = NULL;
+	}
+	g_mutex_unlock(queue->mutex);
+
+	return item;
 }
 
-void
-thread_queue_add(Thread_Queue queue, gpointer item)
+void thread_queue_add(Thread_Queue queue, gpointer item)
 {
-  g_assert(queue != NULL);
-  
-  g_mutex_lock(queue -> mutex);
-  queue -> list = g_slist_append(queue -> list, item);
-  g_mutex_unlock(queue -> mutex);
+	g_assert(queue != NULL);
+
+	g_mutex_lock(queue->mutex);
+	queue->list = g_slist_append(queue->list, item);
+	g_mutex_unlock(queue->mutex);
 }
 
-void
-thread_queue_remove(Thread_Queue queue)
+void thread_queue_remove(Thread_Queue queue)
 {
-  g_assert(queue != NULL);
+	g_assert(queue != NULL);
 
-  g_mutex_lock(queue -> mutex);
-  queue -> list = g_slist_remove_link(queue -> list, queue -> list);
-  g_mutex_unlock(queue -> mutex);
+	g_mutex_lock(queue->mutex);
+	queue->list = g_slist_remove_link(queue->list, queue->list);
+	g_mutex_unlock(queue->mutex);
 }
 
-void
-thread_queue_remove_free(Thread_Queue queue)
+void thread_queue_remove_free(Thread_Queue queue)
 {
-  g_assert(queue != NULL);
+	g_assert(queue != NULL);
 
-  g_mutex_lock(queue -> mutex);
-  g_free(queue -> list -> data);
-  queue -> list = g_slist_remove_link(queue -> list, queue -> list);
-  g_mutex_unlock(queue -> mutex);
+	g_mutex_lock(queue->mutex);
+	g_free(queue->list->data);
+	queue->list = g_slist_remove_link(queue->list, queue->list);
+	g_mutex_unlock(queue->mutex);
 }
