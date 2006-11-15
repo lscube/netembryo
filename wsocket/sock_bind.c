@@ -50,7 +50,7 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 	switch (socktype) {
 	case SCTP:
 #ifndef HAVE_SCTP_FENICE
-		fnc_log(FNC_LOG_ERR, "SCTP protocol not compiled in\n");
+		net_log(NET_LOG_ERR, "SCTP protocol not compiled in\n");
 		return WSOCK_ERROR;
 		break;
 #endif	// else go down to TCP case (SCTP and TCP are both SOCK_STREAM type)
@@ -61,13 +61,13 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 		hints.ai_socktype = SOCK_DGRAM;
 		break;
 	default:
-		fnc_log(FNC_LOG_ERR, "Unknown socket type specified\n");
+		net_log(NET_LOG_ERR, "Unknown socket type specified\n");
 		return WSOCK_ERROR;
 		break;
 	}
 
 	if ((n = gethostinfo(&res, host, port, &hints)) != 0) {
-		fnc_log(FNC_LOG_ERR, "%s\n", gai_strerror(n));	
+		net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));	
 		return WSOCK_ERRADDR;
 	}
 	

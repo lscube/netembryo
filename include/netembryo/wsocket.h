@@ -44,22 +44,6 @@
 #include <netdb.h>
 #include <glib.h>
 
-/** set fnc_log to "fprintf(stderr, ..." if fenice log is not available
- * TODO: change with something embedded in netembryo 
- */
-#ifndef FENICE_LOG_FILE_DEFAULT
-#define fnc_log fprintf
-#define FNC_LOG_FATAL stderr
-#define FNC_LOG_ERR stderr
-#define FNC_LOG_WARN stderr
-#define FNC_LOG_INFO stderr
-#define FNC_LOG_DEBUG stderr
-#define FNC_LOG_VERBOSE stderr
-#define FNC_LOG_CLIENT stderr
-#else
-#include <fenice/fnc_log.h>
-#endif
-
 /* SSL support need revision, may be broken */
 #ifdef HAVE_SSL
 #undef HAVE_SSL
@@ -247,6 +231,17 @@ int sock_SSL_write(SSL *, void *, int);
 int sock_SSL_close(SSL *);
 #endif
 
+/** log facilities */
+/* store pointer to external log function */
+extern void (*net_log)(int, const char*, ...);
+/* levels to be implemented by log function */
+#define NET_LOG_FATAL 0 
+#define NET_LOG_ERR 1
+#define NET_LOG_WARN 2 
+#define NET_LOG_INFO 3 
+#define NET_LOG_DEBUG 4 
+#define NET_LOG_VERBOSE 5 
+
 /** ------------------------------- INTERFACE -------------------------------
  * TODO: write API specs
  */
@@ -261,7 +256,7 @@ int Sock_listen(Sock *n, int backlog);
 int Sock_read(Sock *, void *buffer, int nbytes, void *protodata, int flags); // protodata is sock_type dependant
 int Sock_write(Sock *, void *buffer, int nbytes, void *protodata, int flags);
 int Sock_close(Sock *);
-void Sock_init(void);
+void Sock_init(void (*)(int, const char*, ...));
 int Sock_compare(Sock *, Sock *);
 #define Sock_cmp Sock_compare
 int Sock_socketpair(Sock *[]);

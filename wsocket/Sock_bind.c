@@ -44,19 +44,19 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 #if HAVE_SSL
 	if ((ssl_flag & USE_SSL) {
 		if(socktype != TCP) {
-			fnc_log(FNC_LOG_ERR, "SSL can't work on this protocol.\n");
+			net_log(NET_LOG_ERR, "SSL can't work on this protocol.\n");
 			return NULL;
 		}
 	}
 #endif
 
 	if (sock_bind(host, port, &sockfd, socktype)) {
-		fnc_log(FNC_LOG_ERR, "Error in low level sock_bind().\n");
+		net_log(NET_LOG_ERR, "Error in low level sock_bind().\n");
 		return NULL;
 	}
 
 	if (!(s = g_new0(Sock, 1))) {
-		fnc_log(FNC_LOG_ERR, "Unable to allocate a Sock struct in Sock_bind().\n");
+		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_bind().\n");
 		sock_close(sockfd);
 		return NULL;
 	}
@@ -82,13 +82,13 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 	local_port = sock_get_port(sa_p);
 
 	if(local_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_bind().\n");
+		net_log(NET_LOG_ERR, "Unable to get local port in Sock_bind().\n");
 		Sock_close(s);
 		return NULL;
 	} else
 		s->local_port = ntohs(local_port);
 
-	fnc_log(FNC_LOG_DEBUG, "Socket bound with addr=\"%s\" and port=\"%u\".\n", s->local_host, s->local_port);
+	net_log(NET_LOG_DEBUG, "Socket bound with addr=\"%s\" and port=\"%u\".\n", s->local_host, s->local_port);
 
 	if(is_multicast_address(sa_p, s->local_stg.ss_family)) {
 		if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr) )) {

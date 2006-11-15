@@ -55,14 +55,14 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	}
 
 	if (sock_connect(host, port, &sockfd, socktype)) {
-			fnc_log(FNC_LOG_ERR, "Sock_connect() failure.\n");
+			net_log(NET_LOG_ERR, "Sock_connect() failure.\n");
 			return NULL;
 	}
 
 #if HAVE_SSL
 	if(ssl_flag & USE_SSL) {
 		if (sock_SSL_connect(&ssl_con))
-			fnc_log (FNC_LOG_ERR, "Sock_connect() failure in SSL init.\n");
+			net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
 			sock_close(sockfd);
 			return NULL;
 	}
@@ -74,7 +74,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 		g_free(s->local_host);
 		g_free(s->remote_host);
 	} else if (!(s = g_new0(Sock, 1))) {
-		fnc_log(FNC_LOG_ERR, "Unable to allocate a Sock struct in Sock_connect().\n");
+		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if HAVE_SSL
 		if(ssl_flag & USE_SSL) 
 			sock_SSL_close(ssl_con);
@@ -96,7 +96,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
 	if(getsockname(s->fd, sa_p, &sa_len))
 	{
-		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
 		Sock_close(s);
 		return NULL;
 	}
@@ -109,7 +109,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	local_port = sock_get_port(sa_p);
 
 	if(local_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_connect().\n");
+		net_log(NET_LOG_ERR, "Unable to get local port in Sock_connect().\n");
 		Sock_close(s);
 		return NULL;
 	} else
@@ -120,7 +120,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
 	if(getpeername(s->fd, sa_p, &sa_len))
 	{
-		fnc_log(FNC_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
 		Sock_close(s);
 		return NULL;
 	}
@@ -132,13 +132,13 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
 	remote_port = sock_get_port(sa_p);
 	if(remote_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
 		Sock_close(s);
 		return NULL;
 	} else
 		s->remote_port = ntohs(remote_port);
 
-	fnc_log(FNC_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
+	net_log(NET_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
 		"remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
 		s->remote_port);
 

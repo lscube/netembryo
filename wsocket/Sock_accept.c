@@ -1,5 +1,5 @@
 /* * 
- *  $Id: Sock_accept.c 46 2006-11-10 15:50:54Z dario $
+ *  $Id$
  *  
  *  This file is part of NetEmbryo 
  *
@@ -50,14 +50,14 @@ Sock * Sock_accept(Sock *s)
 #endif
 
 	if ((res = sock_accept(s->fd)) < 0) {
-		fnc_log(FNC_LOG_ERR, "System error in sock_accept().\n");
+		net_log(NET_LOG_ERR, "System error in sock_accept().\n");
 		return NULL;
 	}
 
 #if HAVE_SSL
 	if(s->flags & USE_SSL) {
 		if(sock_SSL_accept(&ssl_con,res)) {
-			fnc_log(FNC_LOG_ERR, "Unable to accept SSL connection.\n");
+			net_log(NET_LOG_ERR, "Unable to accept SSL connection.\n");
 			sock_close(res);
 			return NULL;
 		}
@@ -65,7 +65,7 @@ Sock * Sock_accept(Sock *s)
 #endif
 
 	if (!(new_s = g_new0(Sock, 1))) {
-		fnc_log(FNC_LOG_ERR, "Unable to allocate a Sock struct in Sock_accept().\n");
+		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_accept().\n");
 #if HAVE_SSL
 		if(s->flags & USE_SSL) 
 			sock_SSL_close(ssl_con);
@@ -88,7 +88,7 @@ Sock * Sock_accept(Sock *s)
 
 	if(getpeername(res, sa_p, &sa_len))
 	{
-		fnc_log(FNC_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
 		Sock_close(new_s);
 		return NULL;
 	}
@@ -100,7 +100,7 @@ Sock * Sock_accept(Sock *s)
 
 	remote_port = sock_get_port(sa_p);
 	if(remote_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
 		Sock_close(new_s);
 		return NULL;
 	}
@@ -112,7 +112,7 @@ Sock * Sock_accept(Sock *s)
 
 	if(getsockname(res, sa_p, &sa_len))
 	{
-		fnc_log(FNC_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
 		Sock_close(new_s);
 		return NULL;
 	}
@@ -124,14 +124,14 @@ Sock * Sock_accept(Sock *s)
 
 	local_port = sock_get_port(sa_p);
 	if(local_port < 0) {
-		fnc_log(FNC_LOG_ERR, "Unable to get local port in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get local port in Sock_accept().\n");
 		Sock_close(new_s);
 		return NULL;
 	}
 	else
 		new_s->local_port = ntohs(local_port);
 
-	fnc_log(FNC_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
+	net_log(NET_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
 		"remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
 		new_s->remote_host, new_s->remote_port);
 

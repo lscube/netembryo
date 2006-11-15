@@ -32,11 +32,63 @@
 #include <openssl/ssl.h>
 #endif
 
-void Sock_init(void)
+static void net_log_default(int level, const char *fmt, ...);
+
+void (*net_log)(int, const char*, ...);
+
+void Sock_init(void (*log_func)(int, const char*, ...))
 {
 #if HAVE_SSL
 	SSL_library_init();
 	SSL_load_error_strings();
 #endif
+
+	if (log_func) {
+		net_log = log_func;
+	} else {
+		net_log = net_log_default;
+	}
+
 	return;
+}
+
+static void net_log_default(int level, const char *fmt, ...){
+	va_list args;
+	int no_print=0;
+
+	switch (level) {
+		case NET_LOG_FATAL:
+			fprintf(stderr, "[fatal error] ");
+			break;
+		case NET_LOG_ERR:
+			fprintf(stderr, "[error] ");
+			break;
+		case NET_LOG_WARN:
+			fprintf(stderr, "[warning] ");
+			break;
+		case NET_LOG_DEBUG:
+#ifdef DEBUG
+			fprintf(stderr, "[debug] ");
+#else
+			no_print=1;	 
+#endif
+			break;
+		case NET_LOG_VERBOSE:
+#ifdef VERBOSE
+			fprintf(stderr, "[verbose debug] ");
+#else
+			no_print=1;	 
+#endif
+			break;
+		default: /*NET_LOG_INFO*/
+			fprintf(stderr, "[info] ");
+			break;
+	}
+
+	if(!no_print){
+		va_start(args, fmt);
+		vfprintf(stderr, fmt, args);
+		va_end(args);
+		fflush(stderr);
+	}
 }

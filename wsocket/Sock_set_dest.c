@@ -30,7 +30,7 @@
 int Sock_set_dest(Sock *s, struct sockaddr *sa) {
 
 	if (s->socktype != UDP) {
-		fnc_log(FNC_LOG_ERR, "Only UDP socket can change destination address\n");
+		net_log(NET_LOG_FATAL, "Only UDP socket can change destination address\n");
 		return -1;
 	}
 

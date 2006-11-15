@@ -32,18 +32,18 @@ int Sock_socketpair(Sock *pair[]) {
 	int sdpair[2], i, res;
 
 	if ((res = socketpair(AF_UNIX, SOCK_DGRAM, 0, sdpair)) < 0) {
-		fnc_log(FNC_LOG_ERR, "Sock_socketpair() failure.\n");
+		net_log(NET_LOG_ERR, "Sock_socketpair() failure.\n");
 		return res;
 	}
 	
 	if (!(pair[0] = g_new0(Sock, 1))) {
-		fnc_log(FNC_LOG_ERR, "Unable to allocate first Sock struct in Sock_socketpair().\n");
+		net_log(NET_LOG_FATAL, "Unable to allocate first Sock struct in Sock_socketpair().\n");
 		close (sdpair[0]);
 		close (sdpair[1]);
 		return -1;
 	}
 	if (!(pair[1] = g_new0(Sock, 1))) {
-		fnc_log(FNC_LOG_ERR, "Unable to allocate second Sock struct in Sock_socketpair().\n");
+		net_log(NET_LOG_FATAL, "Unable to allocate second Sock struct in Sock_socketpair().\n");
 		close (sdpair[0]);
 		close (sdpair[1]);
 		g_free(pair[0]);
