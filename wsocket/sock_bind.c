@@ -34,6 +34,10 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 	int n;
 	struct addrinfo *res, *ressave;
 	struct addrinfo hints;
+#ifdef HAVE_SCTP_FENICE
+	struct sctp_initmsg initparams;
+	struct sctp_event_subscribe subscribe;
+#endif
 
 	memset(&hints, 0, sizeof(struct addrinfo));
 
@@ -81,8 +85,31 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 		if ((*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
 			continue;
 
+#ifdef HAVE_SCTP_FENICE
+		if (socktype == SCTP) {
+			// Enable the propagation of packets headers
+			memset(&subscribe, 0, sizeof(subscribe));
+			subscribe.sctp_data_io_event = 1;
+			if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
+					sizeof(subscribe)) < 0) {
+				net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sctp_open.\n");
+				return WSOCK_ERROR;
+				}
+
+			// Setup number of streams to be used for SCTP connection
+			memset(&initparams, 0, sizeof(initparams));
+			initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
+			initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
+			if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
+					sizeof(initparams)) < 0) {
+				net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sctp_open.\n");
+				return WSOCK_ERROR;
+				}
+		}
+#endif
+
                 if (bind(*sock, res->ai_addr, res->ai_addrlen) == 0)
-                        break;
+			break;
 
 		if (close(*sock) < 0)
 			return WSOCK_ERROR;
