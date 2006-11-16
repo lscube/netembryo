@@ -44,10 +44,9 @@
 #include <netdb.h>
 #include <glib.h>
 
-/* SSL support need revision, may be broken */
-#ifdef HAVE_SSL
-#undef HAVE_SSL
-#define HAVE_SSL 0
+#ifdef HAVE_SCTP_FENICE
+#include <netinet/sctp.h>
+#define MAX_SCTP_STREAMS 15
 #endif
 
 #if HAVE_SSL

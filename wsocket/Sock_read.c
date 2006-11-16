@@ -56,7 +56,7 @@ socklen_t sa_len = sizeof(struct sockaddr_storage);
 			if (!protodata) {
 				return -1;
 			}
-			return sctp_recvmsg(transport->fd, buffer, nbytes, NULL,
+			return sctp_recvmsg(s->fd, buffer, nbytes, NULL,
 				 0, (struct sctp_sndrcvinfo *) protodata, &flags);
 			/* flags is discarted: usage may include detection of
 			 * incomplete packet due to small buffer or detection of
