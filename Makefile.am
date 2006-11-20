@@ -1,13 +1,14 @@
-SUBDIRS =	wsocket \
-		sound \
-		bufferpool \
-		randomize \
-		rtp mpglib \
-		mp3receiver \
-		mp3streamer \
-		mpeg12streamer \
-		src \
-		var 
+SUBDIRS =	wsocket
+
+#		sound \
+#		bufferpool \
+#		randomize \
+#		rtp mpglib \
+#		mp3receiver \
+#		mp3streamer \
+#		mpeg12streamer \
+#		src \
+#		var 
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -22,6 +23,17 @@ ACLOCAL_AMFLAGS = -I m4
 
 EXTRA_DIST = 	config \
 		include 
+
+lib_LTLIBRARIES = libnetembryo.la
+
+libincludedir = $(includedir)/netembryo
+libinclude_HEADERS =    include/netembryo/wsocket.h
+
+libnetembryo_la_SOURCES =
+
+libnetembryo_la_LIBADD =   wsocket/libwsocket.la
+
+#fixme add the pkg-config
 
 install-exec-hook:
 

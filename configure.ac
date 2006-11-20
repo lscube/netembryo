@@ -9,13 +9,6 @@ AM_INIT_AUTOMAKE(dist-bzip2 check-news)
 
 AC_PREFIX_PROGRAM(netembryo)
 
-test "x$prefix" = x. || test "x$prefix" = xNONE && prefix=/usr/local
-test "x$exec_prefix" = xNONE && exec_prefix=$prefix
-test "x$sysconfdir" = 'x${prefix}/etc' && sysconfdir="/etc"
-test "x$localstatedir" = 'x${prefix}/var' && localstatedir="/var"
-test "x$mandir" = 'x${prefix}/man' && mandir="${prefix}/share/man"
-
-
 AC_ARG_ENABLE(debug,
 [  --enable-debug          enable gcc dubugging flags [[default=no]]],,
         enable_debug="no")
@@ -24,9 +17,9 @@ AC_ARG_ENABLE(ipv6,
 [  --enable-ipv6            enable IPv6 support [[default=autodetected]]],,
         enable_ipv6="yes")
 
-AC_ARG_ENABLE(libao,
-[  --enable-libao            enable libao support [[default=yes]]],,
-        enable_libao="yes")
+#AC_ARG_ENABLE(libao,
+#[  --enable-libao            enable libao support [[default=yes]]],,
+#        enable_libao="yes")
 
 AM_CONDITIONAL(HAVE_SSL, /bin/false)
 AC_DEFUN([CHECK_SSL],
@@ -93,25 +86,25 @@ dnl Checks for libraries.
 AC_CHECK_LIB(pthread,pthread_create)
 
 dnl the following two checks are usefull only for mp3receiver test program for using libmad
-AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mp3receiver. See http://www.mars.org/home/rob/proj/mpeg/))
+#AC_CHECK_LIB(mad,mad_decoder_run,,AC_MSG_ERROR(libmad is required to compile mp3receiver. See http://www.mars.org/home/rob/proj/mpeg/))
 
 dnl check for vorbis and theora support
-XIPH_PATH_OGG(
-  [ XIPH_PATH_VORBIS(
-    AC_DEFINE(HAVE_VORBIS,1,[Define this if you have vorbis]),
-    AC_MSG_RESULT([*** All Ogg/Vorbis dependent parts will be disabled ***]))
-    AM_PATH_THEORA(
-    AC_DEFINE(HAVE_THEORA,1,[Define this if you have theora]),
-    AC_MSG_RESULT([*** All Ogg/Theora dependent parts will be disabled ***])) 
-  ],
-    AC_MSG_RESULT([*** All of Ogg/Vorbis and Ogg/Theora dependent parts will be disabled ***])
-  )
+#XIPH_PATH_OGG(
+#  [ XIPH_PATH_VORBIS(
+#    AC_DEFINE(HAVE_VORBIS,1,[Define this if you have vorbis]),
+#    AC_MSG_RESULT([*** All Ogg/Vorbis dependent parts will be disabled ***]))
+#    AM_PATH_THEORA(
+#    AC_DEFINE(HAVE_THEORA,1,[Define this if you have theora]),
+#    AC_MSG_RESULT([*** All Ogg/Theora dependent parts will be disabled ***])) 
+#  ],
+#    AC_MSG_RESULT([*** All of Ogg/Vorbis and Ogg/Theora dependent parts will be disabled ***])
+#  )
     
-AM_CONDITIONAL(HAVE_VORBIS, 
-                [test x"$no_ogg" != "xyes" -a x"$no_vorbis" != "xyes"])
+#AM_CONDITIONAL(HAVE_VORBIS, 
+#                [test x"$no_ogg" != "xyes" -a x"$no_vorbis" != "xyes"])
 
-AM_CONDITIONAL(HAVE_THEORA, 
-                [test x"$no_ogg" != "xyes" -a x"$no_theora" != "xyes"])
+#AM_CONDITIONAL(HAVE_THEORA, 
+#                [test x"$no_ogg" != "xyes" -a x"$no_theora" != "xyes"])
 
 dnl Replace `main' with a function in -lm:
 AC_CHECK_LIB(m, main)
@@ -180,17 +173,17 @@ fi
 
 dnl MP3RECEIVER NEED IT 
 AM_CONDITIONAL(ENABLE_LIBAO, /bin/false)
-if test "x$enable_libao" = "xno"; then
+#if test "x$enable_libao" = "xno"; then
         AC_DEFINE([ENABLE_LIBAO], 0,[libao disabled])
-else
-	dnl check for libao header, used in mp3receiver
-	AC_CHECK_HEADER(ao/ao.h)
-	XIPH_PATH_AO(,AC_MSG_ERROR(libao needed!))
-	CFLAGS="$CFLAGS $AO_CFLAGS"
-	LIBS="$LIBS $AO_LIBS"
-        AM_CONDITIONAL(ENABLE_LIBAO, /bin/true) \
-        AC_DEFINE([ENABLE_LIBAO], 1,[libao enabled])
-fi
+#else
+#	dnl check for libao header, used in mp3receiver
+#	AC_CHECK_HEADER(ao/ao.h)
+#	XIPH_PATH_AO(,AC_MSG_ERROR(libao needed!))
+#	CFLAGS="$CFLAGS $AO_CFLAGS"
+#	LIBS="$LIBS $AO_LIBS"
+#        AM_CONDITIONAL(ENABLE_LIBAO, /bin/true) \
+#        AC_DEFINE([ENABLE_LIBAO], 1,[libao enabled])
+#fi
 
 case "$enable_warnings" in
         pedantic)
@@ -274,19 +267,19 @@ netembryo_bin=$PACKAGE_NAME
 AC_SUBST(netembryo_bin)
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([src/Makefile])
-AC_CONFIG_FILES([bufferpool/Makefile])
-AC_CONFIG_FILES([sound/Makefile])
-AC_CONFIG_FILES([mpglib/Makefile])
-AC_CONFIG_FILES([mp3streamer/Makefile])
-AC_CONFIG_FILES([mp3receiver/Makefile])
-AC_CONFIG_FILES([vorbis_streamer/Makefile])
-AC_CONFIG_FILES([vorbis_receiver/Makefile])
-AC_CONFIG_FILES([mpeg12streamer/Makefile])
-AC_CONFIG_FILES([rtp/Makefile])
-AC_CONFIG_FILES([randomize/Makefile])
+#AC_CONFIG_FILES([src/Makefile])
+#AC_CONFIG_FILES([bufferpool/Makefile])
+#AC_CONFIG_FILES([sound/Makefile])
+#AC_CONFIG_FILES([mpglib/Makefile])
+#AC_CONFIG_FILES([mp3streamer/Makefile])
+#AC_CONFIG_FILES([mp3receiver/Makefile])
+#AC_CONFIG_FILES([vorbis_streamer/Makefile])
+#AC_CONFIG_FILES([vorbis_receiver/Makefile])
+#AC_CONFIG_FILES([mpeg12streamer/Makefile])
+#AC_CONFIG_FILES([rtp/Makefile])
+#AC_CONFIG_FILES([randomize/Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
-AC_CONFIG_FILES([var/Makefile])
+#AC_CONFIG_FILES([var/Makefile])
 
 AC_OUTPUT
 

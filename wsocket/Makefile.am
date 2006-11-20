@@ -41,8 +41,6 @@ libwsocket_la_SOURCES +=	create_ssl_ctx.c \
 
 endif
 
-libwsocket_la_LDFLAGS = -static
-
 #if HAVE_SSL 
 #libwsocket_la_LDFLAGS += $(SSL_LDFLAGS)
 #libwsocket_la_LIBADD  = $(SSL_LIBS)
