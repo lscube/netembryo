@@ -46,7 +46,24 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 #ifdef	IPV6
 	case AF_INET6: {
 		struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
-		return (inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len));
+		char *retval, *tmp = str;
+		int a = 0;
+		if (retval = inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len)) {
+			while (tmp = strchr(tmp, '.')) {
+				a++;
+				tmp++;
+			}
+			if (a == 3) {
+				if (!strncmp(str, "::ffff:", 7)) {
+					//this is an IPv4 address mapped in IPv6 address space
+					memmove (str, &str[7], strlen(str) - 6); // one char more for trailing NUL char
+				} else {
+					//this is an IPv6 address containg an IPv4 address (like ::127.0.0.1)
+					memmove (str, &str[2], strlen(str) - 1);
+				}
+			}
+		}
+		return retval;
 	}
 #endif
 
