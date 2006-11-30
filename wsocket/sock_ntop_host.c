@@ -46,10 +46,11 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 #ifdef	IPV6
 	case AF_INET6: {
 		struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
-		char *retval, *tmp = str;
 		int a = 0;
-		if (retval = inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len)) {
-			while (tmp = strchr(tmp, '.')) {
+		char *tmp = str;
+		const char *retval = inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len);
+		if (retval) {
+			while ((tmp = strchr(tmp, '.'))) {
 				a++;
 				tmp++;
 			}
