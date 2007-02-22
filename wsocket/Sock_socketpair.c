@@ -31,6 +31,9 @@ int Sock_socketpair(Sock *pair[]) {
 
 	int sdpair[2], i, res;
 
+	if (!pair)
+		return -1;
+
 	if ((res = socketpair(AF_UNIX, SOCK_DGRAM, 0, sdpair)) < 0) {
 		net_log(NET_LOG_ERR, "Sock_socketpair() failure.\n");
 		return res;

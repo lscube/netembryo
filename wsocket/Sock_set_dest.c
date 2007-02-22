@@ -29,6 +29,9 @@
 
 int Sock_set_dest(Sock *s, struct sockaddr *sa) {
 
+	if (!s)
+		return -1;
+
 	if (s->socktype != UDP) {
 		net_log(NET_LOG_FATAL, "Only UDP socket can change destination address\n");
 		return -1;

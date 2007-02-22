@@ -33,7 +33,10 @@
 int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 {
 
-socklen_t sa_len = sizeof(struct sockaddr_storage);
+	socklen_t sa_len = sizeof(struct sockaddr_storage);
+
+	if(!s)
+		return -1;
 
 #if HAVE_SSL
 	if(s->flags & USE_SSL)

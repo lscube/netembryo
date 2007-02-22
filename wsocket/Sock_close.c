@@ -31,6 +31,9 @@ int Sock_close(Sock *s)
 {
 	int res;
 
+	if (!s)
+		return -1;
+
 	if(s->flags & IS_MULTICAST) {
 		if (s->remote_host)
 			mcast_leave(s->fd,(struct sockaddr *) &(s->remote_stg));

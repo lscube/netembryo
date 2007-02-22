@@ -33,6 +33,9 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 	struct sctp_sndrcvinfo sinfo;
 #endif
 
+	if (!s)
+		return -1;
+
 #if HAVE_SSL
 	if(s->flags & USE_SSL)
 		return sock_SSL_write(s->ssl, buffer, nbytes);

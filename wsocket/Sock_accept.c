@@ -49,6 +49,9 @@ Sock * Sock_accept(Sock *s)
 	SSL *ssl_con = NULL;
 #endif
 
+	if (!s)
+		return NULL;
+
 	if ((res = sock_accept(s->fd)) < 0) {
 		net_log(NET_LOG_ERR, "System error in sock_accept().\n");
 		return NULL;

@@ -29,5 +29,7 @@
 
 int Sock_listen(Sock *s, int backlog)
 {
+	if (!s)
+		return -1;
 	return sock_listen(s->fd, backlog);
 }
