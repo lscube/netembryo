@@ -42,7 +42,6 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <glib.h>
 
 #ifdef HAVE_SCTP_FENICE
 #include <netinet/sctp.h>

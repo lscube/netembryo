@@ -28,8 +28,6 @@
 #include <config.h>
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
-#include <glib/gprintf.h>
 #include <netembryo/wsocket.h>
 #if HAVE_SSL
 #include <openssl/ssl.h>
@@ -71,9 +69,11 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
 	if (binded) {
 		s = binded;
-		g_free(s->local_host);
-		g_free(s->remote_host);
-	} else if (!(s = g_new0(Sock, 1))) {
+		free(s->local_host);
+        s->local_host = NULL;
+		free(s->remote_host);
+        s->remote_host = NULL;
+    } else if (!(s = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if HAVE_SSL
 		if(ssl_flag & USE_SSL) 
@@ -104,7 +104,11 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
 		memset(local_host, 0, sizeof(local_host));
 
-	s->local_host = g_strdup(local_host);
+    if (!(s->local_host = strdup(local_host))) {
+        net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_connect().\n");
+        Sock_close(s);
+        return NULL;
+    }
 
 	local_port = sock_get_port(sa_p);
 
@@ -128,7 +132,11 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
 		memset(remote_host, 0, sizeof(remote_host));
 	
-	s->remote_host = g_strdup(remote_host);
+    if (!(s->remote_host = strdup(remote_host))) {
+        net_log(NET_LOG_FATAL, "Unable to allocate remote host in Sock_connect().\n");
+        Sock_close(s);
+        return NULL;
+    }
 
 	remote_port = sock_get_port(sa_p);
 	if(remote_port < 0) {

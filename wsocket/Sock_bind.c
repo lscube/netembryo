@@ -28,7 +28,6 @@
 #include <config.h>
 #include <stdio.h>
 #include <string.h>
-#include <glib.h>
 #include <netembryo/wsocket.h>
 
 Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag)
@@ -55,7 +54,7 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 		return NULL;
 	}
 
-	if (!(s = g_new0(Sock, 1))) {
+    if (!(s = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_bind().\n");
 		sock_close(sockfd);
 		return NULL;
@@ -77,7 +76,11 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
 		memset(local_host, 0, sizeof(local_host));
 
-	s->local_host = g_strdup(local_host);
+    if (!(s->local_host = strdup(local_host))) {
+        net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_bind().\n");
+        Sock_close(s);
+        return NULL;
+    }
 
 	local_port = sock_get_port(sa_p);
 

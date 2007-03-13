@@ -26,8 +26,6 @@
  * */
 
 #include <config.h>
-#include <glib.h>
-#include <glib/gprintf.h>
 #include <sys/types.h>
 #include <string.h>
 #include <netembryo/wsocket.h>
@@ -67,7 +65,7 @@ Sock * Sock_accept(Sock *s)
 	}
 #endif
 
-	if (!(new_s = g_new0(Sock, 1))) {
+    if (!(new_s = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_accept().\n");
 #if HAVE_SSL
 		if(s->flags & USE_SSL) 
@@ -98,8 +96,12 @@ Sock * Sock_accept(Sock *s)
 
 	if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
 		memset(remote_host, 0, sizeof(remote_host));
-	
-	new_s->remote_host = g_strdup(remote_host);
+
+	if (!(new_s->remote_host = strdup(remote_host))) {
+        net_log(NET_LOG_FATAL, "Unable to allocate remote host in Sock_accept().\n");
+        Sock_close(new_s);
+        return NULL;
+    }
 
 	remote_port = sock_get_port(sa_p);
 	if(remote_port < 0) {
@@ -123,7 +125,11 @@ Sock * Sock_accept(Sock *s)
 	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
 		memset(local_host, 0, sizeof(local_host));
 
-	new_s->local_host = g_strdup(local_host);
+    if (!(new_s->local_host = strdup(local_host))) {
+        net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_accept().\n");
+        Sock_close(new_s);
+        return NULL;
+    }
 
 	local_port = sock_get_port(sa_p);
 	if(local_port < 0) {

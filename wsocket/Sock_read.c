@@ -25,9 +25,6 @@
  *  
  * */
 
-#include <glib.h>
-#include <glib/gprintf.h>
-
 #include <netembryo/wsocket.h>
 
 int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)

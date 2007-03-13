@@ -48,9 +48,9 @@ int Sock_close(Sock *s)
 
 	res = sock_close(s->fd);
 
-	g_free(s->remote_host);
-	g_free(s->local_host);
-	g_free(s);
+	if (s->remote_host) free(s->remote_host);
+	if (s->local_host) free(s->local_host);
+    free(s);
 
 	return res;
 }

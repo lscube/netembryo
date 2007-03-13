@@ -39,17 +39,17 @@ int Sock_socketpair(Sock *pair[]) {
 		return res;
 	}
 	
-	if (!(pair[0] = g_new0(Sock, 1))) {
+    if (!(pair[0] = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate first Sock struct in Sock_socketpair().\n");
 		close (sdpair[0]);
 		close (sdpair[1]);
 		return -1;
 	}
-	if (!(pair[1] = g_new0(Sock, 1))) {
+    if (!(pair[1] = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate second Sock struct in Sock_socketpair().\n");
 		close (sdpair[0]);
 		close (sdpair[1]);
-		g_free(pair[0]);
+		free(pair[0]);
 		return -1;
 	}
 
