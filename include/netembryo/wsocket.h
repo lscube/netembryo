@@ -91,7 +91,7 @@ struct sockaddr_storage
 typedef enum {
 /** ssl flags */
 	USE_SSL = 0x1,
-	USE_TLS = 0x3, /* set also USE_SSL */
+	USE_TLS = 0x3, /**< setting this will also set USE_SSL */
 /** multicast flags */
 	IS_MULTICAST = 0x4
 } sock_flags;
@@ -104,11 +104,11 @@ typedef enum {
 	TCP,
 	UDP,
 	SCTP,
-/** Local socket */
+/** Local socket (Unix) */
 	LOCAL
 } sock_type;
 
-/** NOTE:
+/* NOTE:
  *	struct ip_mreq {
  *		struct in_addr imr_multiaddr;
  *		struct in_addr imr_interface;
@@ -118,15 +118,16 @@ typedef enum {
  *		struct in6_addr	ipv6mr_multiaddr;
  *		unsigned int ipv6mr_interface;
  *	}
- **/
+ */
 
 #if IPV6
+/** multicast IPv6 storage structure */
 struct ipv6_mreq_in6 {
 	struct ipv6_mreq NETmreq6;
 	struct in6_addr __imr_interface6;
 };
 #endif
-
+/** multicast IPv4 storage structure */
 struct ip_mreq_in {
 	struct ip_mreq NETmreq;
 	unsigned int __ipv4mr_interface;
@@ -138,6 +139,7 @@ union ADDR {
 	struct in6_addr in6;
 };
 #endif
+
 union ADDR {
 #if IPV6
 	struct ipv6_mreq_in6 mreq_in6; /*struct in6_addr ipv6mr_multiaddr; struct in6_addr imr_interface6 ; unsigned int ipv6mr_interface; */
@@ -153,7 +155,7 @@ union ADDR {
 	#define imr_interface4 NETmreq.imr_interface
 	#define ipv4_multiaddr NETmreq.imr_multiaddr
 
-/** Developer HowTo:
+/* Developer HowTo: //TODO: Update to new multicast API
  *
  * union ADDR
  * 		struct ipv6_mreq_in6 mreq_in6
@@ -168,21 +170,22 @@ union ADDR {
  * 	 		struct ip_mreq NETmreq
  */
 
+/** socket storage structure */
 typedef struct {
-	int fd;	//! stores socket file descriptor
-	struct sockaddr_storage local_stg;	//! from getsockname
-	struct sockaddr_storage remote_stg;	//! from getpeername or forced
-	sock_type socktype;
-	union ADDR addr;
+    int fd;	///< low level socket file descriptor
+    struct sockaddr_storage local_stg;	///< low level address storage from getsockname
+    struct sockaddr_storage remote_stg;	///< low level address storage from getpeername
+    sock_type socktype; ///< socket type enumeration
+    union ADDR addr; ///< multicast address storage
 	/** flags */
 	sock_flags flags;
 	/** human readable datas */
-	char *remote_host;
-	char *local_host;
-	in_port_t remote_port;	//! stored in host order
-	in_port_t local_port;	//! stored in host order
+    char *remote_host; ///< remote host stored as dinamic string
+    char *local_host; ///< local host stored as dinamic string
+    in_port_t remote_port;	///< remote port stored in host order
+    in_port_t local_port;	///< local port stored in host order
 #if HAVE_SSL
-	SSL *ssl;
+    SSL *ssl; ///< stores ssl context information
 #endif
 } Sock;
 
@@ -199,7 +202,7 @@ typedef struct {
 
 /** low level wrappers */
 int sockfd_to_family(int sockfd);
-int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints);
+int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints); //TODO: Remove
 int sock_connect(char *host, char *port, int *sock, sock_type socktype);
 int sock_bind(char *host, char *port, int *sock, sock_type socktype);
 int sock_accept(int sock);
@@ -240,35 +243,92 @@ extern void (*net_log)(int, const char*, ...);
 #define NET_LOG_DEBUG 4 
 #define NET_LOG_VERBOSE 5 
 
-/** ------------------------------- INTERFACE -------------------------------
- * TODO: write API specs
+/** \class PublicInterface
+ * These functions offer high level network connectivity for IP and Unix protocols
+ */
+
+/** Establish a connection to a remote host.
+ *  \param host Remote host to connect to (may be a hostname).
+ *  \param port Remote port to connect to.
+ *  \param binded Pointer to a pre-binded socket (useful for connect from a specific interface/port),
+ *  if NULL a new socket will be created.
+ *  \param socktype The type of socket to be created.
+ *  \param ssl_flag Enables ssl and/or multicast.
  */
 Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, sock_flags ssl_flag);
-/* usually host is NULL for unicast. For multicast it is the multicast address.
-* Change it (ifi_xxx, see Stevens Chap.16) */
+/** Create a new socket and binds it to an address/port.
+ *  \param host Local address to be used by this socket, if NULL the socket will
+ *  be bound to all interfaces.
+ *  \param port Local port to be used by this socket, if NULL a random port will
+ *  be used.
+ *  \param socktype The type of socket to be created.
+ *  \param ssl_flag Enables ssl and/or multicast.
+ */
 Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag);
-/* returns pointer to a new Sock structure (generated using POSIX accept) */
-Sock * Sock_accept(Sock *); 
+/** Create a new socket accepting a new connection from a listening socket.
+ *  \param main Listening socket.
+ */
+Sock * Sock_accept(Sock *main);
+/** Setup ssl on an existing connected socket.
+ *  \param s Existing socket.
+ */
 int Sock_create_ssl_connection(Sock *s);
-int Sock_listen(Sock *n, int backlog);
-int Sock_read(Sock *, void *buffer, int nbytes, void *protodata, int flags); // protodata is sock_type dependant
-int Sock_write(Sock *, void *buffer, int nbytes, void *protodata, int flags);
-int Sock_close(Sock *);
-void Sock_init(void (*)(int, const char*, ...));
-int Sock_compare(Sock *, Sock *);
+/** Put a socket in listening state.
+ *  \param s Existing socket.
+ *  \param backlog Number of connection that may wait to be accepted.
+ */
+int Sock_listen(Sock *s, int backlog);
+/** Read data from a socket.
+ *  \param s Existing socket.
+ *  \param buffer Buffer reserved for receiving data.
+ *  \param nbytes Size of the buffer.
+ *  \param protodata Pointer to data depending from socket protocol, if NULL a
+ *  suitable default value will be used.
+ *  \param flags Flags to be passed to posix recv() function.
+ */
+int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
+/** Read data to a socket
+ *  \param s Existing socket.
+ *  \param buffer Buffer of data to be sent.
+ *  \param nbytes Amount of data to be sent.
+ *  \param protodata Pointer to data depending from socket protocol, if NULL a
+ *  suitable default value will be used.
+ *  \param flags Flags to be passed to posix send() function.
+ */
+int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
+/** Close an existing socket.
+ *  \param s Existing socket.
+ */
+int Sock_close(Sock *s);
+/** Close an existing socket.
+ *  \param log_function Pointer to a proper log function, if NULL messages will
+ *  be sent to stderr.
+ */
+void Sock_init(void (log_function*)(int, const char*, ...));
+/** Compare two sockets.
+ *  \param p Existing socket.
+ *  \param q Existing socket.
+ */
+int Sock_compare(Sock *p, Sock *q);
 #define Sock_cmp Sock_compare
-int Sock_socketpair(Sock *[]);
-int Sock_set_dest(Sock *, struct sockaddr *);
+/** Creates and connect together two sockets.
+ *  \param pair A vector large enough for two socket structures.
+ */
+int Sock_socketpair(Sock *pair[]);
+/** Change destination address for a non connected protocol socket (like UDP).
+ *  \param s Existing non connected socket.
+ *  \param dst Destination address.
+ */
+int Sock_set_dest(Sock *s, struct sockaddr *dst);
 
-/** low level access macro */
+/** low level access macros */
 #define Sock_fd(A) ((A)->fd)
 #define Sock_type(A) ((A)->socktype)
 
-/** ioctl set properties for socket
- *	RETURN VALUE:
- *	Usually, on success zero is returned. A few ioctls use the return value
- *	as an output parameter and return a nonnegative value on success.
- *	On error, -1 is returned, and errno is set appropriately.
+/** Set ioctl properties for socket
+ *  \return Usually, on success zero. A few ioctls use the return value as an
+ *  output parameter and return a nonnegative value on success. On error, -1 is
+ *  returned, and errno is set appropriately.
  */
 int Sock_set_props(Sock *s, int request, int *on);
 
