@@ -304,7 +304,7 @@ int Sock_close(Sock *s);
  *  \param log_function Pointer to a proper log function, if NULL messages will
  *  be sent to stderr.
  */
-void Sock_init(void (log_function*)(int, const char*, ...));
+void Sock_init(void (*log_function)(int, const char*, ...));
 /** Compare two sockets.
  *  \param p Existing socket.
  *  \param q Existing socket.
