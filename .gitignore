@@ -5,6 +5,12 @@ config.h.in
 config
 configure
 wsocket/.deps
-wsocket/Makefile
-wsocket/Makefile.in
-
+*.o
+*.lo
+*.la
+*Makefile
+*Makefile.in
+*.libs
+config.*
+libtool
+stamp-h1
