@@ -1,11 +1,9 @@
 #!/bin/bash
 
-WANT_AUTOCONF=2.59
-WANT_AUTOMAKE=1.8.3
-WANT_LIBTOOL=1.5.6
+WANT_AUTOCONF=2.5
+WANT_AUTOMAKE=1.8
 
-export WANT_AUTOCONF WANT_AUTOMAKE WANT_LIBTOOL
-
+export WANT_AUTOCONF WANT_AUTOMAKE
 
 function dots ()
 {
@@ -16,7 +14,7 @@ function dots ()
 }
 
 echo
-echo "Bootstrapping package AutoTools configuration..."
+echo "Bootstrapping autotools configuration..."
 
 if ! test -d config; then
 	mkdir config;
@@ -27,13 +25,14 @@ if which libtoolize >/dev/null 2>&1 ; then
 	libtoolize --force --copy --automake &
 	echo " done."
 else
-	echo "WARNING! SVN version needs LibTool!"
+	echo "WARNING! Fenice SVN needs LibTool!"
 	echo "Please, install it."
 	echo "Aborting."
 fi
+
 if which aclocal >/dev/null 2>&1 ; then
 	echo -n "Running aclocal..."
-	aclocal -I m4 &
+	aclocal -I config &
 	dots $! 
 	echo " done."
 fi
@@ -56,6 +55,21 @@ if which automake >/dev/null 2>&1 ; then
 	dots $! 
 	echo " done."
 fi
+
+if which libtoolize >/dev/null 2>&1 ; then
+        echo -n "Running libtoolize..."
+        libtoolize --copy --force 2>&1 | grep -v Putting&
+        dots $! 
+        echo " done."
+fi
+
+#echo -n "Copying missing files..."
+#	cp -f admin/lt* libltdl
+#	cp -f admin/config.* libltdl
+#	cp -f admin/install-sh libltdl
+#	cp -f admin/mkinstalldirs .
+#	cp -f libltdl/acinclude.m4 .
+#echo " done."
 
 echo "All done. Bye."
 echo

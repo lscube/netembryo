@@ -30,7 +30,7 @@ libwsocket_la_SOURCES =		is_multicast.c \
 				Sock_socketpair.c \
 				Sock_set_dest.c
 
-if HAVE_SSL				
+if HAVE_SSL
 libwsocket_la_SOURCES +=	create_ssl_ctx.c \
 				get_ssl_connection.c \
 				sock_SSL_accept.c \
