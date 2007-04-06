@@ -47,7 +47,7 @@ dnl Check for Endianess
 AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define if manchine is big-endian]),[BIGENDIAN="Little Endian"] )
 
 dnl Checks for libraries.
-AC_CHECK_LIB(pthread,pthread_create)
+#AC_CHECK_LIB(pthread,pthread_create)
 
 AC_CHECK_LIBM
 
