@@ -1,7 +1,22 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([netembryo],[0.0.1],[team@streaming.polito.it])
+
+m4_define([netembryo_major_version], [0])
+m4_define([netembryo_minor_version], [0])
+m4_define([netembryo_micro_version], [1])
+m4_define([netembryo_interface_age], [0])
+m4_define([netembryo_binary_age],
+          [m4_eval(100 * netembryo_minor_version + netembryo_micro_version)])
+m4_define([netembryo_version],
+          [netembryo_major_version.netembryo_minor_version.netembryo_micro_version])
+m4_define([netembryo_lt_current],
+          [m4_eval(100 * netembryo_minor_version + netembryo_micro_version - netembryo_interface_age)])
+m4_define([netembryo_lt_revision], [netembryo_interface_age])
+m4_define([netembryo_lt_age], [m4_eval(netembryo_binary_age - netembryo_interface_age)])
+
+AC_INIT(netembryo, [netembryo_version], [http://streaming.polito.it])
+
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_TARGET([])
@@ -91,8 +106,14 @@ esac
 
 AM_CONDITIONAL(HAVE_SSL, /bin/false)
 
-netembryo_bin=$PACKAGE_NAME
-AC_SUBST(netembryo_bin)
+LT_CURRENT=netembryo_lt_current
+LT_REVISION=netembryo_lt_revision
+LT_AGE=netembryo_lt_age
+
+AC_SUBST(LT_CURRENT)
+AC_SUBST(LT_REVISION)
+AC_SUBST(LT_AGE)
+
 
 AC_CONFIG_FILES([Makefile])
 #AC_CONFIG_FILES([src/Makefile])
@@ -113,8 +134,9 @@ AC_OUTPUT
 
 AC_MSG_NOTICE([config files successfully generated!
 
+NetEmbryo version is .............. : $VERSION
+
 NetEmbryo Install prefix .......... : $prefix
-NetEmbryo Binary path ............. : $exec_prefix/bin/$netembyo_bin
 
 Byte order ..................... : this is a $BIGENDIAN machine
 

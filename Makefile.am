@@ -33,7 +33,11 @@ libnetembryo_la_SOURCES =
 
 libnetembryo_la_LIBADD =   wsocket/libwsocket.la
 
-#fixme add the pkg-config
+##fixme add the pkg-config
+#pkgconfigdir = $(libdir)/pkgconfig
+#pkgconfig_DATA = libnetembryo.pc
+
+libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 install-exec-hook:
 
