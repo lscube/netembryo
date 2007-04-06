@@ -25,3 +25,35 @@
  *  
  * */
 
+#ifndef _MP3RECEIVERH
+#define _MP3RECEIVERH
+
+#include <config.h>
+#include <sys/types.h>
+#include <netembryo/wsocket.h>
+#include <nemesi/bufferpool.h>
+
+typedef struct ARG {
+	buffer_pool *bp;
+	playout_buff *pb;
+	Sock *sock;
+	int min_queue;
+	int max_queue;
+	int thread_dead;
+} Arg;
+
+
+#include <pthread.h>
+
+#define DEFAULT_MIN_QUEUE ( (BP_SLOT_NUM < 10)?(BP_SLOT_NUM) : (BP_SLOT_NUM / 10) ) 
+#define DEFAULT_MAX_QUEUE BP_SLOT_NUM
+#define DEFAULT_MID_QUEUE ( DEFAULT_MAX_QUEUE / 2 )
+
+#define MAX_BUFFER_OUT 8192
+
+#define MAX_BUFFER ( 8192 * 4 ) 
+
+void *write_side(void *arg);
+void *read_side(void *arg);
+
+#endif

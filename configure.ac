@@ -115,20 +115,8 @@ AC_SUBST(LT_AGE)
 
 
 AC_CONFIG_FILES([Makefile])
-#AC_CONFIG_FILES([src/Makefile])
-#AC_CONFIG_FILES([bufferpool/Makefile])
-#AC_CONFIG_FILES([sound/Makefile])
-#AC_CONFIG_FILES([mpglib/Makefile])
-#AC_CONFIG_FILES([mp3streamer/Makefile])
-#AC_CONFIG_FILES([mp3receiver/Makefile])
-#AC_CONFIG_FILES([vorbis_streamer/Makefile])
-#AC_CONFIG_FILES([vorbis_receiver/Makefile])
-#AC_CONFIG_FILES([mpeg12streamer/Makefile])
-#AC_CONFIG_FILES([rtp/Makefile])
-#AC_CONFIG_FILES([randomize/Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
 AC_CONFIG_FILES([libnetembryo.pc])
-#AC_CONFIG_FILES([var/Makefile])
 
 AC_OUTPUT
 
