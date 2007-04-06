@@ -83,10 +83,9 @@ else
         AC_MSG_WARN([IPv6 disabled: check skipped.])
 fi
 
-AM_CONDITIONAL(NETEMBRYO_DEBUG, /bin/false)
+AM_CONDITIONAL(NETEMBRYO_DEBUG, [test "$enable_debug" = "yes"])
 if test "x$enable_debug" = "xyes"; then
         CFLAGS="$CFLAGS -g -ggdb"
-        AM_CONDITIONAL(NETEMBRYO_DEBUG, /bin/true) \
         AC_DEFINE([ENABLE_DEBUG], 1,[Debug enabled])
         debug_msg="
    Debuging flags enabled: welcome developer!!!"
@@ -128,6 +127,7 @@ AC_CONFIG_FILES([Makefile])
 #AC_CONFIG_FILES([rtp/Makefile])
 #AC_CONFIG_FILES([randomize/Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
+AC_CONFIG_FILES([libnetembryo.pc])
 #AC_CONFIG_FILES([var/Makefile])
 
 AC_OUTPUT
