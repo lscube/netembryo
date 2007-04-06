@@ -32,6 +32,9 @@ AC_ARG_ENABLE(ipv6,
 [  --enable-ipv6            enable IPv6 support [[default=autodetected]]],,
         enable_ipv6="yes")
 
+AC_ARG_ENABLE(sctp,
+[  --enable-sctp            enable SCTP support [[default=autodetected]]],,         enable_sctp="yes")
+
 dnl Check for LibTool Dynamic Loading
 m4_undefine([AC_PROG_CXX])
 m4_defun([AC_PROG_CXX],[])
@@ -47,17 +50,12 @@ dnl Check for Endianess
 AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define if manchine is big-endian]),[BIGENDIAN="Little Endian"] )
 
 dnl Checks for libraries.
-#AC_CHECK_LIB(pthread,pthread_create)
-
 AC_CHECK_LIBM
 
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
 AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
-
-dnl soundcard for sound oss module, used in mp3receiver
-AC_CHECK_HEADER(linux/soundcard.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -81,6 +79,29 @@ if test "x$enable_ipv6" = "xyes"; then
         AC_CHECK_TYPE(struct sockaddr_in6, AC_DEFINE([IPV6], 1, [Define IPv6 support]), , [#include <netinet/in.h>])
 else
         AC_MSG_WARN([IPv6 disabled: check skipped.])
+fi
+
+dnl Check for SCTP support
+if test "$enable_sctp" = "yes"; then
+        AC_CHECK_TYPE(struct sctp_sndrcvinfo, [
+		 AC_CHECK_LIB(sctp,sctp_recvmsg, [
+				AC_DEFINE([HAVE_SCTP_FENICE], 1, [Define SCTP support])
+				AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" = "yes"])
+				sctp_msg="sctp enabled ................... : yes"
+				], [
+				AC_MSG_WARN([SCTP not available])
+				AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" != "yes"])
+				sctp_msg="sctp enabled ................... : no"
+				])], [
+		AC_MSG_WARN([SCTP not available])
+		AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" != "yes"])
+		sctp_msg="sctp enabled ................... : no"],
+	[#include <netinet/sctp.h>])
+	
+else
+        AC_MSG_WARN([SCTP disabled: check skipped.])
+	AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" = "yes"])
+	sctp_msg="sctp enabled ................... : no"
 fi
 
 AM_CONDITIONAL(NETEMBRYO_DEBUG, [test "$enable_debug" = "yes"])
@@ -113,7 +134,6 @@ AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
 
-
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
 AC_CONFIG_FILES([libnetembryo.pc])
@@ -121,14 +141,11 @@ AC_CONFIG_FILES([libnetembryo.pc])
 AC_OUTPUT
 
 AC_MSG_NOTICE([config files successfully generated!
-
-NetEmbryo version is .............. : $VERSION
-
-NetEmbryo Install prefix .......... : $prefix
-
-Byte order ..................... : this is a $BIGENDIAN machine
-
 $debug_msg
+Byte order ..................... : this is a $BIGENDIAN machine
+NetEmbryo version is .............. : $VERSION
+NetEmbryo Install prefix .......... : $prefix
+$sctp_msg
 
  'make' will now compile NetEmbryo and 'su -c make install' will install it.
  Note: On non-Linux systems you might need to use 'gmake' instead of 'make'.

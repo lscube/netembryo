@@ -2,6 +2,9 @@
 netembryoincludedir = $(top_srcdir)/include
 
 noinst_LTLIBRARIES = libwsocket.la
+
+libwsocket_la_LDFLAGS = 
+
 libwsocket_la_SOURCES =		is_multicast.c \
 				is_multicast_address.c \
 				gethostinfo.c \
@@ -51,3 +54,7 @@ INCLUDES = -I$(netembryoincludedir) -I$(top_srcdir)
 #if HAVE_SSL
 #INCLUDES += $(SSL_CFLAG)
 #endif
+
+if FENICE_SCTP
+libwsocket_la_LDFLAGS += -lsctp
+endif

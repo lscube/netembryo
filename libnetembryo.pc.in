@@ -7,5 +7,5 @@ Name: libnetembryo
 Description: network sockets abstraction library
 Version: @VERSION@
 Libs: -L${libdir} -lnetembryo
-Cflags: -I${includedir}/netembryo @EXTRA_FLAGS@
+Cflags: -I${includedir}/netembryo
 
