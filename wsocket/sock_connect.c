@@ -34,7 +34,7 @@ int sock_connect(char *host, char *port, int *sock, sock_type socktype)
 	int n, connect_new;
 	struct addrinfo *res, *ressave;
 	struct addrinfo hints;
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 	struct sctp_initmsg initparams;
 	struct sctp_event_subscribe subscribe;
 #endif
@@ -49,7 +49,7 @@ int sock_connect(char *host, char *port, int *sock, sock_type socktype)
 #endif
 	switch (socktype) {
 	case SCTP:
-#ifndef HAVE_SCTP_FENICE
+#ifndef HAVE_LIBSCTP
 		net_log(NET_LOG_FATAL, "SCTP protocol not compiled in\n");
 		return WSOCK_ERROR;
 		break;
@@ -76,14 +76,14 @@ int sock_connect(char *host, char *port, int *sock, sock_type socktype)
 	connect_new = (*sock < 0);
 
 	do {
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 		if (socktype == SCTP)
 			res->ai_protocol = IPPROTO_SCTP;
 #endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
 		if (connect_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
 			continue;
 
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 		if (socktype == SCTP) {
 			// Enable the propagation of packets headers
 			memset(&subscribe, 0, sizeof(subscribe));

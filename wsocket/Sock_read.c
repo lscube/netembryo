@@ -52,7 +52,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 			return recv(s->fd, buffer, nbytes, flags);
 			break;
 		case SCTP:
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 			if (!protodata) {
 				return -1;
 			}

@@ -29,7 +29,7 @@
 
 int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 {
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 	struct sctp_sndrcvinfo sinfo;
 #endif
 
@@ -53,7 +53,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 					protodata, sizeof(struct sockaddr_storage));
 			break;
 		case SCTP:
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 			if (!protodata) {
 				protodata = &sinfo;
 				memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));

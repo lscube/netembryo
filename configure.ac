@@ -84,23 +84,11 @@ fi
 dnl Check for SCTP support
 if test "$enable_sctp" = "yes"; then
         AC_CHECK_TYPE(struct sctp_sndrcvinfo, [
-         AC_CHECK_LIB(sctp,sctp_recvmsg, [
-                AC_DEFINE([HAVE_SCTP_FENICE], 1, [Define SCTP support])
-                AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" = "yes"])
-                sctp_msg="sctp enabled ................... : yes"
-                ], [
-                AC_MSG_WARN([SCTP not available])
-                AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" != "yes"])
-                sctp_msg="sctp enabled ................... : no"
-                ])], [
-        AC_MSG_WARN([SCTP not available])
-        AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" != "yes"])
-        sctp_msg="sctp enabled ................... : no"],
-    [#include <netinet/sctp.h>])
-    
+         AC_CHECK_LIB(sctp,sctp_recvmsg)],
+         AC_MSG_WARN([SCTP disabled: headers not found]),
+         [#include <netinet/sctp.h>])
 else
-        AC_MSG_WARN([SCTP disabled: check skipped.])
-    AM_CONDITIONAL(FENICE_SCTP, [test "$enable_sctp" = "yes"])
+    AC_MSG_WARN([SCTP disabled: check skipped.])
     sctp_msg="sctp enabled ................... : no"
 fi
 
@@ -133,6 +121,7 @@ LT_AGE=netembryo_lt_age
 AC_SUBST(LT_CURRENT)
 AC_SUBST(LT_REVISION)
 AC_SUBST(LT_AGE)
+AC_SUBST(LIBS)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])

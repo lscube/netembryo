@@ -54,7 +54,3 @@ INCLUDES = -I$(netembryoincludedir) -I$(top_srcdir)
 #if HAVE_SSL
 #INCLUDES += $(SSL_CFLAG)
 #endif
-
-if FENICE_SCTP
-libwsocket_la_LDFLAGS += -lsctp
-endif

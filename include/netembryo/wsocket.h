@@ -43,7 +43,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#ifdef HAVE_SCTP_FENICE
+#ifdef HAVE_LIBSCTP
 #include <netinet/sctp.h>
 #define MAX_SCTP_STREAMS 15
 #endif
