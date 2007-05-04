@@ -177,9 +177,9 @@ typedef struct {
     struct sockaddr_storage remote_stg;	///< low level address storage from getpeername
     sock_type socktype; ///< socket type enumeration
     union ADDR addr; ///< multicast address storage
-	/** flags */
-	sock_flags flags;
-	/** human readable datas */
+    /** flags */
+    sock_flags flags;
+    /** human readable datas */
     char *remote_host; ///< remote host stored as dinamic string
     char *local_host; ///< local host stored as dinamic string
     in_port_t remote_port;	///< remote port stored in host order
