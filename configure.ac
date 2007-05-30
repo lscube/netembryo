@@ -25,7 +25,7 @@ AM_INIT_AUTOMAKE(dist-bzip2 check-news)
 AC_PREFIX_DEFAULT("/usr")
 
 AC_ARG_ENABLE(debug,
-[  --enable-debug           enable gcc dubugging flags [[default=no]]],,
+[  --enable-debug          enable gcc dubugging flags [[default=no]]],,
         enable_debug="no")
 
 AC_ARG_ENABLE(ipv6,
@@ -125,6 +125,7 @@ AC_SUBST(LIBS)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
+AC_CONFIG_FILES([utils/Makefile])
 AC_CONFIG_FILES([libnetembryo.pc])
 
 AC_OUTPUT

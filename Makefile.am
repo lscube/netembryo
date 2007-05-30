@@ -1,4 +1,5 @@
-SUBDIRS =	wsocket
+SUBDIRS =	wsocket \
+		utils
 
 ACLOCAL_AMFLAGS = -I m4
 
@@ -9,10 +10,12 @@ lib_LTLIBRARIES = libnetembryo.la
 
 libincludedir = $(includedir)/netembryo
 libinclude_HEADERS =    include/netembryo/wsocket.h
+libinclude_HEADERS +=    include/netembryo/url.h
 
 libnetembryo_la_SOURCES =
 
 libnetembryo_la_LIBADD =   wsocket/libwsocket.la
+libnetembryo_la_LIBADD +=   utils/libutils.la
 
 #pkg-config
 pkgconfigdir = $(libdir)/pkgconfig

@@ -1,3 +1,6 @@
+#ifndef _NETEMBRYO_UTILS_H_
+#define _NETEMBRYO_UTILS_H_
+
 /* * 
  *  $Id$
  *  
@@ -23,6 +26,8 @@
  *  
  * */
 
+#include <string.h>
+
 typedef struct
 {
     char * protocol;
@@ -31,4 +36,7 @@ typedef struct
     char * path;
 } Url;
 
-int Url_init(Url * url, char * urlname)
+int Url_init(Url * url, char * urlname);
+void Url_destroy(Url * url);
+
+#endif
