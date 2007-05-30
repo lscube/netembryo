@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libnetembryo
+Description: network sockets abstraction library
+Version: 0.0.1
+Libs: -L${libdir} -lnetembryo -lsctp 
+Cflags: -I${includedir}/netembryo
+
