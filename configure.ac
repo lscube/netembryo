@@ -33,7 +33,8 @@ AC_ARG_ENABLE(ipv6,
         enable_ipv6="yes")
 
 AC_ARG_ENABLE(sctp,
-[  --enable-sctp            enable SCTP support [[default=autodetected]]],,         enable_sctp="yes")
+[  --enable-sctp            enable SCTP support [[default=autodetected]]],, 
+        enable_sctp="yes")
 
 dnl Check for LibTool Dynamic Loading
 m4_undefine([AC_PROG_CXX])
@@ -88,8 +89,7 @@ if test "$enable_sctp" = "yes"; then
          AC_MSG_WARN([SCTP disabled: headers not found]),
          [#include <netinet/sctp.h>])
 else
-    AC_MSG_WARN([SCTP disabled: check skipped.])
-    sctp_msg="sctp enabled ................... : no"
+        AC_MSG_WARN([SCTP disabled: check skipped.])
 fi
 
 AM_CONDITIONAL(NETEMBRYO_DEBUG, [test "$enable_debug" = "yes"])
@@ -131,10 +131,10 @@ AC_OUTPUT
 
 AC_MSG_NOTICE([config files successfully generated!
 $debug_msg
-Byte order ..................... : this is a $BIGENDIAN machine
+Byte order ........................ : this is a $BIGENDIAN machine
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
-$sctp_msg
+NetEmbryo sctp support enabled .... : $enable_sctp
 
  'make' will now compile NetEmbryo and 'su -c make install' will install it.
  Note: On non-Linux systems you might need to use 'gmake' instead of 'make'.
