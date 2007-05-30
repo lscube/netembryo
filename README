@@ -1,15 +1,10 @@
+Netembryo - tiny network abstraction
 
-What is it?
-===========
++ What is netembryo?
 
-NetEmbryo (NEuTrino for the friends) is a collection of network tools
-developed on the wsocket library.
+Netembryo is a collection of function, ranging from the network abstraction to
+the url string parsing, useful for implementing rtp and rtsp applications.
 
+Currently the network wrapper (wsocket or wrapped socket) provides support for TCP, UDP and SCTP.
 
-Main Library
-===========
-
-NetEmbryo package contains an powerfull library called wsocket.
-This library performs a network wrapper with ssl, multicast and ipv6
-supports.
-
+Please refer to the Doxygenerated documentation for usage.

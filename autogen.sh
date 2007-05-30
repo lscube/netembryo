@@ -51,7 +51,7 @@ if which autoconf >/dev/null 2>&1 ; then
 fi
 if which automake >/dev/null 2>&1 ; then
 	echo -n "Running automake..."
-	automake --gnu --add-missing --copy --force-missing 2>&1 | grep -v installing&
+	automake --gnu --add-missing --copy 2>&1 | grep -v installing&
 	dots $! 
 	echo " done."
 fi
