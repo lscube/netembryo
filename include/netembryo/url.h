@@ -28,7 +28,7 @@
 
 #include <string.h>
 
-/** @defgroup NetEmbryo Url Management Interface
+/** @defgroup NetEmbryo_Url Url Management Interface
  *
  * @brief These module offers high level functions to parse and handle URLs
  *

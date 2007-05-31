@@ -243,7 +243,7 @@ extern void (*net_log)(int, const char*, ...);
 #define NET_LOG_DEBUG 4 
 #define NET_LOG_VERBOSE 5 
 
-/** @defgroup NetEmbryo Socket Interface
+/** @defgroup NetEmbryo_Socket Sockets Access Interface
  *
  * @brief These functions offer high level network connectivity for IP and Unix protocols
  *
