@@ -28,15 +28,28 @@
 
 #include <string.h>
 
+/** @defgroup NetEmbryo Url Management Interface
+ *
+ * @brief These module offers high level functions to parse and handle URLs
+ *
+ * @{ */
+
+/**
+ * Saved informations about a parsed url will be stored here
+ */
 typedef struct
 {
-    char * protocol;
-    char * hostname;
-    char * port;
-    char * path;
+    char * protocol; //!< The protocol specified in the url (http, rtsp, etc)
+    char * hostname; //!< The hostname specified in the url (www.something.org, 192.168.0.1, etc)
+    char * port; //!< The port specified in the url
+    char * path; //!< The path of the specific object to access (/path/to/resource.ext)
 } Url;
 
 int Url_init(Url * url, char * urlname);
 void Url_destroy(Url * url);
+
+/**
+ * @}
+ */
 
 #endif

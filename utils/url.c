@@ -25,6 +25,17 @@
 
 #include <netembryo/url.h>
 
+
+/**
+ * Creates an Url informations structure from a URI string
+ *
+ * @param url The url to initialize (Will not free the previous data, Url_destroy must be
+ *            used to free it if we already initialized the structure before)
+ * @param urlname The URI to parse to create the Url informations
+ *
+ * @return Always 0, errors will be reported by setting to NULL the field of
+ *         the Url structure that the function was not able to parse.
+ */
 int Url_init(Url * url, char * urlname)
 {
     char * protocol_begin, * hostname_begin, * port_begin, * path_begin;
@@ -95,6 +106,11 @@ int Url_init(Url * url, char * urlname)
     return 0;
 }
 
+/**
+ * Will destroy the Url structure freeing the data contained in it
+ *
+ * @param url The Url structure to destroy
+ */
 void Url_destroy(Url * url)
 {
     free(url->protocol);
