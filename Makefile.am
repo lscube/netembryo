@@ -7,8 +7,9 @@ EXTRA_DIST = 	config \
 lib_LTLIBRARIES = libnetembryo.la
 
 libincludedir = $(includedir)/netembryo
-libinclude_HEADERS =    include/netembryo/wsocket.h
-libinclude_HEADERS +=    include/netembryo/url.h
+libinclude_HEADERS =    include/netembryo/wsocket.h \
+			include/netembryo/url.h \
+			include/netembryo/rtsp_errors.h
 
 libnetembryo_la_SOURCES =
 

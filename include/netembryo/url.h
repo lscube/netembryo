@@ -1,30 +1,30 @@
-#ifndef _NETEMBRYO_UTILS_H_
-#define _NETEMBRYO_UTILS_H_
-
 /* * 
  *  $Id$
  *  
- *  This file is part of NeMeSI
+ *  This file is part of NetEmbryo 
  *
- *  NeMeSI -- NEtwork MEdia Streamer I
+ * NetEmbryo -- default network wrapper 
  *
  *  Copyright (C) 2007 by team@streaming.polito.it
  *
- *  NeMeSI is free software; you can redistribute it and/or modify
+ *  NetEmbryo is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation; either version 2 of the License, or
  *  (at your option) any later version.
  *
- *  NeMeSI is distributed in the hope that it will be useful,
+ *  NetEmbryo is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with NeMeSI; if not, write to the Free Software
+ *  along with NetEmbryo; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *  
  * */
+
+#ifndef _NETEMBRYO_URL_H_
+#define _NETEMBRYO_URL_H_
 
 #include <string.h>
 
