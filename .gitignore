@@ -4,13 +4,14 @@ autom4te.cache
 config.h.in
 config
 configure
-wsocket/.deps
 *.o
 *.lo
 *.la
+*.pc
 *Makefile
 *Makefile.in
 *.libs
+*.deps
 config.*
 libtool
 stamp-h1
