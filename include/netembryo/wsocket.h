@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
@@ -233,8 +234,9 @@ int sock_SSL_close(SSL *);
 #endif
 
 /** log facilities */
-/* store pointer to external log function */
-extern void (*net_log)(int, const char*, ...);
+/* Outputs the messages using the default logger o a custom one passed to
+ * Sock_init() */
+void net_log(int, const char*, ...);
 /* levels to be implemented by log function */
 #define NET_LOG_FATAL 0 
 #define NET_LOG_ERR 1
@@ -302,11 +304,11 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
  *  @param s Existing socket.
  */
 int Sock_close(Sock *s);
-/** Close an existing socket.
+/** Inits internal structures.
  *  @param log_function Pointer to a proper log function, if NULL messages will
  *  be sent to stderr.
  */
-void Sock_init(void (*log_function)(int, const char*, ...));
+void Sock_init(void (*log_function)(int level, const char *fmt, va_list list));
 /** Compare two sockets.
  *  @param p Existing socket.
  *  @param q Existing socket.

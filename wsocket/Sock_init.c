@@ -1,30 +1,26 @@
-/* * 
- *  $Id$
- *  
- *  This file is part of NetEmbryo 
+/* *
+ *  This file is part of NetEmbryo
  *
- * NetEmbryo -- default network wrapper 
+ * NetEmbryo -- default network wrapper
  *
- *  Copyright (C) 2005 by
- *  	
- *	- Federico Ridolfo	<federico.ridolfo@polito.it>
- * 
- *  NetEmbryo is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
+ *  Copyright (C) 2007 by LScube team <team@streaming.polito.it
+ *  See AUTHORS for more informations
  *
- *  NetEmbryo is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * NetEmbryo is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with NetEmbryo; if not, write to the Free Software
- *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *  
+ * NetEmbryo is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with NetEmbryo; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ *
  * */
-
 
 #include <netembryo/wsocket.h>
 #include <stdarg.h>
@@ -32,64 +28,64 @@
 #if HAVE_SSL
 #include <openssl/ssl.h>
 #endif
+//Shamelessly ripped from ffmpeg
 
-static void net_log_default(int level, const char *fmt, ...);
-
-void (*net_log)(int, const char*, ...);
-
-void Sock_init(void (*log_func)(int, const char*, ...))
+static void net_log_default(int level, const char *fmt, va_list args)
 {
-#if HAVE_SSL
-	SSL_library_init();
-	SSL_load_error_strings();
+    switch (level) {
+        case NET_LOG_FATAL:
+            fprintf(stderr, "[fatal error] ");
+            break;
+        case NET_LOG_ERR:
+            fprintf(stderr, "[error] ");
+            break;
+        case NET_LOG_WARN:
+            fprintf(stderr, "[warning] ");
+            break;
+        case NET_LOG_DEBUG:
+#ifdef DEBUG
+            fprintf(stderr, "[debug] ");
+#else
+            return;
 #endif
+            break;
+        case NET_LOG_VERBOSE:
+#ifdef VERBOSE
+            fprintf(stderr, "[verbose debug] ");
+#else
+            return;
+#endif
+            break;
+        case NET_LOG_INFO:
+            fprintf(stderr, "[info] ");
+            break;
+        default:
+            fprintf(stderr, "[unk] ");
+            break;
+    }
 
-	if (log_func) {
-		net_log = log_func;
-	} else {
-		net_log = net_log_default;
-	}
-
-	return;
+    vfprintf(stderr, fmt, args);
 }
 
-static void net_log_default(int level, const char *fmt, ...){
-	va_list args;
-	int no_print=0;
+static void (*net_vlog)(int, const char*, va_list) = net_log_default;
 
-	switch (level) {
-		case NET_LOG_FATAL:
-			fprintf(stderr, "[fatal error] ");
-			break;
-		case NET_LOG_ERR:
-			fprintf(stderr, "[error] ");
-			break;
-		case NET_LOG_WARN:
-			fprintf(stderr, "[warning] ");
-			break;
-		case NET_LOG_DEBUG:
-#ifdef DEBUG
-			fprintf(stderr, "[debug] ");
-#else
-			no_print=1;	 
-#endif
-			break;
-		case NET_LOG_VERBOSE:
-#ifdef VERBOSE
-			fprintf(stderr, "[verbose debug] ");
-#else
-			no_print=1;	 
-#endif
-			break;
-		default: /*NET_LOG_INFO*/
-			fprintf(stderr, "[info] ");
-			break;
-	}
+void net_log(int level, const char *fmt, ...)
+{
+    va_list vl;
+    va_start(vl, fmt);
+    net_vlog(level, fmt, vl);
+    va_end(vl);
+}
 
-	if(!no_print){
-		va_start(args, fmt);
-		vfprintf(stderr, fmt, args);
-		va_end(args);
-		fflush(stderr);
-	}
+void Sock_init(void (*log_func)(int, const char*, va_list))
+{
+#if HAVE_SSL
+    SSL_library_init();
+    SSL_load_error_strings();
+#endif
+
+    if (log_func)
+        net_vlog = log_func;
+
+    return;
 }
