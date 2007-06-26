@@ -60,6 +60,7 @@ extern RTSP_Error const RTSP_Forbidden;
 extern RTSP_Error const RTSP_OptionNotSupported;
 extern RTSP_Error const RTSP_NotFound;
 extern RTSP_Error const RTSP_SessionNotFound;
+extern RTSP_Error const RTSP_InvalidRange;
 extern RTSP_Error const RTSP_Fatal_ErrAlloc;
 
 void set_RTSP_Error(RTSP_Error * err, int reply_code, char * message);
