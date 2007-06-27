@@ -9,6 +9,7 @@ RTSP_Error const RTSP_BadRequest = { {400, "Bad Request"}, TRUE };
 RTSP_Error const RTSP_Forbidden = { {403, "Forbidden"}, TRUE };
 RTSP_Error const RTSP_NotFound = { {404, "Not Found"}, TRUE };
 RTSP_Error const RTSP_SessionNotFound = { {454, "Session Not Found"}, TRUE };
+RTSP_Error const RTSP_InvalidRange = { {457, "Invalid Range"}, TRUE };
 RTSP_Error const RTSP_InternalServerError = { {500, "Internal Server Error"}, TRUE };
 RTSP_Error const RTSP_OptionNotSupported = { {551, "Option not supported"}, TRUE };
 
@@ -44,6 +45,8 @@ RTSP_Error const * get_RTSP_Error(int reply_code)
             return &RTSP_NotFound;
         case 454:
             return &RTSP_SessionNotFound;
+		case 457:
+            return &RTSP_InvalidRange;
         case 500:
             return &RTSP_InternalServerError;
         case 551:
