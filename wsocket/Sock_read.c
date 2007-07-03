@@ -31,7 +31,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 		return -1;
 
 #if HAVE_SSL
-	if(s->flags & USE_SSL)
+	if(s->flags & IS_SSL)
 		n = sock_SSL_read(s->ssl,buffer,nbytes);
 	else {
 #endif

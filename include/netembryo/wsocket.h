@@ -86,8 +86,8 @@ struct sockaddr_storage
 /** flags definition*/
 typedef enum {
 /** ssl flags */
-	USE_SSL = 0x1,
-	USE_TLS = 0x3, /**< setting this will also set USE_SSL */
+	IS_SSL = 0x1,
+	IS_TLS = 0x3, /**< setting this will also set IS_SSL */
 /** multicast flags */
 	IS_MULTICAST = 0x4
 } sock_flags;

@@ -51,7 +51,7 @@ Sock * Sock_accept(Sock *s)
 	}
 
 #if HAVE_SSL
-	if(s->flags & USE_SSL) {
+	if(s->flags & IS_SSL) {
 		if(sock_SSL_accept(&ssl_con,res)) {
 			net_log(NET_LOG_ERR, "Unable to accept SSL connection.\n");
 			sock_close(res);
@@ -63,7 +63,7 @@ Sock * Sock_accept(Sock *s)
     if (!(new_s = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_accept().\n");
 #if HAVE_SSL
-		if(s->flags & USE_SSL) 
+		if(s->flags & IS_SSL) 
 			sock_SSL_close(ssl_con);
 #endif
 		sock_close(res);
@@ -75,7 +75,7 @@ Sock * Sock_accept(Sock *s)
 	new_s->flags = s->flags;
 
 #if HAVE_SSL
-	if(s->flags & USE_SSL) 
+	if(s->flags & IS_SSL) 
 		new_s->ssl = ssl_con;
 #endif
 

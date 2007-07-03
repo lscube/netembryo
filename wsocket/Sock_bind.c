@@ -36,7 +36,7 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
 	int32_t local_port;
 
 #if HAVE_SSL
-	if ((ssl_flag & USE_SSL) {
+	if ((ssl_flag & IS_SSL) {
 		if(socktype != TCP) {
 			net_log(NET_LOG_ERR, "SSL can't work on this protocol.\n");
 			return NULL;

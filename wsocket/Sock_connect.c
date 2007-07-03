@@ -53,7 +53,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	}
 
 #if HAVE_SSL
-	if(ssl_flag & USE_SSL) {
+	if(ssl_flag & IS_SSL) {
 		if (sock_SSL_connect(&ssl_con))
 			net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
 			sock_close(sockfd);
@@ -71,7 +71,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
     } else if (!(s = calloc(1, sizeof(Sock)))) {
 		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if HAVE_SSL
-		if(ssl_flag & USE_SSL) 
+		if(ssl_flag & IS_SSL) 
 			sock_SSL_close(ssl_con);
 #endif
 		sock_close (sockfd);
@@ -81,7 +81,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 	s->fd = sockfd;
 	s->socktype = socktype;
 #if HAVE_SSL
-	if(ssl_flag & USE_SSL) 
+	if(ssl_flag & IS_SSL) 
 		s->ssl = ssl_con;
 #endif
 	s->flags = ssl_flag;

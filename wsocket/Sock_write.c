@@ -32,7 +32,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 		return -1;
 
 #if HAVE_SSL
-	if(s->flags & USE_SSL)
+	if(s->flags & IS_SSL)
 		return sock_SSL_write(s->ssl, buffer, nbytes);
 	else {
 #endif		

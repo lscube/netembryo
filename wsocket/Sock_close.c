@@ -37,7 +37,7 @@ int Sock_close(Sock *s)
 	}
 
 #if HAVE_SSL
-	if(s->flags & USE_SSL)
+	if(s->flags & IS_SSL)
 		sock_SSL_close(s->ssl);
 #endif
 
