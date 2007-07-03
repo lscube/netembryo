@@ -323,6 +323,7 @@ int Sock_set_dest(Sock *s, struct sockaddr *dst);
 /** low level access macros */
 #define Sock_fd(A) ((A)->fd)
 #define Sock_type(A) ((A)->socktype)
+#define Sock_flags(A) ((A)->flags)
 
 /** Set ioctl properties for socket
  *  @return Usually, on success zero. A few ioctls use the return value as an
