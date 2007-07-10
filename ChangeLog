@@ -1,5 +1,9 @@
 + Netembryo changelog
-  02 Jul 2007; Luca Barbato <lu_zero@gentoo.org> netembryo-0.0.3:
+
+  10 Jul 2007; Luca Barbato <lu_zero@gentoo.org>: netembryo-0.0.3:
+  Released
+
+02 Jul 2007; Luca Barbato <lu_zero@gentoo.org> netembryo-0.0.3:
   Improved logging function. GPL -> LGPL
 
   20 Jun 2007; Alessandro Molina <amol.wrk@gmail.com> netembryo-0.0.2:
