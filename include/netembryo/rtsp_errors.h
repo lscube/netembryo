@@ -57,6 +57,7 @@ extern RTSP_Error const RTSP_Forbidden;
 extern RTSP_Error const RTSP_OptionNotSupported;
 extern RTSP_Error const RTSP_NotFound;
 extern RTSP_Error const RTSP_SessionNotFound;
+extern RTSP_Error const RTSP_HeaderFieldNotValidforResource;
 extern RTSP_Error const RTSP_InvalidRange;
 extern RTSP_Error const RTSP_Fatal_ErrAlloc;
 
