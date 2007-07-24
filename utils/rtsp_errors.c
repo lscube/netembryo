@@ -26,14 +26,25 @@
 #define FALSE 0
 #define TRUE 1
 
+RTSP_Error const RTSP_Continue = { {100, "Continue"}, FALSE };
 RTSP_Error const RTSP_Ok = { {200, "OK"}, FALSE };
+RTSP_Error const RTSP_Created = { {201, "Created"}, FALSE };
+RTSP_Error const RTSP_Accepted = { {202, "Accepted"}, FALSE };
 RTSP_Error const RTSP_BadRequest = { {400, "Bad Request"}, TRUE };
 RTSP_Error const RTSP_Forbidden = { {403, "Forbidden"}, TRUE };
 RTSP_Error const RTSP_NotFound = { {404, "Not Found"}, TRUE };
+RTSP_Error const RTSP_NotAcceptable = { {406, "Not Acceptable"}, TRUE };
+RTSP_Error const RTSP_UnsupportedMedia = { {415, "Unsupported Media Type"}, TRUE };
+RTSP_Error const RTSP_NotEnoughBandwidth = { {453, "Not Enough Bandwith"}, TRUE };
 RTSP_Error const RTSP_SessionNotFound = { {454, "Session Not Found"}, TRUE };
+RTSP_Error const RTSP_InvalidMethodInState = { {455, "Method Not Valid In This State"}, TRUE };
 RTSP_Error const RTSP_HeaderFieldNotValidforResource = { {456, "Header Field Not Valid for Resource"}, TRUE };
 RTSP_Error const RTSP_InvalidRange = { {457, "Invalid Range"}, TRUE };
+RTSP_Error const RTSP_UnsupportedTransport = { {461, "Unsupported Transport"}, TRUE };
 RTSP_Error const RTSP_InternalServerError = { {500, "Internal Server Error"}, TRUE };
+RTSP_Error const RTSP_NotImplemented = { {501, "Not Implemented"}, TRUE };
+RTSP_Error const RTSP_ServiceUnavailable = { {503, "Service Unavailable"}, TRUE };
+RTSP_Error const RTSP_VersionNotSupported = { {505, "RTSP Version Not Supported"}, TRUE };
 RTSP_Error const RTSP_OptionNotSupported = { {551, "Option not supported"}, TRUE };
 
 /**
@@ -58,22 +69,44 @@ RTSP_Error const * get_RTSP_Error(int reply_code)
 {
     switch (reply_code)
     {
+        case 100:
+            return &RTSP_Continue;
         case 200:
             return &RTSP_Ok;
+        case 201:
+            return &RTSP_Created;
+        case 202:
+            return &RTSP_Accepted;
         case 400:
             return &RTSP_BadRequest;
         case 403:
             return &RTSP_Forbidden;
         case 404:
             return &RTSP_NotFound;
+        case 406:
+            return &RTSP_NotAcceptable;
+        case 415:
+            return &RTSP_UnsupportedMedia;
+        case 453:
+            return &RTSP_NotEnoughBandwidth;
         case 454:
             return &RTSP_SessionNotFound;
+        case 455:
+            return &RTSP_InvalidMethodInState;
         case 456:
             return &RTSP_HeaderFieldNotValidforResource;
         case 457:
             return &RTSP_InvalidRange;
+        case 461:
+            return &RTSP_UnsupportedTransport;
         case 500:
             return &RTSP_InternalServerError;
+        case 501:
+            return &RTSP_NotImplemented;
+        case 503:
+            return &RTSP_ServiceUnavailable;
+        case 505:
+            return &RTSP_VersionNotSupported;
         case 551:
             return &RTSP_OptionNotSupported;
         default:

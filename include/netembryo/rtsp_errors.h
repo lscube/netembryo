@@ -50,16 +50,25 @@ typedef struct
 } RTSP_Error;
 
 
+extern RTSP_Error const RTSP_Continue;
 extern RTSP_Error const RTSP_Ok;
+extern RTSP_Error const RTSP_Created;
+extern RTSP_Error const RTSP_Accepted;
 extern RTSP_Error const RTSP_BadRequest;
-extern RTSP_Error const RTSP_InternalServerError;
 extern RTSP_Error const RTSP_Forbidden;
-extern RTSP_Error const RTSP_OptionNotSupported;
 extern RTSP_Error const RTSP_NotFound;
+extern RTSP_Error const RTSP_NotAcceptable;
+extern RTSP_Error const RTSP_UnsupportedMedia;
+extern RTSP_Error const RTSP_NotEnoughBandwidth;
 extern RTSP_Error const RTSP_SessionNotFound;
 extern RTSP_Error const RTSP_HeaderFieldNotValidforResource;
 extern RTSP_Error const RTSP_InvalidRange;
-extern RTSP_Error const RTSP_Fatal_ErrAlloc;
+extern RTSP_Error const RTSP_UnsupportedTransport;
+extern RTSP_Error const RTSP_InternalServerError;
+extern RTSP_Error const RTSP_NotImplemented;
+extern RTSP_Error const RTSP_ServiceUnavailable;
+extern RTSP_Error const RTSP_VersionNotSupported;
+extern RTSP_Error const RTSP_OptionNotSupported;
 
 void set_RTSP_Error(RTSP_Error * err, int reply_code, char * message);
 RTSP_Error const * get_RTSP_Error(int reply_code);
