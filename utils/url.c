@@ -21,7 +21,8 @@
  * */
 
 #include <netembryo/url.h>
-
+#include <stdio.h>
+#include <ctype.h>
 
 /**
  * Creates an Url informations structure from a URI string
@@ -116,5 +117,117 @@ void Url_destroy(Url * url)
     free(url->path);
 }
 
+/**
+ * Converts an hex char to a decimal value
+ *
+ * @param data The char of an hex encoded digit
+ * @return -1 if given char is not 0-F
+ */
+int hex_to_dec (char data)
+{
+    if( '0' <= data && data <= '9' ) // 0 - 9
+        return data - '0';
+    else if( 'A' <= data && data <= 'F' ) // A - F
+        return data - 'A' + 10;
+    else if( 'a' <= data && data <= 'f' ) // a - f
+        return data - 'a' + 10;
+    else
+        return -1;
+}
 
+/**
+ * Decode a url following RFC 1738
+ *
+ * @param decoded_string a pre-allocated string where decoded charecters will be stored
+ * @param source_string the string where the encoded url is
+ * @param decoded_string_size the size of decoded string char array
+ * @return -1 if url is invalid, lenght of decoded string otherwise
+ */
+int Url_decode (char *decoded_string, const char *source_string, size_t decoded_string_size)
+{
 
+    int decoded_string_pos = 0, source_string_len, i, dec, unit;
+    memset(decoded_string, '\0', decoded_string_size * sizeof(char));
+
+    if (!source_string)
+        return -1;
+
+    source_string_len = strlen (source_string);
+    for (i = 0; i < source_string_len && decoded_string_pos < decoded_string_size; i++ ) {
+        if (source_string[i] == '%') {
+            if ( (i < (source_string_len - 2)) &&
+                 ( (dec = hex_to_dec(source_string[i+1]))>= 0 ) &&
+                 ( (unit = hex_to_dec(source_string[i+2]))>=0 ) ) {
+                     decoded_string[decoded_string_pos] = (char)(dec * 16 + unit);
+                     i += 2;
+                     decoded_string_pos++;
+                 } else {
+                     return -1;
+                 }
+        } else if( source_string[i] == '+' ) {
+            decoded_string[decoded_string_pos] = ' ';
+            decoded_string_pos++;
+        } else {
+            decoded_string[decoded_string_pos] = source_string[i];
+            decoded_string_pos++;
+        }
+    }
+    if (i != source_string_len) {
+        // if decoded_string is too short for decoded url
+        return -1;
+    }
+    decoded_string[decoded_string_pos] = '\0';
+    return decoded_string_pos;
+}
+
+/**
+ * Encode a url following RFC 1738
+ *
+ * @param encoded_string a pre-allocated string where encoded charecters will be stored
+ * @param source_string the string where the url to be encoded is
+ * @param encoded_string_size the size of encoded string char array
+ * @return -1 if url is invalid, lenght of encoded string otherwise
+ */
+int Url_encode (char *encoded_string, const char *source_string, size_t encoded_string_size)
+{
+
+    int encoded_string_pos = 0, source_string_len, i;
+    memset(encoded_string, '\0', encoded_string_size * sizeof(char));
+
+    if (!source_string)
+        return -1;
+
+    source_string_len = strlen (source_string);
+    for (i = 0; i < source_string_len && encoded_string_pos < encoded_string_size; i++ ) {
+        switch (source_string[i]) {
+        case ' ':
+            encoded_string[encoded_string_pos] = '+';
+            encoded_string_pos++;
+            break;
+        case ';':
+        case '+':
+        case '?':
+        case ':':
+        case '@':
+        case '&':
+        case '=':
+            snprintf (encoded_string + encoded_string_pos, encoded_string_size -
+                      encoded_string_pos, "%%%2x", source_string[i]);
+            encoded_string_pos += 3;
+            break;
+        default:
+            if ( iscntrl(source_string[i]) ) {
+                return -1;
+            } else {
+                encoded_string[encoded_string_pos] = source_string[i];
+                encoded_string_pos++;
+            }
+        }
+    }
+    if (i != source_string_len) {
+        // if encoded_string is too short for encoded url
+        return -1;
+    }
+    encoded_string[encoded_string_pos] = '\0';
+    return encoded_string_pos;
+}
