@@ -26,7 +26,7 @@
 
 int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 {
-	int n;
+	int n, param = 1;
 	struct addrinfo *res, *ressave;
 	struct addrinfo hints;
 #ifdef HAVE_LIBSCTP
@@ -102,6 +102,10 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 				}
 		}
 #endif
+                if (setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, &param,
+                    sizeof(int))) 
+                        net_log(NET_LOG_ERR,
+                                "setsockopts(SO_REUSEADDR) failed");
 
                 if (bind(*sock, res->ai_addr, res->ai_addrlen) == 0)
 			break;
