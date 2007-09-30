@@ -35,6 +35,7 @@ RTSP_Error const RTSP_Forbidden = { {403, "Forbidden"}, TRUE };
 RTSP_Error const RTSP_NotFound = { {404, "Not Found"}, TRUE };
 RTSP_Error const RTSP_NotAcceptable = { {406, "Not Acceptable"}, TRUE };
 RTSP_Error const RTSP_UnsupportedMedia = { {415, "Unsupported Media Type"}, TRUE };
+RTSP_Error const RTSP_ParameterNotUnderstood = { {415, "Parameter Not Understood"}, TRUE };
 RTSP_Error const RTSP_NotEnoughBandwidth = { {453, "Not Enough Bandwith"}, TRUE };
 RTSP_Error const RTSP_SessionNotFound = { {454, "Session Not Found"}, TRUE };
 RTSP_Error const RTSP_InvalidMethodInState = { {455, "Method Not Valid In This State"}, TRUE };
@@ -87,6 +88,8 @@ RTSP_Error const * get_RTSP_Error(int reply_code)
             return &RTSP_NotAcceptable;
         case 415:
             return &RTSP_UnsupportedMedia;
+        case 451:
+            return &RTSP_ParameterNotUnderstood;
         case 453:
             return &RTSP_NotEnoughBandwidth;
         case 454:

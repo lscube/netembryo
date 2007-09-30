@@ -59,6 +59,7 @@ extern RTSP_Error const RTSP_Forbidden;
 extern RTSP_Error const RTSP_NotFound;
 extern RTSP_Error const RTSP_NotAcceptable;
 extern RTSP_Error const RTSP_UnsupportedMedia;
+extern RTSP_Error const RTSP_ParameterNotUnderstood;
 extern RTSP_Error const RTSP_NotEnoughBandwidth;
 extern RTSP_Error const RTSP_SessionNotFound;
 extern RTSP_Error const RTSP_HeaderFieldNotValidforResource;
