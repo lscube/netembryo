@@ -5,8 +5,7 @@ noinst_LTLIBRARIES = libwsocket.la
 
 libwsocket_la_LDFLAGS = 
 
-libwsocket_la_SOURCES =		is_multicast.c \
-				is_multicast_address.c \
+libwsocket_la_SOURCES =		is_multicast_address.c \
 				gethostinfo.c \
 				mcast_join.c \
 				mcast_leave.c \

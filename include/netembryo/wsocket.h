@@ -212,7 +212,6 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
 int32_t sock_get_port(const struct sockaddr *sa);
 
 /** multicast*/
-int16_t is_multicast(union ADDR *addr, sa_family_t family);
 int16_t is_multicast_address(const struct sockaddr *sa, sa_family_t family);
 int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/, const char *ifname, unsigned int ifindex, union ADDR *addr);
 int mcast_leave(int sockfd, const struct sockaddr *sa/*, socklen_t salen*/);
