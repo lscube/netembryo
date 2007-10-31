@@ -33,7 +33,7 @@
 #endif
 
 #ifndef IN6_IS_ADDR_MULTICAST
-#define IN6_IS_ADDR_MULTICAST(a) (((__const uint8_t *) (a))[0] == 0xff)
+#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
 #endif
 
 /*return values:
@@ -53,7 +53,7 @@ int16_t is_multicast(union ADDR *addr, sa_family_t family)
 		case AF_INET6: {
 			struct in6_addr *in6;
 			in6 = &(addr->mreq_in6.imr_interface6);
-			return IN6_IS_ADDR_MULTICAST(in6->s6_addr);
+			return IN6_IS_ADDR_MULTICAST(in6);
 		}
 #endif
 #ifdef  AF_UNIX
