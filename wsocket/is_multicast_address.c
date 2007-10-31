@@ -20,18 +20,8 @@
  *  
  * */
 
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
 #include <netembryo/wsocket.h>
 
-#ifndef IN_IS_ADDR_MULTICAST
-#define IN_IS_ADDR_MULTICAST(a) ((((in_addr_t )(a)) & 0xf0000000) == 0xe0000000)
-#endif
-
-#ifndef IN6_IS_ADDR_MULTICAST
-#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
-#endif
 
 /*return values:
  * 0 --> false
