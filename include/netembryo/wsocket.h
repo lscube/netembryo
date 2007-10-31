@@ -50,6 +50,12 @@
 #include <openssl/ssl.h>
 #endif
 
+#ifndef IPV6_ADD_MEMBERSHIP
+#define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
+#endif
+
+
 #ifndef IN_IS_ADDR_MULTICAST
 #define IN_IS_ADDR_MULTICAST(a)	((((in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
 #endif
