@@ -112,7 +112,7 @@ case "$enable_errors" in
         ;;
 esac
 
-AM_CONDITIONAL(HAVE_SSL, /bin/false)
+AM_CONDITIONAL(HAVE_SSL, [test "x" != "x"])
 
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
