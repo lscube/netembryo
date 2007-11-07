@@ -21,7 +21,7 @@
  * this piece of code is taken from NeMeSI
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 #ifdef HAVE_SOCKADDR_DL_STRUCT
 #include <net/if_dl.h>

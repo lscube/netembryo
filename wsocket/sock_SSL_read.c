@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <openssl/ssl.h>
 
 int sock_SSL_read(SSL *ssl_con, void *buffer, int nbytes)

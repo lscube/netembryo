@@ -21,7 +21,7 @@
  * */
 
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <openssl/ssl.h>
 
 int sock_SSL_write(SSL *ssl_con, void *buffer, int nbytes)

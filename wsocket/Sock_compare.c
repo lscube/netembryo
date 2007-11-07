@@ -21,7 +21,7 @@
  * */
 
 #include <string.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int Sock_compare(Sock *p, Sock *q)
 {

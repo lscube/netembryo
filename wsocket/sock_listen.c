@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int sock_listen(int s, int backlog)
 {

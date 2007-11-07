@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 
 /*return values:

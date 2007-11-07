@@ -21,7 +21,7 @@
  * */
 
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <net/if.h>
 #include <sys/ioctl.h>
 

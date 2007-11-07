@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <netinet/in.h>
 #include <netdb.h> // for getnameinfo()
 

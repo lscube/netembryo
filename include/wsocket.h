@@ -21,8 +21,8 @@
  * */
 
 
-#ifndef __WSOCKET_H
-#define __WSOCKET_H
+#ifndef WSOCKET_H
+#define WSOCKET_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -350,4 +350,4 @@ in_port_t get_local_port(Sock *);
  * @}
  */
  
-#endif
+#endif // WSOCKET_H

@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/rtsp_errors.h>
+#include "rtsp_errors.h"
 #include <string.h>
 
 #define FALSE 0

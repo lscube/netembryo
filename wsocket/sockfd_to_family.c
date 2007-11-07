@@ -21,7 +21,7 @@
  * */
 
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int sockfd_to_family(int sockfd)
 {

@@ -22,7 +22,7 @@
 
 
 #include <config.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <openssl/ssl.h>
 
 int sock_SSL_accept(SSL **ssl_con, int new_fd)

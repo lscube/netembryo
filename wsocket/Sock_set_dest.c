@@ -42,7 +42,7 @@
  *
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int Sock_set_dest(Sock *s, struct sockaddr *sa) {
 

@@ -21,7 +21,7 @@
  * */
 
 #include <config.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <openssl/ssl.h>
 #ifndef CERT_N_KEY_NAME 
 # define CERT_N_KEY_NAME NETEMBRYO_CERT_FILE_DEFAULT_STR

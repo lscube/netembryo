@@ -22,7 +22,7 @@
  *
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <stdarg.h>
 
 #if HAVE_SSL

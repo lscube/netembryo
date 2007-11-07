@@ -24,7 +24,7 @@
 #include <openssl/ssl.h>
 #endif
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int Sock_create_ssl_connection(Sock *s)
 {

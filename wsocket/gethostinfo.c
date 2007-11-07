@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints)
 {

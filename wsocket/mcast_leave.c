@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int mcast_leave(int sockfd, const struct sockaddr *sa/*, socklen_t salen*/)
 {

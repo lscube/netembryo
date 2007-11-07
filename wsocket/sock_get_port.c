@@ -23,7 +23,7 @@
 
 
 #include <sys/types.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int32_t sock_get_port(const struct sockaddr *sa)
 {

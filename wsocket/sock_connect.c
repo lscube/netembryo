@@ -22,7 +22,7 @@
  * */
 
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int sock_connect(char *host, char *port, int *sock, sock_type socktype)
 {

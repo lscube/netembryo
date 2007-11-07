@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #include <openssl/ssl.h>
 
 int sock_SSL_close(SSL *ssl_con)

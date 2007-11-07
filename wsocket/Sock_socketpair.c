@@ -20,7 +20,7 @@
  *
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int Sock_socketpair(Sock *pair[]) {
 

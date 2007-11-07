@@ -21,7 +21,7 @@
  * */
 
 #include <sys/ioctl.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int Sock_set_props(Sock *s, int request, int *on)
 {

@@ -20,7 +20,7 @@
  *  
  * */
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 /*return -1 if an error occurs during accept*/
 /*return the socket descriptor, note: doesn't shutdown the listened one */

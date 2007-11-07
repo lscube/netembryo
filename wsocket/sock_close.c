@@ -21,7 +21,7 @@
  * */
 
 
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 int sock_close(int s)
 {

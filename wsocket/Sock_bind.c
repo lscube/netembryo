@@ -23,7 +23,7 @@
 #include <config.h>
 #include <stdio.h>
 #include <string.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 
 Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag)
 {

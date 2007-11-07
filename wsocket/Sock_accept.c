@@ -23,7 +23,7 @@
 #include <config.h>
 #include <sys/types.h>
 #include <string.h>
-#include <netembryo/wsocket.h>
+#include "wsocket.h"
 #if HAVE_SSL
 #include <openssl/ssl.h>
 #endif
