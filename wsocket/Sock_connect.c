@@ -119,7 +119,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
 	if(getpeername(s->fd, sa_p, &sa_len))
 	{
-		net_log(NET_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote address in Sock_connect().\n");
 		Sock_close(s);
 		return NULL;
 	}
@@ -135,7 +135,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
 	remote_port = sock_get_port(sa_p);
 	if(remote_port < 0) {
-		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
 		Sock_close(s);
 		return NULL;
 	} else
