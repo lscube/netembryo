@@ -14,6 +14,8 @@ sources.
 
 - install the dependencies
 - enter the netembryo unpacked directory
++ You may have to run libtoolize --copy --force if your libtool version is
+  different from the one used to create the package.
 - type ./configure in order to prepare the makefiles, you may specify a non
   standard prefix and the other paths, please refer to ./configure --help for
   the full details
