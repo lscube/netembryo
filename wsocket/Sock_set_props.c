@@ -25,7 +25,7 @@
 
 int Sock_set_props(Sock *s, int request, int *on)
 {
-	if (!s)
-		return -1;
-	return ioctl(s->fd, request, on);
+    if (!s)
+        return -1;
+    return ioctl(s->fd, request, on);
 }

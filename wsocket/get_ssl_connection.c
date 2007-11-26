@@ -25,22 +25,22 @@
 
 SSL *get_ssl_connection(int sock)
 {
-	SSL *ssl_con;
-	SSL_CTX *ssl_ctx = NULL;
-	
-	ssl_ctx=create_ssl_ctx();
-	if(!ssl_ctx)
-		return NULL;
-	/*SSL*/	
-	ssl_con = SSL_new(ssl_ctx);
-	if(!(ssl_con)) {
-		SSL_CTX_free(ssl_ctx);
-		return NULL;
-	}
-	SSL_set_fd (ssl_con, sock);
-	
-	SSL_get_cipher (ssl_con);
+    SSL *ssl_con;
+    SSL_CTX *ssl_ctx = NULL;
+    
+    ssl_ctx=create_ssl_ctx();
+    if(!ssl_ctx)
+        return NULL;
+    /*SSL*/    
+    ssl_con = SSL_new(ssl_ctx);
+    if(!(ssl_con)) {
+        SSL_CTX_free(ssl_ctx);
+        return NULL;
+    }
+    SSL_set_fd (ssl_con, sock);
+    
+    SSL_get_cipher (ssl_con);
 
-	return ssl_con; 
+    return ssl_con; 
 
 }

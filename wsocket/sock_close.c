@@ -25,5 +25,5 @@
 
 int sock_close(int s)
 {
-	return close(s);
+    return close(s);
 }

@@ -7,7 +7,7 @@
  *
  *  Copyright (C) 2006 by
  *
- *      - Dario Gallucci	<dario.gallucci@gmail.com>
+ *      - Dario Gallucci    <dario.gallucci@gmail.com>
  *
  *  NetEmbryo is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -46,23 +46,23 @@
 
 int Sock_set_dest(Sock *s, struct sockaddr *sa) {
 
-	if (!s)
-		return -1;
+    if (!s)
+        return -1;
 
-	if (s->socktype != UDP) {
-		net_log(NET_LOG_FATAL, "Only UDP socket can change destination address\n");
-		return -1;
-	}
+    if (s->socktype != UDP) {
+        net_log(NET_LOG_FATAL, "Only UDP socket can change destination address\n");
+        return -1;
+    }
 
-	switch (sa->sa_family) {
-	case AF_INET:
-		memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in));
-		break;
-	case AF_INET6:
-		memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in6));
-		break;
-	default:
-		break;
-	}
-	return 0;
+    switch (sa->sa_family) {
+    case AF_INET:
+        memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in));
+        break;
+    case AF_INET6:
+        memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in6));
+        break;
+    default:
+        break;
+    }
+    return 0;
 }

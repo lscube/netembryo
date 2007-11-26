@@ -25,5 +25,5 @@
 
 int Sock_compare(Sock *p, Sock *q)
 {
-	return memcmp(p, q, sizeof(Sock));
+    return memcmp(p, q, sizeof(Sock));
 }

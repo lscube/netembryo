@@ -31,73 +31,73 @@
 
 Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, sock_flags ssl_flag)
 {
-	Sock *s;
-	char remote_host[128]; /*Unix Domain is largest*/
-	char local_host[128]; /*Unix Domain is largest*/
-	int sockfd = -1;
-	struct sockaddr *sa_p = NULL;
-	socklen_t sa_len = 0;
-	int32_t local_port;
-	int32_t remote_port;
+    Sock *s;
+    char remote_host[128]; /*Unix Domain is largest*/
+    char local_host[128]; /*Unix Domain is largest*/
+    int sockfd = -1;
+    struct sockaddr *sa_p = NULL;
+    socklen_t sa_len = 0;
+    int32_t local_port;
+    int32_t remote_port;
 #if HAVE_SSL
-	SSL *ssl_con;
+    SSL *ssl_con;
 #endif
 
-	if(binded) {
-		sockfd = binded->fd;
-	}
+    if(binded) {
+        sockfd = binded->fd;
+    }
 
-	if (sock_connect(host, port, &sockfd, socktype)) {
-			net_log(NET_LOG_ERR, "Sock_connect() failure.\n");
-			return NULL;
-	}
+    if (sock_connect(host, port, &sockfd, socktype)) {
+            net_log(NET_LOG_ERR, "Sock_connect() failure.\n");
+            return NULL;
+    }
 
 #if HAVE_SSL
-	if(ssl_flag & IS_SSL) {
-		if (sock_SSL_connect(&ssl_con))
-			net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
-			sock_close(sockfd);
-			return NULL;
-	}
-	else
+    if(ssl_flag & IS_SSL) {
+        if (sock_SSL_connect(&ssl_con))
+            net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
+            sock_close(sockfd);
+            return NULL;
+    }
+    else
 #endif
 
-	if (binded) {
-		s = binded;
-		free(s->local_host);
+    if (binded) {
+        s = binded;
+        free(s->local_host);
         s->local_host = NULL;
-		free(s->remote_host);
+        free(s->remote_host);
         s->remote_host = NULL;
     } else if (!(s = calloc(1, sizeof(Sock)))) {
-		net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
+        net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if HAVE_SSL
-		if(ssl_flag & IS_SSL) 
-			sock_SSL_close(ssl_con);
+        if(ssl_flag & IS_SSL) 
+            sock_SSL_close(ssl_con);
 #endif
-		sock_close (sockfd);
-		return NULL;
-	}
+        sock_close (sockfd);
+        return NULL;
+    }
 
-	s->fd = sockfd;
-	s->socktype = socktype;
+    s->fd = sockfd;
+    s->socktype = socktype;
 #if HAVE_SSL
-	if(ssl_flag & IS_SSL) 
-		s->ssl = ssl_con;
+    if(ssl_flag & IS_SSL) 
+        s->ssl = ssl_con;
 #endif
-	s->flags = ssl_flag;
+    s->flags = ssl_flag;
 
-	sa_p = (struct sockaddr *) &(s->local_stg);
-	sa_len = sizeof(struct sockaddr_storage);
+    sa_p = (struct sockaddr *) &(s->local_stg);
+    sa_len = sizeof(struct sockaddr_storage);
 
-	if(getsockname(s->fd, sa_p, &sa_len))
-	{
-		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
-		Sock_close(s);
-		return NULL;
-	}
+    if(getsockname(s->fd, sa_p, &sa_len))
+    {
+        net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
+        Sock_close(s);
+        return NULL;
+    }
 
-	if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
-		memset(local_host, 0, sizeof(local_host));
+    if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
+        memset(local_host, 0, sizeof(local_host));
 
     if (!(s->local_host = strdup(local_host))) {
         net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_connect().\n");
@@ -105,54 +105,54 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
         return NULL;
     }
 
-	local_port = sock_get_port(sa_p);
+    local_port = sock_get_port(sa_p);
 
-	if(local_port < 0) {
-		net_log(NET_LOG_ERR, "Unable to get local port in Sock_connect().\n");
-		Sock_close(s);
-		return NULL;
-	} else
-		s->local_port = ntohs(local_port);
+    if(local_port < 0) {
+        net_log(NET_LOG_ERR, "Unable to get local port in Sock_connect().\n");
+        Sock_close(s);
+        return NULL;
+    } else
+        s->local_port = ntohs(local_port);
 
-	sa_p = (struct sockaddr *) &(s->remote_stg);
-	sa_len = sizeof(struct sockaddr_storage);
+    sa_p = (struct sockaddr *) &(s->remote_stg);
+    sa_len = sizeof(struct sockaddr_storage);
 
-	if(getpeername(s->fd, sa_p, &sa_len))
-	{
-		net_log(NET_LOG_ERR, "Unable to get remote address in Sock_connect().\n");
-		Sock_close(s);
-		return NULL;
-	}
+    if(getpeername(s->fd, sa_p, &sa_len))
+    {
+        net_log(NET_LOG_ERR, "Unable to get remote address in Sock_connect().\n");
+        Sock_close(s);
+        return NULL;
+    }
 
-	if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
-		memset(remote_host, 0, sizeof(remote_host));
-	
+    if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
+        memset(remote_host, 0, sizeof(remote_host));
+    
     if (!(s->remote_host = strdup(remote_host))) {
         net_log(NET_LOG_FATAL, "Unable to allocate remote host in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     }
 
-	remote_port = sock_get_port(sa_p);
-	if(remote_port < 0) {
-		net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
-		Sock_close(s);
-		return NULL;
-	} else
-		s->remote_port = ntohs(remote_port);
+    remote_port = sock_get_port(sa_p);
+    if(remote_port < 0) {
+        net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
+        Sock_close(s);
+        return NULL;
+    } else
+        s->remote_port = ntohs(remote_port);
 
-	net_log(NET_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
-		"remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
-		s->remote_port);
+    net_log(NET_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
+        "remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
+        s->remote_port);
 
-	if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
-		//fprintf(stderr,"IS MULTICAST\n");
-		if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr))!=0) {
-			Sock_close(s);
-			return NULL;
-		}
-		s->flags |= IS_MULTICAST;
-	}
+    if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
+        //fprintf(stderr,"IS MULTICAST\n");
+        if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr))!=0) {
+            Sock_close(s);
+            return NULL;
+        }
+        s->flags |= IS_MULTICAST;
+    }
 
-	return s;
+    return s;
 }

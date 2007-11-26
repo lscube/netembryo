@@ -26,53 +26,53 @@
 
 char *get_remote_host(Sock *s)
 {
-	char str[128];
+    char str[128];
 
-	if(!(s->remote_host)) {
-		if(!sock_ntop_host((struct sockaddr *)&(s->remote_stg),str,sizeof(str)))
-			memset(str, 0, sizeof(str));
-		s->remote_host = strdup(str);
-	}
-	return s->remote_host;
+    if(!(s->remote_host)) {
+        if(!sock_ntop_host((struct sockaddr *)&(s->remote_stg),str,sizeof(str)))
+            memset(str, 0, sizeof(str));
+        s->remote_host = strdup(str);
+    }
+    return s->remote_host;
 }
 
 char *get_local_host(Sock *s)
 {
-	char str[128]; /*Unix domain is largest*/
+    char str[128]; /*Unix domain is largest*/
 
-	if(!(s->local_host)) {
-		if(!sock_ntop_host((struct sockaddr *)&(s->local_stg),str,sizeof(str)))
-			memset(str, 0, sizeof(str));
-		s->local_host = strdup(str);
-		}
-	return s->local_host;
+    if(!(s->local_host)) {
+        if(!sock_ntop_host((struct sockaddr *)&(s->local_stg),str,sizeof(str)))
+            memset(str, 0, sizeof(str));
+        s->local_host = strdup(str);
+        }
+    return s->local_host;
 }
 
 inline int get_local_hostname(char *localhostname, size_t len) //return 0 if ok
 {
-	//return getnameinfo((struct sockaddr *)&(s->local_stg), sizeof(s->local_stg), localhostname, len, NULL, 0, 0);
-	return gethostname(localhostname, len);
+    //return getnameinfo((struct sockaddr *)&(s->local_stg), sizeof(s->local_stg), localhostname, len, NULL, 0, 0);
+    return gethostname(localhostname, len);
 }
 
 in_port_t get_remote_port(Sock *s)
 {
-	int32_t port;
-	if(!(s->remote_port)) {
-		if((port = sock_get_port((struct sockaddr *)&(s->remote_stg))) < 0)
-			return 0;
-		s->remote_port = ntohs(port);
-	}
-	return s->remote_port;
+    int32_t port;
+    if(!(s->remote_port)) {
+        if((port = sock_get_port((struct sockaddr *)&(s->remote_stg))) < 0)
+            return 0;
+        s->remote_port = ntohs(port);
+    }
+    return s->remote_port;
 }
 
 in_port_t get_local_port(Sock *s)
 {
-	int32_t port;
-	
-	if(!(s->local_port)) {
-		if((port = sock_get_port((struct sockaddr *)&(s->local_stg))) < 0)
-			return 0;
-		s->local_port = ntohs(port);
-	}
-	return s->local_port;
+    int32_t port;
+    
+    if(!(s->local_port)) {
+        if((port = sock_get_port((struct sockaddr *)&(s->local_stg))) < 0)
+            return 0;
+        s->local_port = ntohs(port);
+    }
+    return s->local_port;
 }

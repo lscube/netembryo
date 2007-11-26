@@ -24,6 +24,6 @@
 
 int sock_listen(int s, int backlog)
 {
-	return listen(s, backlog);
+    return listen(s, backlog);
 }
 

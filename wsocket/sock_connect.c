@@ -26,98 +26,98 @@
 
 int sock_connect(char *host, char *port, int *sock, sock_type socktype)
 {
-	int n, connect_new;
-	struct addrinfo *res, *ressave;
-	struct addrinfo hints;
+    int n, connect_new;
+    struct addrinfo *res, *ressave;
+    struct addrinfo hints;
 #ifdef HAVE_LIBSCTP
-	struct sctp_initmsg initparams;
-	struct sctp_event_subscribe subscribe;
+    struct sctp_initmsg initparams;
+    struct sctp_event_subscribe subscribe;
 #endif
 
-	memset(&hints, 0, sizeof(struct addrinfo));
+    memset(&hints, 0, sizeof(struct addrinfo));
 
-	hints.ai_flags = AI_CANONNAME;
+    hints.ai_flags = AI_CANONNAME;
 #ifdef IPV6
-	hints.ai_family = AF_UNSPEC;
+    hints.ai_family = AF_UNSPEC;
 #else
-	hints.ai_family = AF_INET;
+    hints.ai_family = AF_INET;
 #endif
-	switch (socktype) {
-	case SCTP:
+    switch (socktype) {
+    case SCTP:
 #ifndef HAVE_LIBSCTP
-		net_log(NET_LOG_FATAL, "SCTP protocol not compiled in\n");
-		return WSOCK_ERROR;
-		break;
-#endif	// else go down to TCP case (SCTP and TCP are both SOCK_STREAM type)
-	case TCP:
-		hints.ai_socktype = SOCK_STREAM;
-		break;
-	case UDP:
-		hints.ai_socktype = SOCK_DGRAM;
-		break;
-	default:
-		net_log(NET_LOG_ERR, "Unknown socket type specified\n");
-		return WSOCK_ERROR;
-		break;
-	}
+        net_log(NET_LOG_FATAL, "SCTP protocol not compiled in\n");
+        return WSOCK_ERROR;
+        break;
+#endif    // else go down to TCP case (SCTP and TCP are both SOCK_STREAM type)
+    case TCP:
+        hints.ai_socktype = SOCK_STREAM;
+        break;
+    case UDP:
+        hints.ai_socktype = SOCK_DGRAM;
+        break;
+    default:
+        net_log(NET_LOG_ERR, "Unknown socket type specified\n");
+        return WSOCK_ERROR;
+        break;
+    }
 
-	if ((n = gethostinfo(&res, host, port, &hints)) != 0) {
-		net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));	
-		return WSOCK_ERRADDR;
-	}
-	
-	ressave = res;
+    if ((n = gethostinfo(&res, host, port, &hints)) != 0) {
+        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));    
+        return WSOCK_ERRADDR;
+    }
+    
+    ressave = res;
 
-	connect_new = (*sock < 0);
+    connect_new = (*sock < 0);
 
-	do {
+    do {
 #ifdef HAVE_LIBSCTP
-		if (socktype == SCTP)
-			res->ai_protocol = IPPROTO_SCTP;
+        if (socktype == SCTP)
+            res->ai_protocol = IPPROTO_SCTP;
 #endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
-		if (connect_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
-			continue;
+        if (connect_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
+            continue;
 
 #ifdef HAVE_LIBSCTP
-		if (socktype == SCTP) {
-			// Enable the propagation of packets headers
-			memset(&subscribe, 0, sizeof(subscribe));
-			subscribe.sctp_data_io_event = 1;
-			if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
-					sizeof(subscribe)) < 0) {
-				net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
-				return WSOCK_ERROR;
-				}
+        if (socktype == SCTP) {
+            // Enable the propagation of packets headers
+            memset(&subscribe, 0, sizeof(subscribe));
+            subscribe.sctp_data_io_event = 1;
+            if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
+                    sizeof(subscribe)) < 0) {
+                net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
+                return WSOCK_ERROR;
+                }
 
 
-			// Setup number of streams to be used for SCTP connection
-			memset(&initparams, 0, sizeof(initparams));
-			initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
-			initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
-			if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
-					sizeof(initparams)) < 0) {
-				net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
-				return WSOCK_ERROR;
-				}
-		}
+            // Setup number of streams to be used for SCTP connection
+            memset(&initparams, 0, sizeof(initparams));
+            initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
+            initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
+            if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
+                    sizeof(initparams)) < 0) {
+                net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
+                return WSOCK_ERROR;
+                }
+        }
 #endif
 
-		if (connect(*sock, res->ai_addr, res->ai_addrlen) == 0)
-			break;
+        if (connect(*sock, res->ai_addr, res->ai_addrlen) == 0)
+            break;
 
-		if (connect_new) {
-			if (close(*sock) < 0)
-				return WSOCK_ERROR;
-			else
-				*sock = -1;
-		}
+        if (connect_new) {
+            if (close(*sock) < 0)
+                return WSOCK_ERROR;
+            else
+                *sock = -1;
+        }
 
-	} while ((res = res->ai_next) != NULL);
+    } while ((res = res->ai_next) != NULL);
 
-	freeaddrinfo(ressave);
+    freeaddrinfo(ressave);
 
-	if ( !res )
-		return WSOCK_ERROR;
+    if ( !res )
+        return WSOCK_ERROR;
 
-	return WSOCK_OK;
+    return WSOCK_OK;
 }

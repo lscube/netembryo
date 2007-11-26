@@ -28,15 +28,15 @@
 
 int Sock_create_ssl_connection(Sock *s)
 {
-	if(!s)
-		return WSOCK_ERROR;
+    if(!s)
+        return WSOCK_ERROR;
 
 #if HAVE_SSL
-	if(s->flags & IS_SSL) {
-		s->ssl = get_ssl_connection(s->fd);
-		if(!(s->ssl))
-			return WSOCK_ERROR;
-	}
+    if(s->flags & IS_SSL) {
+        s->ssl = get_ssl_connection(s->fd);
+        if(!(s->ssl))
+            return WSOCK_ERROR;
+    }
 #endif
-	return WSOCK_OK;
+    return WSOCK_OK;
 }

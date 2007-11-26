@@ -35,56 +35,56 @@ static RSA *__RSA_generate_temp_key_CB (SSL *ssl, int export)
 #define KEY_512_LEN 512 
 #endif
 { 
-	RSA *rsa; 
-	if (!(rsa = RSA_generate_key (KEY_512_LEN,RSA_F4,NULL,NULL))) 
-		return NULL;
-	return rsa; 
+    RSA *rsa; 
+    if (!(rsa = RSA_generate_key (KEY_512_LEN,RSA_F4,NULL,NULL))) 
+        return NULL;
+    return rsa; 
 }
 #endif
 
 SSL_CTX *create_ssl_ctx(void)
 {
-	SSL_CTX *ssl_ctx = NULL;
-	char *env,*cert_n_key = CERT_N_KEY_NAME;
+    SSL_CTX *ssl_ctx = NULL;
+    char *env,*cert_n_key = CERT_N_KEY_NAME;
 
-		/*SSL_CTX*/
-	ssl_ctx = SSL_CTX_new(SSLv3_server_method());
-	if(!ssl_ctx)
-		return NULL;
-	SSL_CTX_set_options (ssl_ctx,SSL_OP_ALL);
-	
-	/*SSL CIPHERS*/
-	/*
-	if ((env = getenv ("SSL_CIPHERS")))  
-		SSL_CTX_set_cipher_list(ssl_ctx,env); 
-	//SSL_CTX_set_cipher_list(ssl_ctx,"ALL"); 
-	*/
+        /*SSL_CTX*/
+    ssl_ctx = SSL_CTX_new(SSLv3_server_method());
+    if(!ssl_ctx)
+        return NULL;
+    SSL_CTX_set_options (ssl_ctx,SSL_OP_ALL);
+    
+    /*SSL CIPHERS*/
+    /*
+    if ((env = getenv ("SSL_CIPHERS")))  
+        SSL_CTX_set_cipher_list(ssl_ctx,env); 
+    //SSL_CTX_set_cipher_list(ssl_ctx,"ALL"); 
+    */
 
-	if ((env = getenv ("SSL_CERT_N_KEY_FILE"))) 
-		cert_n_key = env; 
-	if (access (cert_n_key, R_OK) < 0) { 
-		fprintf(stderr,"can't access certificate file %s.",cert_n_key); 
-		SSL_CTX_free(ssl_ctx);
-		return NULL; 
-	} 
-	if (!SSL_CTX_use_certificate_file (ssl_ctx, cert_n_key,SSL_FILETYPE_PEM)) {
-		fprintf(stderr,"unable to load certificate from %s.",cert_n_key); 
-		SSL_CTX_free(ssl_ctx);
-		return NULL; 
-	} 
-	if (!SSL_CTX_use_RSAPrivateKey_file (ssl_ctx, cert_n_key,SSL_FILETYPE_PEM)) { 
-		printf("unable to load private key from %s.",cert_n_key); 
-		SSL_CTX_free(ssl_ctx);
-		return NULL; 
-	}
-	
-	if (!SSL_CTX_check_private_key(ssl_ctx)) {
-		fprintf(stderr,"Private key does not match the certificate public key\n");
-		return NULL;
-	}
-	/*
-	if (SSL_CTX_need_tmp_RSA (ssl_ctx)) 
-		SSL_CTX_set_tmp_rsa_callback (ssl_ctx,__RSA_generate_temp_key_CB); */
-	return ssl_ctx;
+    if ((env = getenv ("SSL_CERT_N_KEY_FILE"))) 
+        cert_n_key = env; 
+    if (access (cert_n_key, R_OK) < 0) { 
+        fprintf(stderr,"can't access certificate file %s.",cert_n_key); 
+        SSL_CTX_free(ssl_ctx);
+        return NULL; 
+    } 
+    if (!SSL_CTX_use_certificate_file (ssl_ctx, cert_n_key,SSL_FILETYPE_PEM)) {
+        fprintf(stderr,"unable to load certificate from %s.",cert_n_key); 
+        SSL_CTX_free(ssl_ctx);
+        return NULL; 
+    } 
+    if (!SSL_CTX_use_RSAPrivateKey_file (ssl_ctx, cert_n_key,SSL_FILETYPE_PEM)) { 
+        printf("unable to load private key from %s.",cert_n_key); 
+        SSL_CTX_free(ssl_ctx);
+        return NULL; 
+    }
+    
+    if (!SSL_CTX_check_private_key(ssl_ctx)) {
+        fprintf(stderr,"Private key does not match the certificate public key\n");
+        return NULL;
+    }
+    /*
+    if (SSL_CTX_need_tmp_RSA (ssl_ctx)) 
+        SSL_CTX_set_tmp_rsa_callback (ssl_ctx,__RSA_generate_temp_key_CB); */
+    return ssl_ctx;
 
 }

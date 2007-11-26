@@ -27,38 +27,38 @@
 
 int sock_SSL_accept(SSL **ssl_con, int new_fd)
 {
-	int ssl_err;
-	X509 * client_cert;
-	char * str;
-	
-	*ssl_con = get_ssl_connection(new_fd);
+    int ssl_err;
+    X509 * client_cert;
+    char * str;
+    
+    *ssl_con = get_ssl_connection(new_fd);
 
-	if(!(*ssl_con)) {
-		net_log(NET_LOG_ERR, "sock_SSL_accept: get_ssl_connection() returned NULL.\n");
-		return WSOCK_ERROR;
-	}
+    if(!(*ssl_con)) {
+        net_log(NET_LOG_ERR, "sock_SSL_accept: get_ssl_connection() returned NULL.\n");
+        return WSOCK_ERROR;
+    }
 
-	if (SSL_accept(*ssl_con) <= 0) {
-		net_log(NET_LOG_ERR, "sock_SSL_accept: SSL_accept() failed.\n");
-		sock_SSL_close(*ssl_con);
-		return WSOCK_ERROR;
-	}
+    if (SSL_accept(*ssl_con) <= 0) {
+        net_log(NET_LOG_ERR, "sock_SSL_accept: SSL_accept() failed.\n");
+        sock_SSL_close(*ssl_con);
+        return WSOCK_ERROR;
+    }
 
 #if 0
-	/*Client Cert. Not used*/
-	client_cert = SSL_get_peer_certificate (*ssl_con);
-	if (client_cert != NULL) {
-		printf ("Client certificate:\n");
-		str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
-		/*printf ("\t subject: %s\n", str);
-		free (str);*/
-		str = X509_NAME_oneline (X509_get_issuer_name  (client_cert), 0, 0);
-		/*printf ("\t issuer: %s\n", str);
-		free (str);*/
-		X509_free (client_cert);
-	}
-	/*---------------------*/
+    /*Client Cert. Not used*/
+    client_cert = SSL_get_peer_certificate (*ssl_con);
+    if (client_cert != NULL) {
+        printf ("Client certificate:\n");
+        str = X509_NAME_oneline (X509_get_subject_name (client_cert), 0, 0);
+        /*printf ("\t subject: %s\n", str);
+        free (str);*/
+        str = X509_NAME_oneline (X509_get_issuer_name  (client_cert), 0, 0);
+        /*printf ("\t issuer: %s\n", str);
+        free (str);*/
+        X509_free (client_cert);
+    }
+    /*---------------------*/
 #endif
 
-	return WSOCK_OK;
+    return WSOCK_OK;
 }

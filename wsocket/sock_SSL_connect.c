@@ -26,35 +26,35 @@
 
 int sock_SSL_connect(SSL **ssl_con, int sockfd)
 {
-	int ssl_err;
-	SSL_CTX *ssl_ctx = NULL;
+    int ssl_err;
+    SSL_CTX *ssl_ctx = NULL;
 
-	ssl_ctx = SSL_CTX_new(SSLv3_client_method());
-	if(!ssl_ctx) {
-		net_log(NET_LOG_ERR, "sock_SSL_connect: !ssl_ctx\n");
-		return WSOCK_ERROR;
-	}
+    ssl_ctx = SSL_CTX_new(SSLv3_client_method());
+    if(!ssl_ctx) {
+        net_log(NET_LOG_ERR, "sock_SSL_connect: !ssl_ctx\n");
+        return WSOCK_ERROR;
+    }
 
-	*ssl_con = SSL_new(ssl_ctx);
+    *ssl_con = SSL_new(ssl_ctx);
 
-	if(!(*ssl_con)) {
-		net_log(NET_LOG_ERR, "sock_SSL_connect: SSL_new() failed.\n");
-		SSL_CTX_free(ssl_ctx);
-		return WSOCK_ERROR;
-	}
-	
-	SSL_set_fd (*ssl_con, sockfd);
-	SSL_set_connect_state(*ssl_con);
-	ssl_err = SSL_connect(*ssl_con);
+    if(!(*ssl_con)) {
+        net_log(NET_LOG_ERR, "sock_SSL_connect: SSL_new() failed.\n");
+        SSL_CTX_free(ssl_ctx);
+        return WSOCK_ERROR;
+    }
+    
+    SSL_set_fd (*ssl_con, sockfd);
+    SSL_set_connect_state(*ssl_con);
+    ssl_err = SSL_connect(*ssl_con);
 
-	if(ssl_err < 0) 
-		SSL_set_shutdown(*ssl_con,SSL_SENT_SHUTDOWN);
-	if(ssl_err <= 0) {
-		net_log(NET_LOG_ERR, "sock_SSL_connect: SSL_connect() failed.\n");
-		SSL_free(*ssl_con);
-		SSL_CTX_free(ssl_ctx);
-		return WSOCK_ERROR;
-	}
+    if(ssl_err < 0) 
+        SSL_set_shutdown(*ssl_con,SSL_SENT_SHUTDOWN);
+    if(ssl_err <= 0) {
+        net_log(NET_LOG_ERR, "sock_SSL_connect: SSL_connect() failed.\n");
+        SSL_free(*ssl_con);
+        SSL_CTX_free(ssl_ctx);
+        return WSOCK_ERROR;
+    }
 
-	return WSOCK_OK;
+    return WSOCK_OK;
 }

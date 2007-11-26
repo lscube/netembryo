@@ -26,5 +26,5 @@
 
 int sock_SSL_write(SSL *ssl_con, void *buffer, int nbytes)
 {
-	return SSL_write(ssl_con, buffer, nbytes);
+    return SSL_write(ssl_con, buffer, nbytes);
 }

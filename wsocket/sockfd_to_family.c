@@ -25,11 +25,11 @@
 
 int sockfd_to_family(int sockfd)
 {
-	struct sockaddr_storage stg;
-	socklen_t len;
-	
-	len=sizeof(struct sockaddr_storage);
-	if(getsockname(sockfd,(struct sockaddr *)&stg,&len) < 0)
-		return -1;
-	return ((struct sockaddr *)&stg)->sa_family;
+    struct sockaddr_storage stg;
+    socklen_t len;
+    
+    len=sizeof(struct sockaddr_storage);
+    if(getsockname(sockfd,(struct sockaddr *)&stg,&len) < 0)
+        return -1;
+    return ((struct sockaddr *)&stg)->sa_family;
 }

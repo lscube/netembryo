@@ -57,7 +57,7 @@
 
 
 #ifndef IN_IS_ADDR_MULTICAST
-#define IN_IS_ADDR_MULTICAST(a)	((((in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
+#define IN_IS_ADDR_MULTICAST(a)    ((((in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
 #endif
 
 #if IPV6
@@ -94,91 +94,91 @@ struct sockaddr_storage
 /** flags definition*/
 typedef enum {
 /** ssl flags */
-	IS_SSL = 0x1,
-	IS_TLS = 0x3, /**< setting this will also set IS_SSL */
+    IS_SSL = 0x1,
+    IS_TLS = 0x3, /**< setting this will also set IS_SSL */
 /** multicast flags */
-	IS_MULTICAST = 0x4
+    IS_MULTICAST = 0x4
 } sock_flags;
 
 /** socket type definition */
 typedef enum {
 /** socket fd not valid */
-	SOCK_NONE,
+    SOCK_NONE,
 /** IP based protcols */
-	TCP,
-	UDP,
-	SCTP,
+    TCP,
+    UDP,
+    SCTP,
 /** Local socket (Unix) */
-	LOCAL
+    LOCAL
 } sock_type;
 
 /* NOTE:
- *	struct ip_mreq {
- *		struct in_addr imr_multiaddr;
- *		struct in_addr imr_interface;
- *	}
+ *    struct ip_mreq {
+ *        struct in_addr imr_multiaddr;
+ *        struct in_addr imr_interface;
+ *    }
  *
- *	struct ipv6_mreq {
- *		struct in6_addr	ipv6mr_multiaddr;
- *		unsigned int ipv6mr_interface;
- *	}
+ *    struct ipv6_mreq {
+ *        struct in6_addr    ipv6mr_multiaddr;
+ *        unsigned int ipv6mr_interface;
+ *    }
  */
 
 #if IPV6
 /** multicast IPv6 storage structure */
 struct ipv6_mreq_in6 {
-	struct ipv6_mreq NETmreq6;
-	struct in6_addr __imr_interface6;
+    struct ipv6_mreq NETmreq6;
+    struct in6_addr __imr_interface6;
 };
 #endif
 /** multicast IPv4 storage structure */
 struct ip_mreq_in {
-	struct ip_mreq NETmreq;
-	unsigned int __ipv4mr_interface;
+    struct ip_mreq NETmreq;
+    unsigned int __ipv4mr_interface;
 };
 
 #if 0
 union ADDR {
-	struct in_addr in;
-	struct in6_addr in6;
+    struct in_addr in;
+    struct in6_addr in6;
 };
 #endif
 
 union ADDR {
 #if IPV6
-	struct ipv6_mreq_in6 mreq_in6; /*struct in6_addr ipv6mr_multiaddr; struct in6_addr imr_interface6 ; unsigned int ipv6mr_interface; */
+    struct ipv6_mreq_in6 mreq_in6; /*struct in6_addr ipv6mr_multiaddr; struct in6_addr imr_interface6 ; unsigned int ipv6mr_interface; */
 #endif //IPV6
-	struct ip_mreq_in mreq_in; /*struct in_addr ipv4mr_multiaddr; struct in_addr imr_interface4; unsigned int ipv4mr_interface;*/
+    struct ip_mreq_in mreq_in; /*struct in_addr ipv4mr_multiaddr; struct in_addr imr_interface4; unsigned int ipv4mr_interface;*/
 };
 #if IPV6
-	#define imr_interface6 __imr_interface6
-	#define ipv6_interface NETmreq6.ipv6mr_interface
-	#define ipv6_multiaddr NETmreq6.ipv6mr_multiaddr
+    #define imr_interface6 __imr_interface6
+    #define ipv6_interface NETmreq6.ipv6mr_interface
+    #define ipv6_multiaddr NETmreq6.ipv6mr_multiaddr
 #endif //IPV6
-	#define ipv4_interface __ipv4mr_interface
-	#define imr_interface4 NETmreq.imr_interface
-	#define ipv4_multiaddr NETmreq.imr_multiaddr
+    #define ipv4_interface __ipv4mr_interface
+    #define imr_interface4 NETmreq.imr_interface
+    #define ipv4_multiaddr NETmreq.imr_multiaddr
 
 /* Developer HowTo: //TODO: Update to new multicast API
  *
  * union ADDR
- * 		struct ipv6_mreq_in6 mreq_in6
- * 			struct in6_addr ipv6_multiaddr	// IPv6 class D multicast address. defined =  NETmreq6.ipv6mr_multiaddr
- * 			struct in6_addr imr_interface6	// IPv6 address of local interface.
- * 			unsigned int ipv6_interface	// interface index, or 0
- * 			struct ipv6_mreq NETmreq6
- * 		 struct ip_mreq_in mreq_in
- * 	 		struct in_addr ipv4_multiaddr 	// IPv4 class D multicast address. defined = NETmreq.imr_multiaddr
- * 	 		struct in_addr imr_interface4	// IPv4 address of local interface. defined = NETmreq.imr_interface
- * 	 		unsigned int ipv4_interface	// interface index, or 0
- * 	 		struct ip_mreq NETmreq
+ *         struct ipv6_mreq_in6 mreq_in6
+ *             struct in6_addr ipv6_multiaddr    // IPv6 class D multicast address. defined =  NETmreq6.ipv6mr_multiaddr
+ *             struct in6_addr imr_interface6    // IPv6 address of local interface.
+ *             unsigned int ipv6_interface    // interface index, or 0
+ *             struct ipv6_mreq NETmreq6
+ *          struct ip_mreq_in mreq_in
+ *              struct in_addr ipv4_multiaddr     // IPv4 class D multicast address. defined = NETmreq.imr_multiaddr
+ *              struct in_addr imr_interface4    // IPv4 address of local interface. defined = NETmreq.imr_interface
+ *              unsigned int ipv4_interface    // interface index, or 0
+ *              struct ip_mreq NETmreq
  */
 
 /** socket storage structure */
 typedef struct {
-    int fd;	///< low level socket file descriptor
-    struct sockaddr_storage local_stg;	///< low level address storage from getsockname
-    struct sockaddr_storage remote_stg;	///< low level address storage from getpeername
+    int fd;    ///< low level socket file descriptor
+    struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
+    struct sockaddr_storage remote_stg;    ///< low level address storage from getpeername
     sock_type socktype; ///< socket type enumeration
     union ADDR addr; ///< multicast address storage
     /** flags */
@@ -186,23 +186,23 @@ typedef struct {
     /** human readable datas */
     char *remote_host; ///< remote host stored as dinamic string
     char *local_host; ///< local host stored as dinamic string
-    in_port_t remote_port;	///< remote port stored in host order
-    in_port_t local_port;	///< local port stored in host order
+    in_port_t remote_port;    ///< remote port stored in host order
+    in_port_t local_port;    ///< local port stored in host order
 #if HAVE_SSL
     SSL *ssl; ///< stores ssl context information
 #endif
 } Sock;
 
-#define WSOCK_ERRORPROTONOSUPPORT -5	
-#define WSOCK_ERRORIOCTL	-4	
-#define WSOCK_ERRORINTERFACE	-3	
-#define WSOCK_ERROR	-2	
-#define WSOCK_ERRFAMILYUNKNOWN	-1
+#define WSOCK_ERRORPROTONOSUPPORT -5    
+#define WSOCK_ERRORIOCTL    -4    
+#define WSOCK_ERRORINTERFACE    -3    
+#define WSOCK_ERROR    -2    
+#define WSOCK_ERRFAMILYUNKNOWN    -1
 #define WSOCK_OK 0
-#define WSOCK_ERRSIZE	1
-#define WSOCK_ERRFAMILY	2
-#define WSOCK_ERRADDR	3
-#define WSOCK_ERRPORT	4
+#define WSOCK_ERRSIZE    1
+#define WSOCK_ERRFAMILY    2
+#define WSOCK_ERRADDR    3
+#define WSOCK_ERRPORT    4
 
 /** low level wrappers */
 int sockfd_to_family(int sockfd);

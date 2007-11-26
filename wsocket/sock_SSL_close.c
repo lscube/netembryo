@@ -25,9 +25,9 @@
 
 int sock_SSL_close(SSL *ssl_con)
 {
-	//SSL_shutdown(ssl_con);
-	SSL_set_shutdown(ssl_con,SSL_SENT_SHUTDOWN);
-	if(ssl_con)
-		SSL_free(ssl_con);
-	return WSOCK_OK;
+    //SSL_shutdown(ssl_con);
+    SSL_set_shutdown(ssl_con,SSL_SENT_SHUTDOWN);
+    if(ssl_con)
+        SSL_free(ssl_con);
+    return WSOCK_OK;
 }
