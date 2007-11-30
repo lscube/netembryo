@@ -26,8 +26,9 @@
 #ifdef HAVE_SOCKADDR_DL_STRUCT
 #include <net/if_dl.h>
 #endif
-#ifdef AF_UNIX
-#include <sys/un.h>
+
+#if !defined(WIN32) && defined(AF_UNIX)
+# include <sys/un.h>
 #endif
 
 const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
@@ -63,7 +64,7 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 	}
 #endif
 
-#ifdef	AF_UNIX
+#if !defined(WIN32) && defined(AF_UNIX)
 	case AF_UNIX: {
 		struct sockaddr_un *unp = (struct sockaddr_un *) sa;
 
