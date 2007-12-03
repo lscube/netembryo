@@ -38,14 +38,14 @@ typedef struct
 {
     int reply_code; //!< RTSP code representation of the message
     char reply_str[RTSP_MAX_REPLY_MESSAGE_LEN]; //!< written representation of the message
-} ReplyMessage;
+} RTSP_ReplyMessage;
 
 /**
   * RTSP error description
   */
 typedef struct
 {
-    ReplyMessage message; //!< RTSP standard error message
+    RTSP_ReplyMessage message; //!< RTSP standard error message
     int got_error; //!< can be: FALSE no error, TRUE generic error or have internal error id
 } RTSP_Error;
 
