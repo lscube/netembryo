@@ -20,8 +20,11 @@
  *
  * */
 
-#include <sys/ioctl.h>
 #include "wsocket.h"
+
+#ifndef WIN32
+#include <sys/ioctl.h>
+#endif
 
 int Sock_set_props(Sock *s, int request, int *on)
 {

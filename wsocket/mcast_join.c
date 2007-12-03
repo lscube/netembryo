@@ -22,13 +22,17 @@
 
 
 #include "wsocket.h"
-#include <net/if.h>
-#include <sys/ioctl.h>
+
+#ifndef WIN32
+#   include <sys/ioctl.h>
+#   include <net/if.h>
+#endif
 
 /* On success, zero is returned*/
 int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/,const char *ifname, unsigned int ifindex, union ADDR *addr)
 {
     switch (sa->sa_family) {
+#ifndef WIN32
     case AF_INET: {
         /*struct ip_mreq        mreq;*/
         struct ifreq        ifreq;
@@ -81,6 +85,7 @@ doioctl:
 
         return(setsockopt(sockfd, IPPROTO_IPV6, IPV6_ADD_MEMBERSHIP,&(*addr).mreq_in6.NETmreq6, sizeof((*addr).mreq_in6.NETmreq6)));
     }
+#endif
 #endif
     default:
         return WSOCK_ERRFAMILYUNKNOWN;

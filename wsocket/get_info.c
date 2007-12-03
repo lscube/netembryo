@@ -21,8 +21,11 @@
  * */
 
 #include "wsocket.h"
+
+#ifndef WIN32
 #include <netinet/in.h>
 #include <netdb.h> // for getnameinfo()
+#endif
 
 char *get_remote_host(Sock *s)
 {

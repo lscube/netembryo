@@ -32,14 +32,22 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <unistd.h>
 #include <errno.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+
+#ifndef WIN32
+#   include <unistd.h>
+#   include <netinet/in.h>
+#   include <arpa/inet.h>
+#   include <sys/types.h>
+#   include <sys/socket.h>
+#   include <arpa/inet.h>
+#   include <netdb.h>
+#else
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   include <stdint.h>
+#endif
+
 
 #ifdef HAVE_LIBSCTP
 #include <netinet/sctp.h>
@@ -70,6 +78,12 @@
 #define ntohl24(x) (x)
 #else
 #define ntohl24(x) (((x&0xff) << 16) | (x&0xff00) | ((x&0xff0000)>>16)) 
+#endif
+
+#ifdef WIN32
+typedef unsigned short sa_family_t;
+typedef unsigned short in_port_t;
+typedef unsigned int in_addr_t;
 #endif
 
 #ifndef HAVE_STRUCT_SOCKADDR_STORAGE
