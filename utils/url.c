@@ -1,9 +1,9 @@
-/* * 
+/* *
  * * This file is part of NetEmbryo
  *
  * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
  * See AUTHORS for more details
- * 
+ *
  * NetEmbryo is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with NetEmbryo; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *  
+ *
  * */
 
 #include "url.h"
@@ -27,10 +27,10 @@
 /**
  * Creates an Url informations structure from a URI string
  *
- * @param url The url to initialize (Will not free the previous data, Url_destroy must be
- *            used to free it if we already initialized the structure before)
+ * @param url The url to initialize (Will not free the previous data,
+ *            Url_destroy must be used to free it if we already initialized
+ *            the structure before)
  * @param urlname The URI to parse to create the Url informations
- *
  * @return Always 0, errors will be reported by setting to NULL the field of
  *         the Url structure that the function was not able to parse.
  */
@@ -46,8 +46,7 @@ int Url_init(Url * url, char * urlname)
         hostname_begin = urlname;
         protocol_begin = NULL;
         protocol_len = 0;
-    }
-    else {
+    } else {
         protocol_len = (size_t)(hostname_begin - urlname);
         hostname_begin = hostname_begin + 3;
         protocol_begin = urlname;
@@ -58,19 +57,18 @@ int Url_init(Url * url, char * urlname)
     path_begin = strstr(hostname_begin, "/");
     if (path_begin == NULL) {
         path_len = 0;
-    }
-    else {
+    } else {
         ++path_begin;
         hostname_len = (size_t)(path_begin - hostname_begin - 1);
         path_len = strlen(urlname) - ((size_t)(path_begin - urlname));
     }
 
     port_begin = strstr(hostname_begin, ":");
-    if ((port_begin == NULL) || ((port_begin > path_begin) && (path_begin != NULL))) {
+    if ((port_begin == NULL) ||
+        ((port_begin > path_begin) && (path_begin != NULL))) {
         port_len = 0;
         port_begin = NULL;
-    }
-    else {
+    } else {
         ++port_begin;
         if (path_len)
             port_len = (size_t)(path_begin - port_begin - 1);
@@ -143,7 +141,8 @@ int hex_to_dec (char data)
  * @param decoded_string_size the size of decoded string char array
  * @return -1 if url is invalid, lenght of decoded string otherwise
  */
-int Url_decode (char *decoded_string, const char *source_string, size_t decoded_string_size)
+int Url_decode (char *decoded_string, const char *source_string,
+                size_t decoded_string_size)
 {
 
     int decoded_string_pos = 0, source_string_len, i, dec, unit;
@@ -153,12 +152,15 @@ int Url_decode (char *decoded_string, const char *source_string, size_t decoded_
         return -1;
 
     source_string_len = strlen (source_string);
-    for (i = 0; i < source_string_len && decoded_string_pos < decoded_string_size; i++ ) {
+    for (i = 0;
+         i < source_string_len && decoded_string_pos < decoded_string_size;
+         i++ ) {
         if (source_string[i] == '%') {
             if ( (i < (source_string_len - 2)) &&
                  ( (dec = hex_to_dec(source_string[i+1]))>= 0 ) &&
                  ( (unit = hex_to_dec(source_string[i+2]))>=0 ) ) {
-                     decoded_string[decoded_string_pos] = (char)(dec * 16 + unit);
+                     decoded_string[decoded_string_pos] =
+                        (char)(dec * 16 + unit);
                      i += 2;
                      decoded_string_pos++;
                  } else {
@@ -188,7 +190,8 @@ int Url_decode (char *decoded_string, const char *source_string, size_t decoded_
  * @param encoded_string_size the size of encoded string char array
  * @return -1 if url is invalid, lenght of encoded string otherwise
  */
-int Url_encode (char *encoded_string, const char *source_string, size_t encoded_string_size)
+int Url_encode (char *encoded_string, const char *source_string,
+                size_t encoded_string_size)
 {
 
     int encoded_string_pos = 0, source_string_len, i;
@@ -198,7 +201,9 @@ int Url_encode (char *encoded_string, const char *source_string, size_t encoded_
         return -1;
 
     source_string_len = strlen (source_string);
-    for (i = 0; i < source_string_len && encoded_string_pos < encoded_string_size; i++ ) {
+    for (i = 0;
+         i < source_string_len && encoded_string_pos < encoded_string_size;
+         i++ ) {
         switch (source_string[i]) {
         case ' ':
             encoded_string[encoded_string_pos] = '+';
@@ -211,8 +216,9 @@ int Url_encode (char *encoded_string, const char *source_string, size_t encoded_
         case '@':
         case '&':
         case '=':
-            snprintf (encoded_string + encoded_string_pos, encoded_string_size -
-                      encoded_string_pos, "%%%2x", source_string[i]);
+            snprintf (encoded_string + encoded_string_pos,
+                      encoded_string_size - encoded_string_pos,
+                      "%%%2x", source_string[i]);
             encoded_string_pos += 3;
             break;
         default:
