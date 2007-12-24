@@ -65,7 +65,7 @@ int Url_init(Url * url, char * urlname)
 
     port_begin = strstr(hostname_begin, ":");
     if ((port_begin == NULL) ||
-        ((port_begin > path_begin) && (path_begin != NULL))) {
+        ((port_begin >= path_begin) && (path_begin != NULL))) {
         port_len = 0;
         port_begin = NULL;
     } else {
