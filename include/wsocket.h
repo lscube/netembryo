@@ -84,6 +84,9 @@
 typedef unsigned short sa_family_t;
 typedef unsigned short in_port_t;
 typedef unsigned int in_addr_t;
+
+const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt);
+int inet_pton(int af, const char *src, void *dst);
 #endif
 
 #ifndef HAVE_STRUCT_SOCKADDR_STORAGE
