@@ -222,7 +222,6 @@ typedef struct {
 #define WSOCK_ERRPORT    4
 
 /** low level wrappers */
-int gethostinfo(struct addrinfo **res, char *host, char *serv, struct addrinfo *hints); //TODO: Remove
 int sock_connect(char *host, char *port, int *sock, sock_type socktype);
 int sock_bind(char *host, char *port, int *sock, sock_type socktype);
 int sock_accept(int sock);

@@ -93,7 +93,7 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
         break;
     }
 
-    if ((n = gethostinfo(&res, host, port, &hints)) != 0) {
+    if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
         net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));    
         return WSOCK_ERRADDR;
     }
@@ -202,7 +202,7 @@ int sock_connect(char *host, char *port, int *sock, sock_type socktype)
         break;
     }
 
-    if ((n = gethostinfo(&res, host, port, &hints)) != 0) {
+    if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
         net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));    
         return WSOCK_ERRADDR;
     }
