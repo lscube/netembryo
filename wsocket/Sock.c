@@ -72,8 +72,8 @@ Sock * Sock_accept(Sock *s)
     int res = -1;
     char remote_host[128]; /*Unix Domain is largest*/
     char local_host[128]; /*Unix Domain is largest*/
-    int32_t remote_port = -1;
-    int32_t local_port = -1;
+    int remote_port = -1;
+    int local_port = -1;
     Sock *new_s = NULL;
     struct sockaddr *sa_p = NULL;
     socklen_t sa_len = 0;
@@ -194,7 +194,7 @@ Sock * Sock_bind(char *host, char *port,
     struct sockaddr *sa_p;
     socklen_t sa_len;
     char local_host[128];
-    int32_t local_port;
+    int local_port;
 
 #if HAVE_SSL
     if ((ssl_flag & IS_SSL)) {
@@ -307,8 +307,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     int sockfd = -1;
     struct sockaddr *sa_p = NULL;
     socklen_t sa_len = 0;
-    int32_t local_port;
-    int32_t remote_port;
+    int local_port;
+    int remote_port;
 #if HAVE_SSL
     SSL *ssl_con;
 #endif

@@ -268,7 +268,7 @@ int sock_connect(char *host, char *port, int *sock, sock_type socktype)
  * @return the port or -1 on error
  */
 
-int32_t sock_get_port(const struct sockaddr *sa)
+int sock_get_port(const struct sockaddr *sa)
 {
     switch (sa->sa_family) {
         case AF_INET: {
