@@ -14,7 +14,6 @@ libwsocket_la_SOURCES =		gethostinfo.c \
 				sock_get_port.c \
 				sock_listen.c \
 				sock_ntop_host.c \
-				sockfd_to_family.c \
 				get_info.c \
 				Sock.c
 
