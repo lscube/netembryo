@@ -240,17 +240,6 @@ int32_t sock_get_port(const struct sockaddr *sa);
 int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/, const char *ifname, unsigned int ifindex, union ADDR *addr);
 int mcast_leave(int sockfd, const struct sockaddr *sa/*, socklen_t salen*/);
 
-#if HAVE_SSL
-/** ssl wrappers */
-SSL_CTX *create_ssl_ctx(void);
-SSL *get_ssl_connection(int);
-int sock_SSL_connect(SSL **, int);
-int sock_SSL_accept(SSL **, int);
-int sock_SSL_read(SSL *, void *, int);
-int sock_SSL_write(SSL *, void *, int);
-int sock_SSL_close(SSL *);
-#endif
-
 /** log facilities */
 /* Outputs the messages using the default logger o a custom one passed to
  * Sock_init() */

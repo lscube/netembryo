@@ -18,17 +18,6 @@ libwsocket_la_SOURCES =		gethostinfo.c \
 				get_info.c \
 				Sock.c
 
-if HAVE_SSL
-libwsocket_la_SOURCES +=	create_ssl_ctx.c \
-				get_ssl_connection.c \
-				sock_SSL_accept.c \
-				sock_SSL_close.c \
-				sock_SSL_connect.c \
-				sock_SSL_read.c \
-				sock_SSL_write.c
-
-endif
-
 #if HAVE_SSL 
 #libwsocket_la_LDFLAGS += $(SSL_LDFLAGS)
 #libwsocket_la_LIBADD  = $(SSL_LIBS)
