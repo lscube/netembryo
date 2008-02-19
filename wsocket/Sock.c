@@ -33,6 +33,40 @@
 #include <openssl/ssl.h>
 #endif
 
+/**
+ * Tell if an address is multicast
+ */
+
+static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
+{   
+    switch (family) {
+        case AF_INET: {
+            struct in_addr *in;
+            in = &(((struct sockaddr_in *) stg)->sin_addr);
+            return IN_IS_ADDR_MULTICAST(ntohl(in->s_addr));
+        }
+#ifdef  IPV6
+        case AF_INET6: {
+            struct in6_addr *in6;
+            in6 = &(((struct sockaddr_in6 *) stg)->sin6_addr);
+            return IN6_IS_ADDR_MULTICAST(in6);
+        }
+#endif
+#ifdef  AF_UNIX
+        case AF_UNIX:
+            return -1;
+#endif
+#ifdef  HAVE_SOCKADDR_DL_STRUCT
+        case AF_LINK: 
+            return -1;
+#endif
+        default:
+            return -1;
+    }
+    
+    return -1;
+}
+
 Sock * Sock_accept(Sock *s)
 {
     int res = -1;
