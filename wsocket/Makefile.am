@@ -18,19 +18,7 @@ libwsocket_la_SOURCES =		is_multicast_address.c \
 				sock_ntop_host.c \
 				sockfd_to_family.c \
 				get_info.c \
-				Sock_accept.c \
-				Sock_bind.c \
-				Sock_close.c \
-				Sock_compare.c \
-				Sock_connect.c \
-				Sock_init.c \
-				Sock_listen.c \
-				Sock_set_props.c \
-				Sock_read.c \
-				Sock_write.c \
-				Sock_create_ssl_connection.c \
-				Sock_socketpair.c \
-				Sock_set_dest.c
+				Sock.c
 
 if HAVE_SSL
 libwsocket_la_SOURCES +=	create_ssl_ctx.c \
