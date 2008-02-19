@@ -20,6 +20,10 @@
  *
  * */
 
+/**
+ * @file wsocket.h
+ * socket wrapper
+ */
 
 #ifndef WSOCKET_H
 #define WSOCKET_H
@@ -278,10 +282,6 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
  *  @param main Listening socket.
  */
 Sock * Sock_accept(Sock *main);
-/** Setup ssl on an existing connected socket.
- *  @param s Existing socket.
- */
-int Sock_create_ssl_connection(Sock *s);
 /** Put a socket in listening state.
  *  @param s Existing socket.
  *  @param backlog Number of connection that may wait to be accepted.

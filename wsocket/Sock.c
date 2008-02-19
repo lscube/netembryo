@@ -433,21 +433,6 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     return s;
 }
 
-int Sock_create_ssl_connection(Sock *s)
-{
-    if(!s)
-        return WSOCK_ERROR;
-
-#if HAVE_SSL
-    if(s->flags & IS_SSL) {
-        s->ssl = get_ssl_connection(s->fd);
-        if(!(s->ssl))
-            return WSOCK_ERROR;
-    }
-#endif
-    return WSOCK_OK;
-}
-
 static void net_log_default(int level, const char *fmt, va_list args)
 {
     switch (level) {
