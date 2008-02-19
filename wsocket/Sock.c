@@ -185,7 +185,7 @@ Sock * Sock_accept(Sock *s)
     return new_s;
 }
 
-Sock * Sock_bind(char *host, char *port,
+Sock * Sock_bind(char *host, char *port, Sock *sock,
                  sock_type socktype, sock_flags ssl_flag)
 {
 
@@ -204,6 +204,10 @@ Sock * Sock_bind(char *host, char *port,
         }
     }
 #endif
+
+    if(sock) {
+        sockfd = sock->fd;
+    }
 
     if (sock_bind(host, port, &sockfd, socktype)) {
         net_log(NET_LOG_ERR, "Error in low level sock_bind().\n");

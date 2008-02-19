@@ -274,10 +274,11 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
  *  be bound to all interfaces.
  *  @param port Local port to be used by this socket, if NULL a random port will
  *  be used.
+ *  @param sock Pointer to a pre-created socket
  *  @param socktype The type of socket to be created.
  *  @param ssl_flag Enables ssl and/or multicast.
  */
-Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag);
+Sock * Sock_bind(char *host, char *port, Sock *sock, sock_type socktype, sock_flags ssl_flag);
 /** Create a new socket accepting a new connection from a listening socket.
  *  @param main Listening socket.
  */
