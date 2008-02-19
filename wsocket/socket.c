@@ -55,6 +55,7 @@ int sock_accept(int sock)
 int sock_bind(char *host, char *port, int *sock, sock_type socktype)
 {
     int n, param = 1;
+    int bind_new;
     struct addrinfo *res, *ressave;
     struct addrinfo hints;
 #ifdef HAVE_LIBSCTP
@@ -99,13 +100,14 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
     }
     
     ressave = res;
+    bind_new = (*sock < 0);
 
     do {
 #ifdef HAVE_LIBSCTP
         if (socktype == SCTP)
             res->ai_protocol = IPPROTO_SCTP;
 #endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
-        if ((*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
+        if (bind_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
             continue;
 
 #ifdef HAVE_LIBSCTP
@@ -138,8 +140,12 @@ int sock_bind(char *host, char *port, int *sock, sock_type socktype)
                 if (bind(*sock, res->ai_addr, res->ai_addrlen) == 0)
             break;
 
-        if (close(*sock) < 0)
-            return WSOCK_ERROR;
+        if (bind_new) {
+            if (close(*sock) < 0)
+                return WSOCK_ERROR;
+            else
+                *sock = -1;
+        }
 
     } while ((res = res->ai_next) != NULL);
 
