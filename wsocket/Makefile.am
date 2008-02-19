@@ -7,12 +7,7 @@ libwsocket_la_LDFLAGS =
 
 libwsocket_la_SOURCES =		gethostinfo.c \
 				multicast.c \
-				sock_accept.c \
-				sock_bind.c \
-				sock_close.c \
-				sock_connect.c \
-				sock_get_port.c \
-				sock_listen.c \
+				socket.c \
 				sock_ntop_host.c \
 				get_info.c \
 				Sock.c
