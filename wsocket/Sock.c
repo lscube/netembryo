@@ -66,7 +66,8 @@ Sock * Sock_accept(Sock *s)
 #endif
 
     if (!(new_s = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_accept().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate a Sock struct in Sock_accept().\n");
 #if HAVE_SSL
         if(s->flags & IS_SSL) 
             sock_SSL_close(ssl_con);
@@ -89,7 +90,8 @@ Sock * Sock_accept(Sock *s)
 
     if(getpeername(res, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR, "Unable to get remote address in Sock_accept().\n");
+        net_log(NET_LOG_ERR,
+                "Unable to get remote address in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
     }
@@ -98,7 +100,8 @@ Sock * Sock_accept(Sock *s)
         memset(remote_host, 0, sizeof(remote_host));
 
     if (!(new_s->remote_host = strdup(remote_host))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate remote host in Sock_accept().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate remote host in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
     }
@@ -126,7 +129,8 @@ Sock * Sock_accept(Sock *s)
         memset(local_host, 0, sizeof(local_host));
 
     if (!(new_s->local_host = strdup(local_host))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_accept().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate local host in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
     }
@@ -147,7 +151,8 @@ Sock * Sock_accept(Sock *s)
     return new_s;
 }
 
-Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag)
+Sock * Sock_bind(char *host, char *port,
+                 sock_type socktype, sock_flags ssl_flag)
 {
 
     Sock *s = NULL;
@@ -172,7 +177,8 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
     }
 
     if (!(s = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_bind().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate a Sock struct in Sock_bind().\n");
         sock_close(sockfd);
         return NULL;
     }
@@ -194,7 +200,8 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
         memset(local_host, 0, sizeof(local_host));
 
     if (!(s->local_host = strdup(local_host))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_bind().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate local host in Sock_bind().\n");
         Sock_close(s);
         return NULL;
     }
@@ -208,7 +215,9 @@ Sock * Sock_bind(char *host, char *port, sock_type socktype, sock_flags ssl_flag
     } else
         s->local_port = ntohs(local_port);
 
-    net_log(NET_LOG_DEBUG, "Socket bound with addr=\"%s\" and port=\"%u\".\n", s->local_host, s->local_port);
+    net_log(NET_LOG_DEBUG,
+            "Socket bound with addr=\"%s\" and port=\"%u\".\n",
+            s->local_host, s->local_port);
 
     if(is_multicast_address(sa_p, s->local_stg.ss_family)) {
         if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr) )) {
@@ -254,7 +263,9 @@ int Sock_compare(Sock *p, Sock *q)
     return memcmp(p, q, sizeof(Sock));
 }
 
-Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, sock_flags ssl_flag)
+
+Sock * Sock_connect(char *host, char *port, Sock *binded,
+                    sock_type socktype, sock_flags ssl_flag)
 {
     Sock *s;
     char remote_host[128]; /*Unix Domain is largest*/
@@ -316,7 +327,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
     if(getsockname(s->fd, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
+        net_log(NET_LOG_ERR,
+                "Unable to get remote port in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     }
@@ -325,7 +337,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
         memset(local_host, 0, sizeof(local_host));
 
     if (!(s->local_host = strdup(local_host))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate local host in Sock_connect().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate local host in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     }
@@ -333,7 +346,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
     local_port = sock_get_port(sa_p);
 
     if(local_port < 0) {
-        net_log(NET_LOG_ERR, "Unable to get local port in Sock_connect().\n");
+        net_log(NET_LOG_ERR,
+                "Unable to get local port in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     } else
@@ -344,7 +358,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
 
     if(getpeername(s->fd, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR, "Unable to get remote address in Sock_connect().\n");
+        net_log(NET_LOG_ERR,
+                "Unable to get remote address in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     }
@@ -353,22 +368,24 @@ Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, so
         memset(remote_host, 0, sizeof(remote_host));
     
     if (!(s->remote_host = strdup(remote_host))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate remote host in Sock_connect().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate remote host in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     }
 
     remote_port = sock_get_port(sa_p);
     if(remote_port < 0) {
-        net_log(NET_LOG_ERR, "Unable to get remote port in Sock_connect().\n");
+        net_log(NET_LOG_ERR,
+                "Unable to get remote port in Sock_connect().\n");
         Sock_close(s);
         return NULL;
     } else
         s->remote_port = ntohs(remote_port);
 
-    net_log(NET_LOG_DEBUG, "Socket connected between local=\"%s\":%u and "
-        "remote=\"%s\":%u.\n", s->local_host, s->local_port, s->remote_host,
-        s->remote_port);
+    net_log(NET_LOG_DEBUG,
+            "Socket connected between local=\"%s\":%u and remote=\"%s\":%u.\n",
+            s->local_host, s->local_port, s->remote_host, s->remote_port);
 
     if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
         //fprintf(stderr,"IS MULTICAST\n");
@@ -443,6 +460,7 @@ void net_log(int level, const char *fmt, ...)
     net_vlog(level, fmt, vl);
     va_end(vl);
 }
+
 
 void Sock_init(void (*log_func)(int, const char*, va_list))
 {
@@ -521,7 +539,8 @@ int Sock_set_dest(Sock *s, struct sockaddr *sa) {
         return -1;
 
     if (s->socktype != UDP) {
-        net_log(NET_LOG_FATAL, "Only UDP socket can change destination address\n");
+        net_log(NET_LOG_FATAL,
+                "Only UDP socket can change destination address\n");
         return -1;
     }
 
@@ -537,6 +556,7 @@ int Sock_set_dest(Sock *s, struct sockaddr *sa) {
     }
     return 0;
 }
+
 
 int Sock_set_props(Sock *s, int request, int *on)
 {
@@ -558,13 +578,15 @@ int Sock_socketpair(Sock *pair[]) {
     }
     
     if (!(pair[0] = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate first Sock struct in Sock_socketpair().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate first Sock struct in Sock_socketpair().\n");
         close (sdpair[0]);
         close (sdpair[1]);
         return -1;
     }
     if (!(pair[1] = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate second Sock struct in Sock_socketpair().\n");
+        net_log(NET_LOG_FATAL,
+                "Unable to allocate second Sock struct in Sock_socketpair().\n");
         close (sdpair[0]);
         close (sdpair[1]);
         free(pair[0]);
@@ -575,7 +597,7 @@ int Sock_socketpair(Sock *pair[]) {
         pair[i]->fd = sdpair[i];
         pair[i]->socktype = LOCAL;
     }
-    
+
     return res;
 }
 
