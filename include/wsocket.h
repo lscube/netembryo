@@ -236,7 +236,7 @@ int sock_close(int s);
 /* return the address in human readable string format */
 const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
 /* return the port in network byte order (use ntohs to change it) */
-int32_t sock_get_port(const struct sockaddr *sa);
+int sock_get_port(const struct sockaddr *sa);
 
 /** multicast*/
 int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/, const char *ifname, unsigned int ifindex, union ADDR *addr);
