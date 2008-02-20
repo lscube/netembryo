@@ -67,7 +67,7 @@ static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
     return -1;
 }
 
-Sock * Sock_accept(Sock *s)
+Sock * Sock_accept(Sock *s, void * octx)
 {
     int res = -1;
     char remote_host[128]; /*Unix Domain is largest*/
@@ -77,7 +77,9 @@ Sock * Sock_accept(Sock *s)
     Sock *new_s = NULL;
     struct sockaddr *sa_p = NULL;
     socklen_t sa_len = 0;
+
 #if HAVE_SSL
+    SSL_CTX * ctx = octx;
     SSL *ssl_con = NULL;
 #endif
 
@@ -90,8 +92,8 @@ Sock * Sock_accept(Sock *s)
     }
 
 #if HAVE_SSL
-    if(s->flags & IS_SSL) {
-        if(sock_SSL_accept(&ssl_con,res)) {
+    if(ctx) {
+        if( !(ssl_con = sock_SSL_accept(res, ctx)) ) {
             net_log(NET_LOG_ERR, "Unable to accept SSL connection.\n");
             sock_close(res);
             return NULL;
@@ -103,8 +105,8 @@ Sock * Sock_accept(Sock *s)
         net_log(NET_LOG_FATAL,
                 "Unable to allocate a Sock struct in Sock_accept().\n");
 #if HAVE_SSL
-        if(s->flags & IS_SSL) 
-            sock_SSL_close(ssl_con);
+        if(ctx) 
+            SSL_close_connection(ssl_con, res);
 #endif
         sock_close(res);
         return NULL;
@@ -115,7 +117,7 @@ Sock * Sock_accept(Sock *s)
     new_s->flags = s->flags;
 
 #if HAVE_SSL
-    if(s->flags & IS_SSL) 
+    if(ctx) 
         new_s->ssl = ssl_con;
 #endif
 
@@ -186,7 +188,7 @@ Sock * Sock_accept(Sock *s)
 }
 
 Sock * Sock_bind(char *host, char *port, Sock *sock,
-                 sock_type socktype, sock_flags ssl_flag)
+                 sock_type socktype, void * octx)
 {
 
     Sock *s = NULL;
@@ -197,7 +199,7 @@ Sock * Sock_bind(char *host, char *port, Sock *sock,
     int local_port;
 
 #if HAVE_SSL
-    if ((ssl_flag & IS_SSL)) {
+    if ((octx)) {
         if(socktype != TCP) {
             net_log(NET_LOG_ERR, "SSL can't work on this protocol.\n");
             return NULL;
@@ -223,8 +225,7 @@ Sock * Sock_bind(char *host, char *port, Sock *sock,
 
     s->fd = sockfd;
     s->socktype = socktype;
-
-    s->flags = ssl_flag;
+    s->flags = 0;
 
     sa_p = (struct sockaddr *)&(s->local_stg);
     sa_len = sizeof(struct sockaddr_storage);
@@ -283,8 +284,8 @@ int Sock_close(Sock *s)
     }
 
 #if HAVE_SSL
-    if(s->flags & IS_SSL)
-        sock_SSL_close(s->ssl);
+    if(s->ssl)
+        SSL_close_connection(s->ssl, s->fd);
 #endif
 
     res = sock_close(s->fd);
@@ -303,7 +304,7 @@ int Sock_compare(Sock *p, Sock *q)
 
 
 Sock * Sock_connect(char *host, char *port, Sock *binded,
-                    sock_type socktype, sock_flags ssl_flag)
+                    sock_type socktype, void * octx)
 {
     Sock *s;
     char remote_host[128]; /*Unix Domain is largest*/
@@ -314,6 +315,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     int local_port;
     int remote_port;
 #if HAVE_SSL
+    SSL_CTX * ctx = octx;
     SSL *ssl_con;
 #endif
 
@@ -327,8 +329,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     }
 
 #if HAVE_SSL
-    if(ssl_flag & IS_SSL) {
-        if (sock_SSL_connect(&ssl_con))
+    if((ctx) {
+        if (sock_SSL_connect(&ssl_con, sockfd, ctx))
             net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
             sock_close(sockfd);
             return NULL;
@@ -345,8 +347,8 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     } else if (!(s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if HAVE_SSL
-        if(ssl_flag & IS_SSL) 
-            sock_SSL_close(ssl_con);
+        if(ctx) 
+            SSL_close_connection(ssl_con, sockfd);
 #endif
         sock_close (sockfd);
         return NULL;
@@ -355,10 +357,11 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     s->fd = sockfd;
     s->socktype = socktype;
 #if HAVE_SSL
-    if(ssl_flag & IS_SSL) 
+    s->ssl = 0;
+    if(ctx) 
         s->ssl = ssl_con;
 #endif
-    s->flags = ssl_flag;
+    s->flags = 0;
 
     sa_p = (struct sockaddr *) &(s->local_stg);
     sa_len = sizeof(struct sockaddr_storage);
@@ -514,7 +517,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         return -1;
 
 #if HAVE_SSL
-    if(s->flags & IS_SSL)
+    if (s->ssl)
         n = sock_SSL_read(s->ssl,buffer,nbytes);
     else {
 #endif
@@ -634,7 +637,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         return -1;
 
 #if HAVE_SSL
-    if(s->flags & IS_SSL)
+    if(s->ssl)
         return sock_SSL_write(s->ssl, buffer, nbytes);
     else {
 #endif        

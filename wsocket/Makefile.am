@@ -11,13 +11,8 @@ libwsocket_la_SOURCES =		multicast.c \
 				get_info.c \
 				Sock.c
 
-#if HAVE_SSL 
-#libwsocket_la_LDFLAGS += $(SSL_LDFLAGS)
-#libwsocket_la_LIBADD  = $(SSL_LIBS)
-#endif
+if ENABLE_SSL
+libwsocket_la_SOURCES += ssl.c
+endif
 
 INCLUDES = -I$(netembryoincludedir) -I$(top_srcdir)
-
-#if HAVE_SSL
-#INCLUDES += $(SSL_CFLAG)
-#endif
