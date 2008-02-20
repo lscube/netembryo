@@ -26,7 +26,6 @@
  */
 
 #include <config.h>
-#include <sys/types.h>
 #include <string.h>
 #include "wsocket.h"
 #if HAVE_SSL

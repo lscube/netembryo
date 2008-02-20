@@ -26,7 +26,7 @@
  */
 
 #include "wsocket.h"
-
+#include <string.h>
 /**
  * wraps accept
  * @return -1 on error 
