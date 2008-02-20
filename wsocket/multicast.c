@@ -26,6 +26,7 @@
  */
 
 #include "wsocket.h"
+#include <string.h>
 
 #ifndef WIN32
 #   include <sys/ioctl.h>
