@@ -97,7 +97,7 @@ Sock * Sock_accept(Sock *s, void * octx)
 
 #if HAVE_SSL
     if(ctx) {
-        if( !(ssl_con = sock_SSL_accept(res, ctx)) ) {
+        if( !(ssl_con = SSL_sock_accept(res, ctx)) ) {
             net_log(NET_LOG_ERR, "Unable to accept SSL connection.\n");
             sock_close(res);
             return NULL;
@@ -574,7 +574,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 
 #if HAVE_SSL
     if (s->ssl)
-        n = sock_SSL_read(s->ssl,buffer,nbytes);
+        n = SSL_sock_read(s->ssl,buffer,nbytes);
     else {
 #endif
         switch(s->socktype) {
@@ -721,7 +721,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 
 #if HAVE_SSL
     if(s->ssl)
-        return sock_SSL_write(s->ssl, buffer, nbytes);
+        return SSL_sock_write(s->ssl, buffer, nbytes);
     else {
 #endif        
         switch (s->socktype) {
