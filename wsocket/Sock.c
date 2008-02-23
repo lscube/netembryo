@@ -70,6 +70,8 @@ static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
 /**
  * Create a new socket accepting a new connection from a listening socket.
  * @param main Listening socket.
+ * @param octx optional ssl global context
+ * @return the newly allocated Sock
  */
 Sock * Sock_accept(Sock *s, void * octx)
 {
@@ -199,7 +201,7 @@ Sock * Sock_accept(Sock *s, void * octx)
  *        be used.
  * @param sock Pointer to a pre-created socket
  * @param socktype The type of socket to be created.
- * @param ssl_flag Enables ssl and/or multicast.
+ * @param octx Optional ssl global context
  */
 
 Sock * Sock_bind(char *host, char *port, Sock *sock,
@@ -335,7 +337,7 @@ int Sock_compare(Sock *p, Sock *q)
  * @param binded Pointer to a pre-binded socket (useful for connect from
  *        a specific interface/port), if NULL a new socket will be created.
  * @param socktype The type of socket to be created.
- * @param ssl_flag Enables ssl and/or multicast.
+ * @param octx Optional ssl global context
  */
 
 Sock * Sock_connect(char *host, char *port, Sock *binded,
@@ -364,7 +366,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     }
 
 #if HAVE_SSL
-    if((ctx) {
+    if((ctx)) {
         if (sock_SSL_connect(&ssl_con, sockfd, ctx))
             net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
             sock_close(sockfd);
