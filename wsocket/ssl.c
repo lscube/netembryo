@@ -34,7 +34,7 @@
  * @param : cert verification mode @see SSL_CTX_set_verify
  * @return: 0 on success;
  */
-SSL_CTX * init_ctx(char *key, char * cafile, char * capath) 
+SSL_CTX * Sock_init_ctx(char *key, char * cafile, char * capath) 
 {
     SSL_CTX *global_ctx = NULL;
     char cipher[] = "ALL:eNULL";
@@ -70,7 +70,8 @@ SSL_CTX * init_ctx(char *key, char * cafile, char * capath)
     }
 
     /* Set context within which session can be reused */
-    SSL_CTX_set_session_id_context(global_ctx,(void*)&s_server_session_id_context,
+    SSL_CTX_set_session_id_context(global_ctx,
+                                   (void*)&s_server_session_id_context,
         sizeof(s_server_session_id_context));
 
     /* Choose list of available SSL_CIPHER */
@@ -87,8 +88,8 @@ SSL_CTX * init_ctx(char *key, char * cafile, char * capath)
 
 /**
  * The Function establishes a new ssl connection
- * @Param : the socket descriptor
- * @Return: pointer to new structure ssl
+ * @param : the socket descriptor
+ * @return: pointer to new structure ssl
  */
 
 SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx) {
@@ -111,18 +112,19 @@ SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx) {
         net_log(NET_LOG_ERR,"SSL accept error");
         return 0;
     }
-return(ssl);
+
+    return(ssl);
 }
 
 
 /**
  * It closes a ssl connection
- * @Param : pointer to structure ssl
- * @Param : the socket descriptor
- * @Return: '1' success operation, otherwise '0'
+ * @param : pointer to structure ssl
+ * @param : the socket descriptor
+ * @return: '1' success operation, otherwise '0'
  */
 
-int SSL_close_connection(SSL *ssl,int sockfd) {
+int SSL_close_connection(SSL *ssl, int sockfd) {
 
     int exit;
 
@@ -131,23 +133,23 @@ int SSL_close_connection(SSL *ssl,int sockfd) {
         shutdown(sockfd,SHUT_WR);
         SSL_shutdown(ssl);
     } else {
-          net_log(NET_LOG_ERR,"Shutdown failed");
-          return 0;
-      }
+        net_log(NET_LOG_ERR,"Shutdown failed");
+        return 0;
+    }
     SSL_free(ssl);
-return 1;
+    return 1;
 }
 
 
 /**
- * This function reads at most nbyte from the connection ssl and places them at buffer
- * @Param : pointer to structure ssl
- * @Param : buffer to store bytes that are read.
- * @Param : maximum number of bytes to write to the buffer
- * @Return: 'number of bytes read' success operation, otherwise '0'
+ * This function reads at most nbyte from the connection ssl
+ * @param : pointer to structure ssl
+ * @param : buffer to store bytes that are read.
+ * @param : maximum number of bytes to write to the buffer
+ * @return: 'number of bytes read' success operation, otherwise '0'
  */
 
-int SSL_sock_read(SSL *ssl,void *buffer,int nbyte) {
+int SSL_sock_read(SSL *ssl, void *buffer, int nbyte) {
 
     if(ssl)
         return(SSL_read(ssl,buffer,nbyte));
@@ -158,13 +160,13 @@ int SSL_sock_read(SSL *ssl,void *buffer,int nbyte) {
 
 /**
  * This function writes up to nbyte from buffer to socket ssl
- * @Param : pointer to structure ssl
- * @Param : buffer to store bytes that are read.
- * @Param : maximum number of bytes to write to the buffer
- * @Return: Number of bytes written
+ * @param : pointer to structure ssl
+ * @param : buffer to store bytes that are read.
+ * @param : maximum number of bytes to write to the buffer
+ * @return: Number of bytes written
  */
 
-int SSL_sock_write(SSL *ssl,void *buffer,int nbyte) {
+int SSL_sock_write(SSL *ssl, void *buffer, int nbyte) {
     return(SSL_write(ssl,buffer,nbyte));
 }
 
@@ -190,7 +192,7 @@ int sock_SSL_connect(SSL **ssl_con, int sockfd, SSL_CTX * ssl_ctx)
     ssl_err = SSL_connect(*ssl_con);
 
     if(ssl_err < 0)
-        SSL_set_shutdown(*ssl_con,SSL_SENT_SHUTDOWN);
+        SSL_set_shutdown(*ssl_con, SSL_SENT_SHUTDOWN);
     if(ssl_err <= 0) {
         net_log(NET_LOG_ERR, "sock_SSL_connect: SSL_connect() failed.\n");
         SSL_free(*ssl_con);
