@@ -4,7 +4,7 @@ AC_PREREQ(2.59)
 
 m4_define([netembryo_major_version], [0])
 m4_define([netembryo_minor_version], [0])
-m4_define([netembryo_micro_version], [6])
+m4_define([netembryo_micro_version], [7])
 m4_define([netembryo_interface_age], [0])
 m4_define([netembryo_binary_age],
           [m4_eval(100 * netembryo_minor_version + netembryo_micro_version)])
