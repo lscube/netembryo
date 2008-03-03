@@ -582,7 +582,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         switch(s->socktype) {
         case UDP:
             if (!protodata) {
-                return -1;
+                protodata = &s->remote_stg;
             }
             return recvfrom(s->fd, buffer, nbytes, flags,
                 (struct sockaddr *) protodata, &sa_len);
