@@ -92,25 +92,6 @@ const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt);
 int inet_pton(int af, const char *src, void *dst);
 #endif
 
-#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
-/* Structure large enough to hold any socket address (with the historical exception of 
-AF_UNIX). 128 bytes reserved.  */
-#if ULONG_MAX > 0xffffffff
-# define __ss_aligntype __uint64_t
-#else
-# define __ss_aligntype __uint32_t
-#endif
-#define _SS_SIZE        128
-#define _SS_PADSIZE     (_SS_SIZE - (2 * sizeof (__ss_aligntype)))
-
-struct sockaddr_storage
-{
-    sa_family_t ss_family;      /* Address family */
-    __ss_aligntype __ss_align;  /* Force desired alignment.  */
-    char __ss_padding[_SS_PADSIZE];
-};
-#endif // HAVE_STRUCT_SOCKADDR_STORAGE
-
 /** flags definition*/
 typedef enum {
 /** ssl flags */
