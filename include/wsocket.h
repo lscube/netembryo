@@ -157,44 +157,25 @@ struct ip_mreq_in {
     unsigned int __ipv4mr_interface;
 };
 
-#if 0
-union ADDR {
-    struct in_addr in;
-    struct in6_addr in6;
-};
-#endif
-
 union ADDR {
 #if IPV6
-    struct ipv6_mreq_in6 mreq_in6; /*struct in6_addr ipv6mr_multiaddr; struct in6_addr imr_interface6 ; unsigned int ipv6mr_interface; */
+    struct ipv6_mreq_in6 mreq_in6;
 #endif //IPV6
-    struct ip_mreq_in mreq_in; /*struct in_addr ipv4mr_multiaddr; struct in_addr imr_interface4; unsigned int ipv4mr_interface;*/
+    struct ip_mreq_in mreq_in;
 };
-#if IPV6
-    #define imr_interface6 __imr_interface6
-    #define ipv6_interface NETmreq6.ipv6mr_interface
-    #define ipv6_multiaddr NETmreq6.ipv6mr_multiaddr
-#endif //IPV6
-    #define ipv4_interface __ipv4mr_interface
-    #define imr_interface4 NETmreq.imr_interface
-    #define ipv4_multiaddr NETmreq.imr_multiaddr
 
-/* Developer HowTo: //TODO: Update to new multicast API
- *
- * union ADDR
- *         struct ipv6_mreq_in6 mreq_in6
- *             struct in6_addr ipv6_multiaddr    // IPv6 class D multicast address. defined =  NETmreq6.ipv6mr_multiaddr
- *             struct in6_addr imr_interface6    // IPv6 address of local interface.
- *             unsigned int ipv6_interface    // interface index, or 0
- *             struct ipv6_mreq NETmreq6
- *          struct ip_mreq_in mreq_in
- *              struct in_addr ipv4_multiaddr     // IPv4 class D multicast address. defined = NETmreq.imr_multiaddr
- *              struct in_addr imr_interface4    // IPv4 address of local interface. defined = NETmreq.imr_interface
- *              unsigned int ipv4_interface    // interface index, or 0
- *              struct ip_mreq NETmreq
+#if IPV6
+#define imr_interface6 __imr_interface6
+#define ipv6_interface NETmreq6.ipv6mr_interface
+#define ipv6_multiaddr NETmreq6.ipv6mr_multiaddr
+#endif //IPV6
+#define ipv4_interface __ipv4mr_interface
+#define imr_interface4 NETmreq.imr_interface
+#define ipv4_multiaddr NETmreq.imr_multiaddr
+
+/** 
+ * Socket abstraction structure
  */
-
-/** socket storage structure */
 typedef struct {
     int fd;    ///< low level socket file descriptor
     struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
@@ -203,7 +184,7 @@ typedef struct {
     union ADDR addr; ///< multicast address storage
     /** flags */
     sock_flags flags;
-    /** human readable datas */
+    /** human readable data */
     char *remote_host; ///< remote host stored as dinamic string
     char *local_host; ///< local host stored as dinamic string
     in_port_t remote_port;    ///< remote port stored in host order
@@ -224,25 +205,9 @@ typedef struct {
 #define WSOCK_ERRADDR    3
 #define WSOCK_ERRPORT    4
 
-/** low level wrappers */
-int sock_connect(char *host, char *port, int *sock, sock_type socktype);
-int sock_bind(char *host, char *port, int *sock, sock_type socktype);
-int sock_accept(int sock);
-int sock_listen(int s, int backlog);
-int sock_close(int s);
-
-/** host & port wrappers */
-/* return the address in human readable string format */
-const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
-/* return the port in network byte order (use ntohs to change it) */
-int sock_get_port(const struct sockaddr *sa);
-
-/** multicast*/
-int mcast_join (int sockfd, const struct sockaddr *sa/*, socklen_t salen*/, const char *ifname, unsigned int ifindex, union ADDR *addr);
-int mcast_leave(int sockfd, const struct sockaddr *sa/*, socklen_t salen*/);
 
 /** log facilities */
-/* Outputs the messages using the default logger o a custom one passed to
+/* Outputs the messages using the default logger or a custom one passed to
  * Sock_init() */
 void net_log(int, const char*, ...);
 /* levels to be implemented by log function */
@@ -277,7 +242,6 @@ int Sock_close(Sock *s);
 void Sock_init(void (*log_function)(int level, const char *fmt, va_list list));
 
 int Sock_compare(Sock *p, Sock *q);
-#define Sock_cmp Sock_compare
 
 int Sock_socketpair(Sock *pair[]);
 

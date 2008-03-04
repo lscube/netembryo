@@ -28,6 +28,7 @@
 #include <config.h>
 #include <string.h>
 #include "wsocket.h"
+#include "wsocket-internal.h"
 #if HAVE_SSL
 #include <openssl/ssl.h>
 #endif
