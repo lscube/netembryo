@@ -33,6 +33,16 @@
 #define MAX_SCTP_STREAMS 15
 #endif
 
+#ifndef IN_IS_ADDR_MULTICAST
+#define IN_IS_ADDR_MULTICAST(a)    ((((in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
+#endif
+
+#if IPV6
+#ifndef IN6_IS_ADDR_MULTICAST
+#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
+#endif
+#endif //IPV6
+
 /** 
  * @defgroup NetEmbryo_Internals Low level wrappers
  * @brief Low level internal implementations, private
