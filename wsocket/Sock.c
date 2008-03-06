@@ -29,6 +29,7 @@
 #include <string.h>
 #include "wsocket.h"
 #include "wsocket-internal.h"
+
 #if HAVE_SSL
 #include <openssl/ssl.h>
 #endif
@@ -277,7 +278,7 @@ Sock * Sock_bind(char *host, char *port, Sock *sock,
             s->local_host, s->local_port);
 
     if(is_multicast_address(sa_p, s->local_stg.ss_family)) {
-        if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr) )) {
+        if(mcast_join(s->fd, sa_p)) {
             Sock_close(s);
             return NULL;
         }
@@ -395,7 +396,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
     s->fd = sockfd;
     s->socktype = socktype;
 #if HAVE_SSL
-    s->ssl = 0;
+    s->ssl = NULL;
     if(ctx) 
         s->ssl = ssl_con;
 #endif
@@ -468,7 +469,7 @@ Sock * Sock_connect(char *host, char *port, Sock *binded,
 
     if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
         //fprintf(stderr,"IS MULTICAST\n");
-        if(mcast_join(s->fd, sa_p, NULL, 0, &(s->addr))!=0) {
+        if(mcast_join(s->fd, sa_p)!=0) {
             Sock_close(s);
             return NULL;
         }
@@ -577,7 +578,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 
 #if HAVE_SSL
     if (s->ssl)
-        n = SSL_sock_read(s->ssl,buffer,nbytes);
+        n = SSL_sock_read(s->ssl, buffer, nbytes);
     else {
 #endif
         switch(s->socktype) {

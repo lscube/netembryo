@@ -26,6 +26,7 @@
  */
 
 #include "wsocket.h"
+#include "wsocket-internal.h"
 #include <string.h>
 /**
  * wraps accept

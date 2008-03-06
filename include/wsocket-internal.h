@@ -28,6 +28,11 @@
 #ifndef WSOCKET_INTERNAL_H
 #define WSOCKET_INTERNAL_H
 
+#ifdef HAVE_LIBSCTP
+#include <netinet/sctp.h>
+#define MAX_SCTP_STREAMS 15
+#endif
+
 /** 
  * @defgroup NetEmbryo_Internals Low level wrappers
  * @brief Low level internal implementations, private
@@ -56,8 +61,7 @@ int sock_get_port(const struct sockaddr *sa);
  * @{
  */
 
-int mcast_join (int sockfd, const struct sockaddr *sa, const char *ifname,
-                unsigned int ifindex, union ADDR *addr);
+int mcast_join (int sockfd, const struct sockaddr *sa);
 
 int mcast_leave(int sockfd, const struct sockaddr *sa);
 

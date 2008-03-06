@@ -51,38 +51,6 @@
 #   include <stdint.h>
 #endif
 
-
-#ifdef HAVE_LIBSCTP
-#include <netinet/sctp.h>
-#define MAX_SCTP_STREAMS 15
-#endif
-
-#if HAVE_SSL
-#include <openssl/ssl.h>
-#endif
-
-#ifndef IPV6_ADD_MEMBERSHIP
-#define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
-#define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
-#endif
-
-
-#ifndef IN_IS_ADDR_MULTICAST
-#define IN_IS_ADDR_MULTICAST(a)    ((((in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
-#endif
-
-#if IPV6
-#ifndef IN6_IS_ADDR_MULTICAST
-#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
-#endif
-#endif //IPV6
-
-#ifdef WORDS_BIGENDIAN
-#define ntohl24(x) (x)
-#else
-#define ntohl24(x) (((x&0xff) << 16) | (x&0xff00) | ((x&0xff0000)>>16)) 
-#endif
-
 #ifdef WIN32
 typedef unsigned short sa_family_t;
 typedef unsigned short in_port_t;
@@ -113,56 +81,15 @@ typedef enum {
     LOCAL
 } sock_type;
 
-/* NOTE:
- *    struct ip_mreq {
- *        struct in_addr imr_multiaddr;
- *        struct in_addr imr_interface;
- *    }
- *
- *    struct ipv6_mreq {
- *        struct in6_addr    ipv6mr_multiaddr;
- *        unsigned int ipv6mr_interface;
- *    }
- */
-
-#if IPV6
-/** multicast IPv6 storage structure */
-struct ipv6_mreq_in6 {
-    struct ipv6_mreq NETmreq6;
-    struct in6_addr __imr_interface6;
-};
-#endif
-/** multicast IPv4 storage structure */
-struct ip_mreq_in {
-    struct ip_mreq NETmreq;
-    unsigned int __ipv4mr_interface;
-};
-
-union ADDR {
-#if IPV6
-    struct ipv6_mreq_in6 mreq_in6;
-#endif //IPV6
-    struct ip_mreq_in mreq_in;
-};
-
-#if IPV6
-#define imr_interface6 __imr_interface6
-#define ipv6_interface NETmreq6.ipv6mr_interface
-#define ipv6_multiaddr NETmreq6.ipv6mr_multiaddr
-#endif //IPV6
-#define ipv4_interface __ipv4mr_interface
-#define imr_interface4 NETmreq.imr_interface
-#define ipv4_multiaddr NETmreq.imr_multiaddr
-
 /** 
  * Socket abstraction structure
  */
 typedef struct {
+    sock_type socktype; ///< socket type
     int fd;    ///< low level socket file descriptor
     struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
     struct sockaddr_storage remote_stg;    ///< low level address storage from getpeername
-    sock_type socktype; ///< socket type enumeration
-    union ADDR addr; ///< multicast address storage
+    struct sockaddr_storage multicast_stg; ///< multicast address storage
     /** flags */
     sock_flags flags;
     /** human readable data */
@@ -170,9 +97,7 @@ typedef struct {
     char *local_host; ///< local host stored as dinamic string
     in_port_t remote_port;    ///< remote port stored in host order
     in_port_t local_port;    ///< local port stored in host order
-#if HAVE_SSL
-    SSL *ssl; ///< stores ssl context information
-#endif
+    void *ssl; ///< stores ssl context information
 } Sock;
 
 #define WSOCK_ERRORPROTONOSUPPORT -5    
@@ -185,7 +110,6 @@ typedef struct {
 #define WSOCK_ERRFAMILY    2
 #define WSOCK_ERRADDR    3
 #define WSOCK_ERRPORT    4
-
 
 /** log facilities */
 /* Outputs the messages using the default logger or a custom one passed to
