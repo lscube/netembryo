@@ -25,19 +25,19 @@ AM_INIT_AUTOMAKE(dist-bzip2 check-news)
 AC_PREFIX_DEFAULT("/usr")
 
 AC_ARG_ENABLE(debug,
-[  --enable-debug          enable gcc dubugging flags [[default=no]]],,
-        enable_debug="no")
+	AS_HELP_STRING([--enable-debug], [enable gcc debugging flags (default=no)]),,
+	enable_debug="no")
 
 AC_ARG_ENABLE(ipv6,
-[  --enable-ipv6            enable IPv6 support [[default=autodetected]]],,
+	AS_HELP_STRING([--enable-ipv6], [enable IPv6 support (default=autodetected)]),,
         enable_ipv6="yes")
 
 AC_ARG_ENABLE(sctp,
-[  --enable-sctp            enable SCTP support [[default=autodetected]]],, 
-        enable_sctp="yes")
+	AS_HELP_STRING([--enable-sctp], [enable SCTP support (default=autodetected)]),,
+	enable_sctp="yes")
 
 AC_ARG_ENABLE(ssl,
-[  --enable-ssl            enable SSL support [[default=autodetected]]],, 
+	AS_HELP_STRING([--enable-ssl], [enable SSL support (default=autodetected)]),,
         enable_ssl="yes")
 
 dnl Check for LibTool Dynamic Loading
