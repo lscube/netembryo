@@ -9,7 +9,9 @@ libwsocket_la_SOURCES =		multicast.c \
 				socket.c \
 				sock_ntop_host.c \
 				get_info.c \
-				Sock.c
+				Sock.c \
+				$(top_srcdir)/include/ssl.h \
+				$(top_srcdir)/include/wsocket-internal.h
 
 if ENABLE_SSL
 libwsocket_la_SOURCES += ssl.c
