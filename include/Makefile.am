@@ -1,1 +1,0 @@
-SUBDIRS = netembryo programs nemesi
