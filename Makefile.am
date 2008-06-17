@@ -1,6 +1,8 @@
 SUBDIRS =	wsocket \
 		utils
 
+EXTRA_DIST = Doxyfile
+
 lib_LTLIBRARIES = libnetembryo.la
 
 libincludedir = $(includedir)/netembryo
