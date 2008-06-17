@@ -1,7 +1,7 @@
 SUBDIRS =	wsocket \
 		utils
 
-EXTRA_DIST = 	config \
+EXTRA_DIST = \
 		include 
 
 lib_LTLIBRARIES = libnetembryo.la
