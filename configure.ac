@@ -19,7 +19,7 @@ AC_INIT(netembryo, [netembryo_version], [http://streaming.polito.it])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config.h])
-AC_CANONICAL_TARGET([])
+AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(dist-bzip2 check-news)
 
 AC_PREFIX_DEFAULT("/usr")
