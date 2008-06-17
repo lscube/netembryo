@@ -41,7 +41,8 @@ AC_ARG_ENABLE(ssl,
         enable_ssl="yes")
 
 dnl Check for LibTool Dynamic Loading
-AC_PROG_LIBTOOL
+LT_PREREQ([2.2.4])
+LT_INIT
 LIBTOOL="$LIBTOOL --silent"
 AC_SUBST([LIBTOOL_DEPS])
 
