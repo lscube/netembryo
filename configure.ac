@@ -15,7 +15,7 @@ m4_define([netembryo_lt_current],
 m4_define([netembryo_lt_revision], [netembryo_interface_age])
 m4_define([netembryo_lt_age], [m4_eval(netembryo_binary_age - netembryo_interface_age)])
 
-AC_INIT(netembryo, [netembryo_version], [http://streaming.polito.it])
+AC_INIT([netembryo], [netembryo_version], [http://streaming.polito.it])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_HEADERS([config.h])
