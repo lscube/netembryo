@@ -94,7 +94,6 @@ SSL_CTX * Sock_init_ctx(char *key, char * cafile, char * capath)
 
 SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx) {
 
-    int exit;
     SSL *ssl;
 
     ssl = SSL_new(global_ctx);
