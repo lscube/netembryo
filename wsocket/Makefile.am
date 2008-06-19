@@ -10,11 +10,10 @@ libwsocket_la_SOURCES =		multicast.c \
 				sock_ntop_host.c \
 				get_info.c \
 				Sock.c \
-				$(top_srcdir)/include/ssl.h \
-				$(top_srcdir)/include/wsocket-internal.h
+				wsocket-internal.h
 
 if ENABLE_SSL
-libwsocket_la_SOURCES += ssl.c
+libwsocket_la_SOURCES += ssl.c ssl.h
 endif
 
 INCLUDES = -I$(netembryoincludedir) -I$(top_srcdir)
