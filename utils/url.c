@@ -23,6 +23,7 @@
 #include "url.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 /**
  * Creates an Url informations structure from a URI string
