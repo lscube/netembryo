@@ -49,8 +49,8 @@
  * @{ 
  */
 
-int sock_connect(char *host, char *port, int *sock, sock_type socktype);
-int sock_bind(char *host, char *port, int *sock, sock_type socktype);
+int sock_connect(char const *host, char const *port, int *sock, sock_type socktype);
+int sock_bind(char const *host, char const *port, int *sock, sock_type socktype);
 int sock_accept(int sock);
 int sock_listen(int s, int backlog);
 int sock_close(int s);

@@ -206,7 +206,7 @@ Sock * Sock_accept(Sock *s, void * octx)
  * @param octx Optional ssl global context
  */
 
-Sock * Sock_bind(char *host, char *port, Sock *sock,
+Sock * Sock_bind(char const *host, char const *port, Sock *sock,
                  sock_type socktype, void * octx)
 {
 
@@ -342,7 +342,7 @@ int Sock_compare(Sock *p, Sock *q)
  * @param octx Optional ssl global context
  */
 
-Sock * Sock_connect(char *host, char *port, Sock *binded,
+Sock * Sock_connect(char const *host, char const *port, Sock *binded,
                     sock_type socktype, void * octx)
 {
     Sock *s;

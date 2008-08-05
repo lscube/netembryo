@@ -53,7 +53,7 @@ int sock_accept(int sock)
  * bind wrapper
  */
 
-int sock_bind(char *host, char *port, int *sock, sock_type socktype)
+int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
 {
     int n, param = 1;
     int bind_new;
@@ -172,7 +172,7 @@ int sock_close(int s)
  * wraps connect
  */
 
-int sock_connect(char *host, char *port, int *sock, sock_type socktype)
+int sock_connect(char const *host, char const *port, int *sock, sock_type socktype)
 {
     int n, connect_new;
     struct addrinfo *res, *ressave;

@@ -130,9 +130,9 @@ void net_log(int, const char*, ...);
  * @{ 
  */
 
-Sock * Sock_connect(char *host, char *port, Sock *binded, sock_type socktype, void * ctx);
+Sock * Sock_connect(char const *host, char const *port, Sock *binded, sock_type socktype, void * ctx);
 
-Sock * Sock_bind(char *host, char *port, Sock *sock, sock_type socktype, void * ctx);
+Sock * Sock_bind(char const *host, char const *port, Sock *sock, sock_type socktype, void * ctx);
 
 Sock * Sock_accept(Sock *main, void * ctx);
 
