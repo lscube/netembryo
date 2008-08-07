@@ -1,6 +1,6 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.62)
+AC_PREREQ(2.61)
 
 m4_define([netembryo_major_version], [0])
 m4_define([netembryo_minor_version], [0])
@@ -41,8 +41,7 @@ AC_ARG_ENABLE(ssl,
         enable_ssl="yes")
 
 dnl Check for LibTool Dynamic Loading
-LT_PREREQ([2.2.4])
-LT_INIT
+AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_SUBST([LIBTOOL_DEPS])
 
