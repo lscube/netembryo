@@ -66,10 +66,7 @@ AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
 
 dnl Checks for library functions.
-AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
-AC_FUNC_MMAP
-AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
 
 dnl test enable
