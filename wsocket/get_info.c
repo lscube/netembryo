@@ -21,6 +21,7 @@
  * */
 
 #include "wsocket.h"
+#include "wsocket-internal.h"
 #include <string.h>
 
 #ifndef WIN32

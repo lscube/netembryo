@@ -162,7 +162,7 @@ int Sock_set_props(Sock *s, int request, int *on);
 /*get_info.c*/
 char * get_remote_host(Sock *);
 char * get_local_host(Sock *);
-inline int get_local_hostname(char *localhostname, size_t len); // return 0 if ok
+int get_local_hostname(char *localhostname, size_t len); // return 0 if ok
 in_port_t get_remote_port(Sock *);
 in_port_t get_local_port(Sock *);
 

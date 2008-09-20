@@ -30,6 +30,10 @@
 #include "wsocket.h"
 #include "wsocket-internal.h"
 
+#ifndef WIN32
+# include <sys/ioctl.h>
+#endif
+
 #if HAVE_SSL
 #include <openssl/ssl.h>
 #endif

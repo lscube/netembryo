@@ -18,15 +18,12 @@ m4_define([netembryo_lt_age], [m4_eval(netembryo_binary_age - netembryo_interfac
 AC_INIT([netembryo], [netembryo_version], [http://streaming.polito.it])
 
 AC_CONFIG_AUX_DIR(config)
+AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_HEADERS([config.h])
 AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(dist-bzip2 no-dist-gzip foreign)
 
 AC_PREFIX_DEFAULT("/usr")
-
-AC_ARG_ENABLE(debug,
-	AS_HELP_STRING([--enable-debug], [enable gcc debugging flags (default=no)]),,
-	enable_debug="no")
 
 AC_ARG_ENABLE(ipv6,
 	AS_HELP_STRING([--enable-ipv6], [enable IPv6 support (default=autodetected)]),,
@@ -69,10 +66,7 @@ AC_SUBST(PACKAGE_CFLAGS)
 AC_SUBST(PACKAGE_LIBS)
 
 dnl Checks for library functions.
-AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
-AC_FUNC_MMAP
-AC_FUNC_VPRINTF
 AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
 
 dnl test enable
@@ -92,13 +86,8 @@ else
         AC_MSG_WARN([SCTP disabled: check skipped.])
 fi
 
-AM_CONDITIONAL(NETEMBRYO_DEBUG, [test "$enable_debug" = "yes"])
-if test "x$enable_debug" = "xyes"; then
-        CFLAGS="$CFLAGS -g -ggdb"
-        AC_DEFINE([ENABLE_DEBUG], 1,[Debug enabled])
-        debug_msg="
-   Debuging flags enabled: welcome developer!!!"
-fi
+LSC_ERRORS
+LSC_DEBUG
 
 if test "$enable_ssl" = "yes"; then
     PKG_CHECK_MODULES(OPENSSL, [openssl >= 0.9.8],
@@ -108,18 +97,6 @@ if test "$enable_ssl" = "yes"; then
     LIBS="$LIBS $OPENSSL_LIBS"
 fi
 AM_CONDITIONAL(ENABLE_SSL, [test "$enable_ssl" = "yes"])
-
-case "$enable_errors" in
-        pedantic)
-                CFLAGS="$CFLAGS -pedantic-errors -Werror"
-        ;;
-        normal | yes)
-                CFLAGS="$CFLAGS -Werror"
-        ;;
-        none | *)
-                CFLAGS="$CFLAGS"
-        ;;
-esac
 
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
@@ -137,8 +114,8 @@ AC_CONFIG_FILES([libnetembryo.pc])
 
 AC_OUTPUT
 
+LSC_DEBUG_STATUS
 AC_MSG_NOTICE([config files successfully generated!
-$debug_msg
 Byte order ........................ : this is a $BIGENDIAN machine
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix

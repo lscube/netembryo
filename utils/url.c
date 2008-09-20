@@ -23,6 +23,7 @@
 #include "url.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 /**
  * Creates an Url informations structure from a URI string
@@ -145,7 +146,8 @@ int Url_decode (char *decoded_string, const char *source_string,
                 size_t decoded_string_size)
 {
 
-    int decoded_string_pos = 0, source_string_len, i, dec, unit;
+    size_t decoded_string_pos = 0, source_string_len, i;
+    int dec, unit;
     memset(decoded_string, '\0', decoded_string_size * sizeof(char));
 
     if (!source_string)
@@ -194,7 +196,7 @@ int Url_encode (char *encoded_string, const char *source_string,
                 size_t encoded_string_size)
 {
 
-    int encoded_string_pos = 0, source_string_len, i;
+    size_t encoded_string_pos = 0, source_string_len, i;
     memset(encoded_string, '\0', encoded_string_size * sizeof(char));
 
     if (!source_string)

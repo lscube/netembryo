@@ -20,3 +20,5 @@ pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libnetembryo.pc
 
 libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
+
+ACLOCAL_AMFLAGS = -I m4
