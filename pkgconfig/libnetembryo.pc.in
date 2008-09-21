@@ -6,6 +6,7 @@ includedir=@includedir@
 Name: libnetembryo
 Description: network sockets abstraction library
 Version: @VERSION@
-Libs: -L${libdir} -lnetembryo @LIBS@
+Libs: -L${libdir} -lnetembryo
+Libs.private: @LIBS@
 Cflags: -I${includedir}
 

@@ -1,0 +1,10 @@
+libdir=@abs_top_builddir@
+includedir=@abs_top_srcdir@/bufferpool
+
+Name: libnetembryo
+Description: network sockets abstraction library
+Version: @VERSION@
+Libs: -L${libdir} -lnetembryo
+Libs.private: @LIBS@
+Cflags: -I${includedir}
+

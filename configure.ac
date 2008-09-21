@@ -110,7 +110,8 @@ AC_SUBST(LIBS)
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
 AC_CONFIG_FILES([utils/Makefile])
-AC_CONFIG_FILES([libnetembryo.pc])
+AC_CONFIG_FILES([pkgconfig/libnetembryo.pc])
+AC_CONFIG_FILES([pkgconfig/libnetembryo-uninstalled.pc])
 
 AC_OUTPUT
 

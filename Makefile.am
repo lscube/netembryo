@@ -17,7 +17,7 @@ libnetembryo_la_LIBADD +=   utils/libutils.la
 
 #pkg-config
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = libnetembryo.pc
+pkgconfig_DATA = pkgconfig/libnetembryo.pc
 
 libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
