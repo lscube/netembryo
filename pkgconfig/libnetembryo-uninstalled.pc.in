@@ -1,5 +1,5 @@
 libdir=@abs_top_builddir@
-includedir=@abs_top_srcdir@/bufferpool
+includedir=@abs_top_srcdir@
 
 Name: libnetembryo
 Description: network sockets abstraction library

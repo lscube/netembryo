@@ -6,9 +6,9 @@ EXTRA_DIST = Doxyfile
 lib_LTLIBRARIES = libnetembryo.la
 
 libincludedir = $(includedir)/netembryo
-libinclude_HEADERS =    include/wsocket.h \
-			include/url.h \
-			include/rtsp_errors.h
+libinclude_HEADERS =    netembryo/wsocket.h \
+			netembryo/url.h \
+			netembryo/rtsp_errors.h
 
 libnetembryo_la_SOURCES =
 

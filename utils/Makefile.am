@@ -1,5 +1,5 @@
 
-netembryoincludedir = $(top_srcdir)/include
+netembryoincludedir = $(top_srcdir)/netembryo
 
 noinst_LTLIBRARIES = libutils.la
 
