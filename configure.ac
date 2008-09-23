@@ -33,10 +33,6 @@ AC_ARG_ENABLE(sctp,
 	AS_HELP_STRING([--enable-sctp], [enable SCTP support (default=autodetected)]),,
 	enable_sctp="yes")
 
-AC_ARG_ENABLE(ssl,
-	AS_HELP_STRING([--enable-ssl], [enable SSL support (default=autodetected)]),,
-        enable_ssl="yes")
-
 dnl Check for LibTool Dynamic Loading
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
@@ -89,14 +85,14 @@ fi
 LSC_ERRORS
 LSC_DEBUG
 
-if test "$enable_ssl" = "yes"; then
-    PKG_CHECK_MODULES(OPENSSL, [openssl >= 0.9.8],
-        AC_DEFINE(ENABLE_SSL, 1, [Define if ssl is enabled]),
-        [enable_ssl = "no"])
-    CFLAGS="$CFLAGS $OPENSSL_CFLAGS"
-    LIBS="$LIBS $OPENSSL_LIBS"
-fi
-AM_CONDITIONAL(ENABLE_SSL, [test "$enable_ssl" = "yes"])
+PKG_WITH_MODULES([OPENSSL], [openssl >= 0.9.8],
+  [have_ssl="yes";
+   OPENSSL_REQUIRES="openssl >= 0.9.8";
+   AC_DEFINE(ENABLE_SSL, 1, [Define if ssl is enabled])], [have_ssl="no"],
+  [Enable SSL support through OpenSSL], [yes])
+
+AC_SUBST(OPENSSL_REQUIRES)
+AM_CONDITIONAL(ENABLE_SSL, [test "$have_ssl" = "yes"])
 
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
@@ -121,7 +117,7 @@ Byte order ........................ : this is a $BIGENDIAN machine
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
 NetEmbryo sctp support enabled .... : $enable_sctp
-NetEmbryo ssl support enabled ..... : $enable_ssl
+NetEmbryo ssl support enabled ..... : $have_ssl
 
  'make' will now compile NetEmbryo and 'su -c make install' will install it.
  Note: On non-Linux systems you might need to use 'gmake' instead of 'make'.
