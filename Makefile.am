@@ -12,8 +12,13 @@ pkginclude_HEADERS =    netembryo/wsocket.h \
 
 libnetembryo_la_SOURCES =
 
-libnetembryo_la_LIBADD =   wsocket/libwsocket.la
-libnetembryo_la_LIBADD +=   utils/libutils.la
+libnetembryo_la_LIBADD = \
+	wsocket/libwsocket.la \
+	utils/libutils.la
+
+if HAVE_SCTP
+libnetembryo_la_LIBADD += $(SCTP_LIBS)
+endif
 
 libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 

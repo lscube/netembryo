@@ -22,5 +22,7 @@ AC_DEFUN([LSC_CHECK_SCTP], [
     AC_MSG_RESULT([no, disabled by user])
   ])
 
+  AC_SUBST([SCTP_LIBS])
+
   AM_CONDITIONAL([HAVE_SCTP], [test "x$have_sctp" = "xyes"])
 ])
