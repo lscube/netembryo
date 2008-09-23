@@ -25,10 +25,6 @@ AM_INIT_AUTOMAKE(dist-bzip2 no-dist-gzip foreign)
 
 AC_PREFIX_DEFAULT("/usr")
 
-AC_ARG_ENABLE(ipv6,
-	AS_HELP_STRING([--enable-ipv6], [enable IPv6 support (default=autodetected)]),,
-        enable_ipv6="yes")
-
 dnl Check for LibTool Dynamic Loading
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
@@ -59,13 +55,7 @@ dnl Checks for library functions.
 AC_FUNC_MEMCMP
 AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
 
-dnl test enable
-if test "x$enable_ipv6" = "xyes"; then
-        AC_CHECK_TYPE(struct sockaddr_in6, AC_DEFINE([IPV6], 1, [Define IPv6 support]), , [#include <netinet/in.h>])
-else
-        AC_MSG_WARN([IPv6 disabled: check skipped.])
-fi
-
+LSC_CHECK_IPV6
 LSC_CHECK_SCTP
 
 LSC_ERRORS
