@@ -29,10 +29,6 @@ AC_ARG_ENABLE(ipv6,
 	AS_HELP_STRING([--enable-ipv6], [enable IPv6 support (default=autodetected)]),,
         enable_ipv6="yes")
 
-AC_ARG_ENABLE(sctp,
-	AS_HELP_STRING([--enable-sctp], [enable SCTP support (default=autodetected)]),,
-	enable_sctp="yes")
-
 dnl Check for LibTool Dynamic Loading
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
@@ -70,15 +66,7 @@ else
         AC_MSG_WARN([IPv6 disabled: check skipped.])
 fi
 
-dnl Check for SCTP support
-if test "$enable_sctp" = "yes"; then
-        AC_CHECK_TYPE(struct sctp_sndrcvinfo, [
-         AC_CHECK_LIB(sctp,sctp_recvmsg)],
-         AC_MSG_WARN([SCTP disabled: headers not found]),
-         [#include <netinet/sctp.h>])
-else
-        AC_MSG_WARN([SCTP disabled: check skipped.])
-fi
+LSC_CHECK_SCTP
 
 LSC_ERRORS
 LSC_DEBUG
