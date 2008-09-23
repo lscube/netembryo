@@ -1,4 +1,4 @@
-libdir=@abs_top_builddir@
+libdir=@abs_top_builddir@/.libs
 includedir=@abs_top_srcdir@
 
 Name: libnetembryo
