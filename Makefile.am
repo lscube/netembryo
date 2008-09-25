@@ -1,6 +1,7 @@
 SUBDIRS =	wsocket \
 		utils \
 		pkgconfig \
+		. \
 		tests
 
 EXTRA_DIST = Doxyfile
