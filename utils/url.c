@@ -148,10 +148,11 @@ int Url_decode (char *decoded_string, const char *source_string,
 
     size_t decoded_string_pos = 0, source_string_len, i;
     int dec, unit;
-    memset(decoded_string, '\0', decoded_string_size * sizeof(char));
 
-    if (!source_string)
+    if (!source_string || !decoded_string || decoded_string_size == 0)
         return -1;
+
+    memset(decoded_string, '\0', decoded_string_size * sizeof(char));
 
     source_string_len = strlen (source_string);
     for (i = 0;
