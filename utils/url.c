@@ -122,7 +122,7 @@ void Url_destroy(Url * url)
  * @param data The char of an hex encoded digit
  * @return -1 if given char is not 0-F
  */
-int hex_to_dec (char data)
+static int hex_to_dec (char data)
 {
     if( '0' <= data && data <= '9' ) // 0 - 9
         return data - '0';
