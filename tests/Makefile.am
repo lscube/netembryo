@@ -8,5 +8,6 @@ INCLUDES = -I$(top_srcdir) $(CHECK_CFLAGS)
 LDADD = ../libnetembryo.la $(CHECK_LIBS)
 
 testsuite_SOURCES = \
+	test_hostname.c \
 	test_url.c \
 	suite_main.c
