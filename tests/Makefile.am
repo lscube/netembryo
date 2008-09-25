@@ -10,4 +10,5 @@ LDADD = ../libnetembryo.la $(CHECK_LIBS)
 testsuite_SOURCES = \
 	test_hostname.c \
 	test_url.c \
+	test_url_encode.c \
 	suite_main.c

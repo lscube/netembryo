@@ -25,13 +25,15 @@
 
 extern void add_testcases_hostname(Suite *);
 extern void add_testcases_url(Suite *);
+extern void add_testcases_url_encode(Suite *);
 
 int main() {
   int number_failed;
   Suite *s = suite_create("Netembryo");
 
-  add_testcases_url(s);
   add_testcases_hostname(s);
+  add_testcases_url(s);
+  add_testcases_url_encode(s);
 
   SRunner *sr = srunner_create (s);
   srunner_run_all (sr, CK_VERBOSE);
