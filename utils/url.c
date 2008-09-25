@@ -197,10 +197,11 @@ int Url_encode (char *encoded_string, const char *source_string,
 {
 
     size_t encoded_string_pos = 0, source_string_len, i;
-    memset(encoded_string, '\0', encoded_string_size * sizeof(char));
 
-    if (!source_string)
+    if (!source_string || !encoded_string || encoded_string_size == 0)
         return -1;
+
+    memset(encoded_string, '\0', encoded_string_size * sizeof(char));
 
     source_string_len = strlen (source_string);
     for (i = 0;
