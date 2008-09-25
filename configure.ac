@@ -67,6 +67,9 @@ PKG_WITH_MODULES([OPENSSL], [openssl >= 0.9.8],
 AC_SUBST(OPENSSL_REQUIRES)
 AM_CONDITIONAL(ENABLE_SSL, [test "$have_ssl" = "yes"])
 
+PKG_HAVE_WITH_MODULES([CHECK], [check],
+  [Enable unit testing with 'check'], [yes])
+
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
 LT_AGE=netembryo_lt_age
@@ -79,6 +82,7 @@ AC_SUBST(LIBS)
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([wsocket/Makefile])
 AC_CONFIG_FILES([utils/Makefile])
+AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([pkgconfig/Makefile])
 AC_CONFIG_FILES([pkgconfig/libnetembryo.pc])
 AC_CONFIG_FILES([pkgconfig/libnetembryo-uninstalled.pc])
