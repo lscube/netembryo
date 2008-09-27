@@ -21,6 +21,7 @@
  * */
 
 #include "netembryo/wsocket.h"
+#include <string.h>
 #include <check.h>
 
 START_TEST(local_hostname)

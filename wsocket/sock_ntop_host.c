@@ -31,6 +31,8 @@
 # include <sys/un.h>
 #endif
 
+#include <string.h>
+
 #ifdef WIN32
 const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
 {
