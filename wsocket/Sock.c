@@ -28,13 +28,14 @@
 #include <config.h>
 #include <string.h>
 #include "wsocket.h"
+#include "ssl.h"
 #include "wsocket-internal.h"
 
 #ifndef WIN32
 # include <sys/ioctl.h>
 #endif
 
-#if HAVE_SSL
+#if ENABLE_SSL
 #include <openssl/ssl.h>
 #endif
 
@@ -90,7 +91,7 @@ Sock * Sock_accept(Sock *s, void * octx)
     struct sockaddr *sa_p = NULL;
     socklen_t sa_len = 0;
 
-#if HAVE_SSL
+#if ENABLE_SSL
     SSL_CTX * ctx = octx;
     SSL *ssl_con = NULL;
 #endif
@@ -103,7 +104,7 @@ Sock * Sock_accept(Sock *s, void * octx)
         return NULL;
     }
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if(ctx) {
         if( !(ssl_con = SSL_sock_accept(res, ctx)) ) {
             net_log(NET_LOG_ERR, "Unable to accept SSL connection.\n");
@@ -116,7 +117,7 @@ Sock * Sock_accept(Sock *s, void * octx)
     if (!(new_s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL,
                 "Unable to allocate a Sock struct in Sock_accept().\n");
-#if HAVE_SSL
+#if ENABLE_SSL
         if(ctx) 
             SSL_close_connection(ssl_con, res);
 #endif
@@ -128,7 +129,7 @@ Sock * Sock_accept(Sock *s, void * octx)
     new_s->socktype = s->socktype;
     new_s->flags = s->flags;
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if(ctx) 
         new_s->ssl = ssl_con;
 #endif
@@ -221,7 +222,7 @@ Sock * Sock_bind(char const *host, char const *port, Sock *sock,
     char local_host[128];
     int local_port;
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if ((octx)) {
         if(socktype != TCP) {
             net_log(NET_LOG_ERR, "SSL can't work on this protocol.\n");
@@ -311,7 +312,7 @@ int Sock_close(Sock *s)
             mcast_leave(s->fd,(struct sockaddr *) &(s->local_stg));
     }
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if(s->ssl)
         SSL_close_connection(s->ssl, s->fd);
 #endif
@@ -357,7 +358,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     socklen_t sa_len = 0;
     int local_port;
     int remote_port;
-#if HAVE_SSL
+#if ENABLE_SSL
     SSL_CTX * ctx = octx;
     SSL *ssl_con;
 #endif
@@ -371,7 +372,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
             return NULL;
     }
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if((ctx)) {
         if (sock_SSL_connect(&ssl_con, sockfd, ctx))
             net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
@@ -389,7 +390,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
         s->remote_host = NULL;
     } else if (!(s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
-#if HAVE_SSL
+#if ENABLE_SSL
         if(ctx) 
             SSL_close_connection(ssl_con, sockfd);
 #endif
@@ -399,7 +400,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 
     s->fd = sockfd;
     s->socktype = socktype;
-#if HAVE_SSL
+#if ENABLE_SSL
     s->ssl = NULL;
     if(ctx) 
         s->ssl = ssl_con;
@@ -538,7 +539,7 @@ void net_log(int level, const char *fmt, ...)
 
 void Sock_init(void (*log_func)(int, const char*, va_list))
 {
-#if HAVE_SSL
+#if ENABLE_SSL
     SSL_library_init();
     SSL_load_error_strings();
 #endif
@@ -580,9 +581,9 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     if(!s)
         return -1;
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if (s->ssl)
-        n = SSL_sock_read(s->ssl, buffer, nbytes);
+        SSL_sock_read(s->ssl, buffer, nbytes);
     else {
 #endif
         switch(s->socktype) {
@@ -616,7 +617,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         default:
             break;
         }
-#if HAVE_SSL
+#if ENABLE_SSL
     }
 #endif
 
@@ -727,7 +728,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     if (!s)
         return -1;
 
-#if HAVE_SSL
+#if ENABLE_SSL
     if(s->ssl)
         return SSL_sock_write(s->ssl, buffer, nbytes);
     else {
@@ -759,7 +760,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         default:
             break;
         }
-#if HAVE_SSL
+#if ENABLE_SSL
     }
 #endif        
     return -1;
