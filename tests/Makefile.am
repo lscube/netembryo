@@ -12,4 +12,5 @@ testsuite_SOURCES = \
 	test_url.c \
 	test_url_encode.c \
 	test_url_decode.c \
+	test_sock.c \
 	suite_main.c
