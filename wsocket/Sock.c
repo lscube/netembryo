@@ -69,8 +69,6 @@ static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
         default:
             return -1;
     }
-    
-    return -1;
 }
 
 
