@@ -39,9 +39,6 @@ AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_SUBST([LIBTOOL_DEPS])
 
-dnl Check for Endianess
-AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define if manchine is big-endian]),[BIGENDIAN="Little Endian"] )
-
 dnl Checks for header files.
 AC_HEADER_STDC
 AC_HEADER_TIME
