@@ -39,25 +39,6 @@ AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_SUBST([LIBTOOL_DEPS])
 
-dnl Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-AC_C_INLINE
-AC_CHECK_TYPES(struct sockaddr_storage,,, [#include <sys/socket.h>])
-
-#init CFLAG and PKG_LIB
-AC_SUBST(PACKAGE_CFLAGS)
-AC_SUBST(PACKAGE_LIBS)
-
-dnl Checks for library functions.
-AC_FUNC_MEMCMP
-AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
-
 LSC_CHECK_IPV6
 LSC_CHECK_SCTP
 
