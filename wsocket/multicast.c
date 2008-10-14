@@ -25,12 +25,18 @@
  * Multicast support
  */
 
+#include <arpa/inet.h> 
 #include "wsocket.h"
 #include <string.h>
 
 #ifndef WIN32
 #   include <sys/ioctl.h>
 #   include <net/if.h>
+#endif
+
+#ifdef _DARWIN_C_SOURCE
+#define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
+#define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
 #endif
 
 /**

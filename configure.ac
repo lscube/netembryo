@@ -20,7 +20,6 @@ AC_INIT([netembryo], [netembryo_version], [http://streaming.polito.it])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_HEADERS([config.h])
-AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(dist-bzip2 no-dist-gzip foreign)
 AM_MAINTAINER_MODE
 
@@ -35,32 +34,15 @@ AC_USE_SYSTEM_EXTENSIONS
 dnl Force usage of POSIX.1-2001 (clock_gettime)
 CPPFLAGS="${CPPFLAGS} -D_POSIX_C_SOURCE=200112L"
 
+dnl Workaround Darwin
+AS_IF([test "x$(uname)" = "xDarwin"],[
+  CPPFLAGS="${CPPFLAGS} -D_DARWIN_C_SOURCE"
+])
+
 dnl Check for LibTool Dynamic Loading
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"
 AC_SUBST([LIBTOOL_DEPS])
-
-dnl Check for Endianess
-AC_C_BIGENDIAN([BIGENDIAN="Big Endian"] AC_DEFINE([WORDS_BIGENDIAN], 1, [Define if manchine is big-endian]),[BIGENDIAN="Little Endian"] )
-
-dnl Checks for header files.
-AC_HEADER_STDC
-AC_HEADER_TIME
-AC_CHECK_HEADERS(sys/errno.h fcntl.h getopt.h sys/time.h unistd.h)
-
-dnl Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-AC_C_INLINE
-AC_CHECK_TYPES(struct sockaddr_storage,,, [#include <sys/socket.h>])
-
-#init CFLAG and PKG_LIB
-AC_SUBST(PACKAGE_CFLAGS)
-AC_SUBST(PACKAGE_LIBS)
-
-dnl Checks for library functions.
-AC_FUNC_MEMCMP
-AC_CHECK_FUNCS(socket getaddrinfo getopt_long gettimeofday uname)
 
 LSC_CHECK_IPV6
 LSC_CHECK_SCTP
@@ -78,7 +60,7 @@ AC_SUBST(OPENSSL_REQUIRES)
 AM_CONDITIONAL(ENABLE_SSL, [test "$have_ssl" = "yes"])
 
 PKG_HAVE_WITH_MODULES([CHECK], [check],
-  [Enable unit testing with 'check'], [yes])
+  [Enable unit testing with 'check'])
 
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
@@ -101,7 +83,6 @@ AC_OUTPUT
 
 LSC_DEBUG_STATUS
 AC_MSG_NOTICE([config files successfully generated!
-Byte order ........................ : this is a $BIGENDIAN machine
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
 NetEmbryo sctp support enabled .... : $enable_sctp
