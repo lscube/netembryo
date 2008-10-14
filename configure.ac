@@ -55,7 +55,7 @@ AC_SUBST(OPENSSL_REQUIRES)
 AM_CONDITIONAL(ENABLE_SSL, [test "$have_ssl" = "yes"])
 
 PKG_HAVE_WITH_MODULES([CHECK], [check],
-  [Enable unit testing with 'check'], [yes])
+  [Enable unit testing with 'check'])
 
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
