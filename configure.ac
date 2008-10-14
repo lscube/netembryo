@@ -78,7 +78,6 @@ AC_OUTPUT
 
 LSC_DEBUG_STATUS
 AC_MSG_NOTICE([config files successfully generated!
-Byte order ........................ : this is a $BIGENDIAN machine
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
 NetEmbryo sctp support enabled .... : $enable_sctp
