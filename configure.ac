@@ -2,6 +2,32 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
 
+dnl Process this file with autoconf to produce a configure script.
+dnl 
+dnl immediately before every release do:
+dnl ===================================
+dnl if (the interface is totally unchanged from previous release)
+dnl    *_lt_revision ++;
+dnl else { /* interfaces have been added, removed or changed */
+dnl    *_lt_revision = 0;
+dnl    *_lt_current ++;
+dnl    if (any interfaces have been _added_ since last release)
+dnl       *_lt_age ++;
+dnl    if (any interfaces have been _removed_ or _incompatibly changed_)
+dnl       *_lt_age = 0;
+dnl }
+dnl 
+dnl If you want to know more about what you are doing, here are some details:
+dnl  * *_lt_current is the current API version
+dnl  * *_lt_revision is an internal revision number which is increased when
+dnl    the API itself did not change
+dnl  * *_lt_age is the number of previous API versions still supported by
+dnl    this library
+dnl  * libtool has its own numbering scheme, because local library numbering
+dnl    schemes are platform dependent
+dnl  * in Linux, the library will be named
+dnl    libname.so.(*_lt_current - *_lt_age).*_lt_age.*_lt_revision
+
 m4_define([netembryo_major_version], [0])
 m4_define([netembryo_minor_version], [0])
 m4_define([netembryo_micro_version], [8])
@@ -10,10 +36,10 @@ m4_define([netembryo_binary_age],
           [m4_eval(100 * netembryo_minor_version + netembryo_micro_version)])
 m4_define([netembryo_version],
           [netembryo_major_version.netembryo_minor_version.netembryo_micro_version])
-m4_define([netembryo_lt_current],
-          [m4_eval(100 * netembryo_minor_version + netembryo_micro_version - netembryo_interface_age)])
-m4_define([netembryo_lt_revision], [netembryo_interface_age])
-m4_define([netembryo_lt_age], [m4_eval(netembryo_binary_age - netembryo_interface_age)])
+
+m4_define([netembryo_lt_revision], [0])
+m4_define([netembryo_lt_current], [8])
+m4_define([netembryo_lt_age],     [8])
 
 AC_INIT([netembryo], [netembryo_version], [http://streaming.polito.it])
 
