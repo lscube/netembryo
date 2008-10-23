@@ -54,7 +54,7 @@ RTSP_Error const RTSP_OptionNotSupported = { {551, "Option not supported"}, TRUE
  * @param reply_code the code of RTSP reply message
  * @param message the content of the RTSP reply message
  */
-void set_RTSP_Error(RTSP_Error * err, int reply_code, char * message)
+void set_RTSP_Error(RTSP_Error * err, int reply_code, const char * message)
 {
     err->got_error = TRUE;
     err->message.reply_code = reply_code;

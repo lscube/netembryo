@@ -71,7 +71,7 @@ extern RTSP_Error const RTSP_ServiceUnavailable;
 extern RTSP_Error const RTSP_VersionNotSupported;
 extern RTSP_Error const RTSP_OptionNotSupported;
 
-void set_RTSP_Error(RTSP_Error * err, int reply_code, char * message);
+void set_RTSP_Error(RTSP_Error * err, int reply_code, const char * message);
 RTSP_Error const * get_RTSP_Error(int reply_code);
 /**
  * @}
