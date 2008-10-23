@@ -62,6 +62,25 @@ AC_DEFUN([CC_CHECK_CFLAGS], [
     [$2], [$3])
 ])
 
+dnl CC_CHECK_CFLAG_APPEND(FLAG, [action-if-found], [action-if-not-found])
+dnl Check for CFLAG and appends them to CFLAGS if supported
+AC_DEFUN([CC_CHECK_CFLAG_APPEND], [
+  AC_CACHE_CHECK([if $CC supports $1 flag],
+    AS_TR_SH([cc_cv_cflags_$1]),
+    CC_CHECK_CFLAGS_SILENT([$1]) dnl Don't execute actions here!
+  )
+
+  AS_IF([eval test x$]AS_TR_SH([cc_cv_cflags_$1])[ = xyes],
+    [CFLAGS="$CFLAGS $1"; $2], [$3])
+])
+
+dnl CC_CHECK_CFLAGS_APPEND([FLAG1 FLAG2], [action-if-found], [action-if-not])
+AC_DEFUN([CC_CHECK_CFLAGS_APPEND], [
+  for flag in $1; do
+    CC_CHECK_CFLAG_APPEND($flag, [$2], [$3])
+  done
+])
+
 dnl Check if the flag is supported by linker (cacheable)
 dnl CC_CHECK_LDFLAGS([FLAG], [ACTION-IF-FOUND],[ACTION-IF-NOT-FOUND])
 
