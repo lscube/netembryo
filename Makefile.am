@@ -14,9 +14,11 @@ pkginclude_HEADERS =    netembryo/wsocket.h \
 
 libnetembryo_la_SOURCES =
 
+libnetembryo_la_CFLAGS = $(GLIB_CFLAGS)
 libnetembryo_la_LIBADD = \
 	wsocket/libwsocket.la \
-	utils/libutils.la
+	utils/libutils.la \
+	$(GLIB_LIBS)
 
 if HAVE_SCTP
 libnetembryo_la_LIBADD += $(SCTP_LIBS)

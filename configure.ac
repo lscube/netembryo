@@ -78,6 +78,8 @@ LSC_CHECK_SCTP
 LSC_ERRORS
 LSC_DEBUG
 
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.14])
+
 PKG_WITH_MODULES([OPENSSL], [openssl >= 0.9.8],
   [have_ssl="yes";
    OPENSSL_REQUIRES="openssl >= 0.9.8";

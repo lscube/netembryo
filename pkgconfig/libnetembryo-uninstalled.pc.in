@@ -4,7 +4,7 @@ includedir=@abs_top_srcdir@
 Name: libnetembryo
 Description: network sockets abstraction library
 Version: @VERSION@
-Requires.private: @OPENSSL_REQUIRES@
+Requires.private: @OPENSSL_REQUIRES@ glib-2.0 >= 2.14
 Libs: -L${libdir} -lnetembryo
 Libs.private: @LIBS@
 Cflags: -I${includedir}
