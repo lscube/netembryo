@@ -9,5 +9,5 @@ Version: @VERSION@
 Requires.private: @OPENSSL_REQUIRES@ glib-2.0 >= 2.14
 Libs: -L${libdir} -lnetembryo
 Libs.private: @LIBS@ @SCTP_LIBS@
-Cflags: -I${includedir}
+Cflags: -I${includedir} -DSUPPORT_ATTRIBUTE_CONST=@HAVE_CONST@
 

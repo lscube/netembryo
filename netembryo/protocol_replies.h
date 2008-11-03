@@ -81,7 +81,11 @@ extern const ProtocolReply RTSP_OptionNotSupported;
  */
 
 ProtocolReply reply_build_custom(uint16_t code, bool error, const char *message);
-ProtocolReply reply_get_rtsp(uint16_t code);
+ProtocolReply reply_get_rtsp(uint16_t code)
+#ifdef SUPPORT_ATTRIBUTE_CONST
+    __attribute__((__const__))
+#endif
+    ;
 void reply_free(ProtocolReply reply);
 /**
  * @}
