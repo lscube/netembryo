@@ -67,12 +67,6 @@ AC_CANONICAL_HOST
 AS_CASE([$host_os],
 	[darwin*], [CPPFLAGS="${CPPFLAGS} -D_DARWIN_C_SOURCE"])
 
-dnl Check for the const attribute, that can be used to tell the
-dnl compiler to further optimise lookup functions like reply_get_rtsp().
-CC_ATTRIBUTE_CONST([HAVE_CONST=1], [HAVE_CONST=1])
-CPPFLAGS="$CPPFLAGS -DSUPPORT_ATTRIBUTE_CONST=$HAVE_CONST"
-AC_SUBST([HAVE_CONST])
-
 dnl Check for LibTool Dynamic Loading
 AC_PROG_LIBTOOL
 LIBTOOL="$LIBTOOL --silent"

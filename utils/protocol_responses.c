@@ -58,25 +58,6 @@ static GString *protocol_response_new_int(const char *protostr,
 }
 
 /**
- * @brief Create a new response for a protocol with a given reply code
- *
- * @param proto Protocol to write the respones for.
- * @param code Reply code to use
- */
-GString *protocol_response_new(Protocol proto, guint16 code)
-{
-    const char *protostr = protocols_strings[proto];
-    const char *replystr = NULL;
-
-    switch(proto) {
-    case RTSP_1_0:
-        replystr = reply_get_rtsp(code).message;
-    }
-
-    return protocol_response_new_int(protostr, code, replystr);
-}
-
-/**
  * @brief Create a new response for a protocol with a given reply
  *
  * @param proto Protocol to write the response for.
