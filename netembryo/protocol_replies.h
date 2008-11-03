@@ -46,8 +46,6 @@ typedef struct {
   uint16_t code;
   //! If true, this is an error reply
   bool error;
-  //! If true the message string is not statically allocated
-  bool custom;
   //! Human-readable message for the reply
   const char *message;
 } ProtocolReply;
@@ -80,8 +78,6 @@ extern const ProtocolReply RTSP_OptionNotSupported;
  * @}
  */
 
-ProtocolReply reply_build_custom(uint16_t code, bool error, const char *message);
-void reply_free(ProtocolReply reply);
 /**
  * @}
  */
