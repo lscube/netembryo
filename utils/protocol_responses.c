@@ -38,37 +38,23 @@ static const char protocols_strings[][16] = {
 };
 
 /**
- * @brief Internal utility function to generate a response
- *
- * @param protostr String with name and version of the protocol
- * @param code Reply code for the response
- * @param replystr String with the description of response
- */
-static GString *protocol_response_new_int(const char *protostr,
-                                          guint16 code,
-                                          const char *replystr)
-{
-    GString *response = g_string_new("");
-
-    g_string_printf(response,
-                    "%s %d %s" EL,
-                    protostr, code, replystr);
-
-    return response;
-}
-
-/**
  * @brief Create a new response for a protocol with a given reply
  *
  * @param proto Protocol to write the response for.
  * @param reply Protocol reply to use for code and message.
  */
-GString *protocol_response_new_reply(Protocol proto,
+GString *protocol_response_new(Protocol proto,
                                      ProtocolReply reply)
 {
-    return protocol_response_new_int(protocols_strings[proto],
-                                     reply.code,
-                                     reply.message);
+    GString *response = g_string_new("");
+
+    g_string_printf(response,
+                    "%s %d %s" EL,
+                    protocols_strings[proto],
+                    reply.code,
+                    reply.message);
+
+    return response;
 }
 
 /**

@@ -41,7 +41,7 @@ typedef enum {
     RTSP_1_0 //!< RTSP/1.0
 } Protocol;
 
-GString *protocol_response_new_reply(Protocol proto, ProtocolReply reply);
+GString *protocol_response_new(Protocol proto, ProtocolReply reply);
 
 void protocol_append_header(GString *response, const char *header);
 void protocol_append_header_uint(GString *response, const char *header,
