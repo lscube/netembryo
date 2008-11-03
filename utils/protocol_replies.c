@@ -89,6 +89,45 @@ ProtocolReply reply_build_custom(uint16_t code, bool error,
  */
 ProtocolReply reply_get_rtsp(uint16_t code)
 {
+#define BIGTABLE
+#ifdef BIGTABLE
+    static const ProtocolReply *const table[] = {
+        [100] = &RTSP_Continue,
+        [200] = &RTSP_Ok,
+        [201] = &RTSP_Created,
+        [202] = &RTSP_Accepted,
+        [400] = &RTSP_BadRequest,
+        [403] = &RTSP_Forbidden,
+        [404] = &RTSP_NotFound,
+        [406] = &RTSP_NotAcceptable,
+        [415] = &RTSP_UnsupportedMedia,
+        [451] = &RTSP_ParameterNotUnderstood,
+        [453] = &RTSP_NotEnoughBandwidth,
+        [454] = &RTSP_SessionNotFound,
+        [455] = &RTSP_InvalidMethodInState,
+        [456] = &RTSP_HeaderFieldNotValidforResource,
+        [457] = &RTSP_InvalidRange,
+        [461] = &RTSP_UnsupportedTransport,
+        [500] = &RTSP_InternalServerError,
+        [501] = &RTSP_NotImplemented,
+        [503] = &RTSP_ServiceUnavailable,
+        [505] = &RTSP_VersionNotSupported,
+        [551] = &RTSP_OptionNotSupported
+    };
+
+    if ( code < 100 ||
+         code > sizeof(table)/sizeof(table[0]) ||
+         table[code] == NULL ) {
+        /* Since we don't know this error code, return an ISE instead.
+         * But since this is an error condition, assert out so
+         * that we kill ourselves during debug instead.
+         */
+        assert(false);
+        return RTSP_InternalServerError;
+    } else {
+        return *table[code];
+    }
+#else
     switch (code)
     {
         case 100:
@@ -141,6 +180,7 @@ ProtocolReply reply_get_rtsp(uint16_t code)
             assert(false);
             return RTSP_InternalServerError;
     }
+#endif
 }
 
 /**
