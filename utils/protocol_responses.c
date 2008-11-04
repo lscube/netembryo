@@ -43,8 +43,8 @@ static const char protocols_strings[][16] = {
  * @param proto Protocol to write the response for.
  * @param reply Protocol reply to use for code and message.
  */
-GString *protocol_response_new(Protocol proto,
-                                     ProtocolReply reply)
+GString *protocol_response_new(const Protocol proto,
+                               const ProtocolReply reply)
 {
     GString *response = g_string_new("");
 
@@ -79,7 +79,7 @@ void protocol_append_header(GString *response, const char *header)
  * @param value The value of the header to append
  */
 void protocol_append_header_uint(GString *response, const char *header,
-                                 guint value)
+                                 const guint value)
 {
     g_string_append_printf(response, "%s: %u" EL,
                            header, value);
