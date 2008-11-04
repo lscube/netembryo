@@ -28,7 +28,6 @@
 #ifndef _NETEMBRYO_PROTOCOL_RESPONSES_H_
 #define _NETEMBRYO_PROTOCOL_RESPONSES_H_
 
-#include <netembryo/protocol_replies.h>
 #include <glib.h>
 
 /**
@@ -41,7 +40,31 @@ typedef enum {
     RTSP_1_0 //!< RTSP/1.0
 } Protocol;
 
-GString *protocol_response_new(const Protocol proto, const ProtocolReply reply);
+typedef enum {
+    RTSP_Continue = 100,
+    RTSP_Ok = 200,
+    RTSP_Created = 201,
+    RTSP_Accepted = 202,
+    RTSP_BadRequest = 400,
+    RTSP_Forbidden = 403,
+    RTSP_NotFound = 404,
+    RTSP_NotAcceptable = 406,
+    RTSP_UnsupportedMedia = 415,
+    RTSP_ParameterNotUnderstood = 451,
+    RTSP_NotEnoughBandwidth = 453,
+    RTSP_SessionNotFound = 454,
+    RTSP_InvalidMethodInState = 455,
+    RTSP_HeaderFieldNotValidforResource = 456,
+    RTSP_InvalidRange = 457,
+    RTSP_UnsupportedTransport = 461,
+    RTSP_InternalServerError = 500,
+    RTSP_NotImplemented = 501,
+    RTSP_ServiceUnavailable = 503,
+    RTSP_VersionNotSupported = 505,
+    RTSP_OptionNotSupported = 551
+} RTSP_ResponseCode;
+
+GString *protocol_response_new(const Protocol proto, const guint16 code);
 
 void protocol_append_header(GString *response, const char *header);
 void protocol_append_header_uint(GString *response, const char *header,

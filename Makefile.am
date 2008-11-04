@@ -10,7 +10,6 @@ lib_LTLIBRARIES = libnetembryo.la
 
 pkginclude_HEADERS =    netembryo/wsocket.h \
 			netembryo/url.h \
-			netembryo/protocol_replies.h \
 			netembryo/protocol_responses.h
 
 libnetembryo_la_SOURCES =

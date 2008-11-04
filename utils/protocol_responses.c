@@ -22,6 +22,8 @@
 
 #include "protocol_responses.h"
 
+#include <assert.h>
+
 /** End of line macro */
 #define EL "\r\n"
 
@@ -38,21 +40,61 @@ static const char protocols_strings[][16] = {
 };
 
 /**
+ * @brief Table of default response text for protocols
+ *
+ * This table contains the default response for a given code for each protocol
+ * supported.
+ *
+ * It is indexed first by protocol then by three-digits response code
+ *
+ * @todo Provide a size-optimised alternative.
+ */
+static const char *const responses[][1000] = {
+    [RTSP_1_0] = {
+        [100] = "Continue",
+        [200] = "OK",
+        [201] = "Created",
+        [202] = "Accepted",
+        [400] = "Bad Request",
+        [403] = "Forbidden",
+        [404] = "Not Found",
+        [406] = "Not Acceptable",
+        [415] = "Unsupported Media Type",
+        [451] = "Parameter Not Understood",
+        [453] = "Not Enough Bandwith",
+        [454] = "Session Not Found",
+        [455] = "Method Not Valid In This State",
+        [456] = "Header Field Not Valid for Resource",
+        [457] = "Invalid Range",
+        [461] = "Unsupported Transport",
+        [500] = "Internal Server Error",
+        [501] = "Not Implemented",
+        [503] = "Service Unavailable",
+        [505] = "RTSP Version Not Supported",
+        [551] = "Option not supported",
+        [999] = NULL
+    }
+};
+
+/**
  * @brief Create a new response for a protocol with a given reply
  *
  * @param proto Protocol to write the response for.
  * @param reply Protocol reply to use for code and message.
  */
 GString *protocol_response_new(const Protocol proto,
-                               const ProtocolReply reply)
+                               const guint16 code)
 {
     GString *response = g_string_new("");
+
+    /* make sure the code is valid and we don't exceed our boundaries. */
+    assert(100 <= code && code <= 999);
 
     g_string_printf(response,
                     "%s %d %s" EL,
                     protocols_strings[proto],
-                    reply.code,
-                    reply.message);
+                    code,
+                    responses[proto][code]);
 
     return response;
 }
