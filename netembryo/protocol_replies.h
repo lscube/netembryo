@@ -66,6 +66,7 @@ extern const ProtocolReply RTSP_UnsupportedMedia;
 extern const ProtocolReply RTSP_ParameterNotUnderstood;
 extern const ProtocolReply RTSP_NotEnoughBandwidth;
 extern const ProtocolReply RTSP_SessionNotFound;
+extern const ProtocolReply RTSP_InvalidMethodInState;
 extern const ProtocolReply RTSP_HeaderFieldNotValidforResource;
 extern const ProtocolReply RTSP_InvalidRange;
 extern const ProtocolReply RTSP_UnsupportedTransport;
