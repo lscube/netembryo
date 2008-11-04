@@ -35,8 +35,6 @@ int main() {
 
   add_testcases_hostname(s);
   add_testcases_url(s);
-  add_testcases_url_encode(s);
-  add_testcases_url_decode(s);
   add_testcases_sock(s);
 
   SRunner *sr = srunner_create (s);

@@ -44,8 +44,6 @@ typedef struct
 
 int Url_init(Url * url, char * urlname);
 void Url_destroy(Url * url);
-int Url_decode (char *decoded_string, const char *source_string, size_t decoded_string_size);
-int Url_encode (char *encoded_string, const char *source_string, size_t encoded_string_size);
 
 /**
  * @}
