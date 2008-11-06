@@ -25,21 +25,14 @@
  * @brief Functions to generate protocol responses (HTTP and RTSP)
  */
 
-#ifndef _NETEMBRYO_PROTOCOL_RESPONSES_H_
-#define _NETEMBRYO_PROTOCOL_RESPONSES_H_
-
-#include <glib.h>
+#ifndef _NETEMBRYO_RTSP_H_
+#define _NETEMBRYO_RTSP_H_
 
 /**
- * @brief List of protocols supported by the library
+ * @brief Status codes for RTSP responses.
  *
- * @todo This right now only allows RTSP/1.0 but this is supposed to be generic,
- * so there might be more in the future.
+ * The list is derived from the list in RFC2326, sections 7.1.1 and 11.
  */
-typedef enum {
-    RTSP_1_0 //!< RTSP/1.0
-} Protocol;
-
 typedef enum {
     RTSP_Continue = 100,
     RTSP_Ok = 200,
@@ -64,10 +57,6 @@ typedef enum {
     RTSP_OptionNotSupported = 551
 } RTSP_ResponseCode;
 
-GString *protocol_response_new(const Protocol proto, const guint16 code);
-
-void protocol_append_header(GString *response, const char *header);
-void protocol_append_header_uint(GString *response, const char *header,
-                                 const guint value);
+const char *rtsp_reason_phrase(RTSP_ResponseCode code);
 
 #endif
