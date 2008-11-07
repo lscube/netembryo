@@ -8,8 +8,5 @@ libutils_la_LDFLAGS =
 libutils_la_SOURCES =		url.c \
 				rtsp.c
 
-libutils_la_CFLAGS = $(GLIB_CFLAGS)
-
-
 INCLUDES = -I$(netembryoincludedir) -I$(top_srcdir)
 
