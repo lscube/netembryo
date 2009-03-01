@@ -28,7 +28,6 @@
 #include <config.h>
 #include <string.h>
 #include "wsocket.h"
-#include "ssl.h"
 #include "wsocket-internal.h"
 
 #ifndef WIN32
@@ -36,7 +35,7 @@
 #endif
 
 #if ENABLE_SSL
-#include <openssl/ssl.h>
+#include "ssl.h"
 #endif
 
 /**

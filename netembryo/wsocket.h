@@ -98,6 +98,7 @@ typedef struct {
     in_port_t remote_port;    ///< remote port stored in host order
     in_port_t local_port;    ///< local port stored in host order
     void *ssl; ///< stores ssl context information
+    void *data; ///< user data
 } Sock;
 
 #define WSOCK_ERRORPROTONOSUPPORT -5    
