@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.61)
 
 dnl Process this file with autoconf to produce a configure script.
-dnl 
+dnl
 dnl immediately before every release do:
 dnl ===================================
 dnl if (the interface is totally unchanged from previous release)
@@ -16,7 +16,7 @@ dnl       *_lt_age ++;
 dnl    if (any interfaces have been _removed_ or _incompatibly changed_)
 dnl       *_lt_age = 0;
 dnl }
-dnl 
+dnl
 dnl If you want to know more about what you are doing, here are some details:
 dnl  * *_lt_current is the current API version
 dnl  * *_lt_revision is an internal revision number which is increased when
@@ -41,7 +41,7 @@ m4_define([netembryo_lt_revision], [0])
 m4_define([netembryo_lt_current], [8])
 m4_define([netembryo_lt_age],     [8])
 
-AC_INIT([netembryo], [netembryo_version], [http://streaming.polito.it])
+AC_INIT([netembryo], [netembryo_version], [http://www.lscube.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(m4)

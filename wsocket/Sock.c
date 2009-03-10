@@ -1,9 +1,9 @@
-/* * 
+/* *
  * * This file is part of NetEmbryo
  *
- * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
+ * Copyright (C) 2009 by LScube team <team@lscube.org>
  * See AUTHORS for more details
- * 
+ *
  * NetEmbryo is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with NetEmbryo; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *  
+ *
  * */
 
 /**
@@ -43,7 +43,7 @@
  */
 
 static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
-{   
+{
     switch (family) {
         case AF_INET: {
             struct in_addr *in;
@@ -62,7 +62,7 @@ static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
             return -1;
 #endif
 #ifdef  HAVE_SOCKADDR_DL_STRUCT
-        case AF_LINK: 
+        case AF_LINK:
             return -1;
 #endif
         default:
@@ -115,7 +115,7 @@ Sock * Sock_accept(Sock *s, void * octx)
         net_log(NET_LOG_FATAL,
                 "Unable to allocate a Sock struct in Sock_accept().\n");
 #if ENABLE_SSL
-        if(ctx) 
+        if(ctx)
             SSL_close_connection(ssl_con, res);
 #endif
         sock_close(res);
@@ -127,7 +127,7 @@ Sock * Sock_accept(Sock *s, void * octx)
     new_s->flags = s->flags;
 
 #if ENABLE_SSL
-    if(ctx) 
+    if(ctx)
         new_s->ssl = ssl_con;
 #endif
 
@@ -334,7 +334,7 @@ int Sock_compare(Sock *p, Sock *q)
     return memcmp(p, q, sizeof(Sock));
 }
 
-/** 
+/**
  * Establish a connection to a remote host.
  * @param host Remote host to connect to (may be a hostname).
  * @param port Remote port to connect to.
@@ -388,7 +388,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     } else if (!(s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if ENABLE_SSL
-        if(ctx) 
+        if(ctx)
             SSL_close_connection(ssl_con, sockfd);
 #endif
         sock_close (sockfd);
@@ -399,7 +399,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     s->socktype = socktype;
 #if ENABLE_SSL
     s->ssl = NULL;
-    if(ctx) 
+    if(ctx)
         s->ssl = ssl_con;
 #endif
     s->flags = 0;
@@ -448,7 +448,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 
     if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
         memset(remote_host, 0, sizeof(remote_host));
-    
+
     if (!(s->remote_host = strdup(remote_host))) {
         net_log(NET_LOG_FATAL,
                 "Unable to allocate remote host in Sock_connect().\n");
@@ -528,7 +528,7 @@ void net_log(int level, const char *fmt, ...)
     va_end(vl);
 }
 
-/** 
+/**
  * Init internal structures.
  * @param log_function Pointer to a proper log function, if NULL messages will
  * be sent to stderr.
@@ -621,7 +621,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     return -1;
 }
 
-/** 
+/**
  * Change destination address for a non connected protocol socket (like UDP).
  * @param s Existing non connected socket.
  * @param dst Destination address.
@@ -681,7 +681,7 @@ int Sock_socketpair(Sock *pair[]) {
         net_log(NET_LOG_ERR, "Sock_socketpair() failure.\n");
         return res;
     }
-    
+
     if (!(pair[0] = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL,
                 "Unable to allocate first Sock struct in Sock_socketpair().\n");
@@ -729,7 +729,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     if(s->ssl)
         return SSL_sock_write(s->ssl, buffer, nbytes);
     else {
-#endif        
+#endif
         switch (s->socktype) {
         case TCP:
             return send(s->fd, buffer, nbytes, flags);
@@ -738,7 +738,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
             if (!protodata) {
                 protodata = &(s->remote_stg);
             }
-            return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *) 
+            return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *)
                     protodata, sizeof(struct sockaddr_storage));
             break;
         case SCTP:
@@ -747,7 +747,7 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
                 protodata = &sinfo;
                 memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
             }
-            return sctp_send(s->fd, buffer, nbytes, 
+            return sctp_send(s->fd, buffer, nbytes,
                 (struct sctp_sndrcvinfo *) protodata, flags);
 #endif
             break;
@@ -759,6 +759,6 @@ int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         }
 #if ENABLE_SSL
     }
-#endif        
+#endif
     return -1;
 }

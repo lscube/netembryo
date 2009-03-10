@@ -1,7 +1,7 @@
 /* *
  *  This file is part of Feng
  *
- * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
+ * Copyright (C) 2009 by LScube team <team@lscube.org>
  * See AUTHORS for more details
  *
  * Feng is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@
  * @param : cert verification mode @see SSL_CTX_set_verify
  * @return: 0 on success;
  */
-SSL_CTX * Sock_init_ctx(char *key, char * cafile, char * capath) 
+SSL_CTX * Sock_init_ctx(char *key, char * cafile, char * capath)
 {
     SSL_CTX *global_ctx = NULL;
     char cipher[] = "ALL:eNULL";

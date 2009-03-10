@@ -1,9 +1,9 @@
-/* * 
+/* *
  * This file is part of NetEmbryo
  *
- * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
+ * Copyright (C) 2009 by LScube team <team@lscube.org>
  * See AUTHORS for more details
- * 
+ *
  * NetEmbryo is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -16,7 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with NetEmbryo; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA 
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * */
 
@@ -25,8 +25,8 @@
  * socket wrapper
  */
 
-#ifndef WSOCKET_H
-#define WSOCKET_H
+#ifndef NETEMBRYO_WSOCKET_H
+#define NETEMBRYO_WSOCKET_H
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -81,7 +81,7 @@ typedef enum {
     LOCAL
 } sock_type;
 
-/** 
+/**
  * Socket abstraction structure
  */
 typedef struct {
@@ -101,10 +101,10 @@ typedef struct {
     void *data; ///< user data
 } Sock;
 
-#define WSOCK_ERRORPROTONOSUPPORT -5    
-#define WSOCK_ERRORIOCTL    -4    
-#define WSOCK_ERRORINTERFACE    -3    
-#define WSOCK_ERROR    -2    
+#define WSOCK_ERRORPROTONOSUPPORT -5
+#define WSOCK_ERRORIOCTL    -4
+#define WSOCK_ERRORINTERFACE    -3
+#define WSOCK_ERROR    -2
 #define WSOCK_ERRFAMILYUNKNOWN    -1
 #define WSOCK_OK 0
 #define WSOCK_ERRSIZE    1
@@ -117,18 +117,18 @@ typedef struct {
  * Sock_init() */
 void net_log(int, const char*, ...);
 /* levels to be implemented by log function */
-#define NET_LOG_FATAL 0 
+#define NET_LOG_FATAL 0
 #define NET_LOG_ERR 1
-#define NET_LOG_WARN 2 
-#define NET_LOG_INFO 3 
-#define NET_LOG_DEBUG 4 
-#define NET_LOG_VERBOSE 5 
+#define NET_LOG_WARN 2
+#define NET_LOG_INFO 3
+#define NET_LOG_DEBUG 4
+#define NET_LOG_VERBOSE 5
 
 /** @defgroup NetEmbryo_Socket Sockets Access Interface
  *
  * @brief simple socket abstraction.
  *
- * @{ 
+ * @{
  */
 
 Sock * Sock_connect(char const *host, char const *port, Sock *binded, sock_type socktype, void * ctx);
@@ -170,5 +170,5 @@ in_port_t get_local_port(Sock *);
 /**
  * @}
  */
- 
-#endif // WSOCKET_H
+
+#endif // NETEMBRYO_WSOCKET_H

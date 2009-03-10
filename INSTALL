@@ -33,10 +33,10 @@ softwares:
 - git >= 1.5 [4]
 - autotools (automake >= 1.9, autoconf >= 2.61) [5]
 
-The sources reside at git://live.polito.it/var/git/netembryo.git you can fetch
+The sources reside at git://git.lscube.org/netembryo.git you can fetch
 them by issuing
 
-$ git clone git://live.polito.it/var/git/netembryo.git
+$ git clone git://git.lscube.org/netembryo.git
 
 Please refer to the git website[4] and our site[0] for further documentation.
 
@@ -49,7 +49,7 @@ The standard build instruction applies form this step.
 
 + Links
 
-[0] http://live.polito.it/                      -- LScube main website
+[0] http://www.lscube.org/                      -- LScube main website
 
 [1] http://www.gnu.org/software/gcc/            -- GNU Compiler collection
     http://www.gnu.org/software/libtool/        -- GNU Libtool

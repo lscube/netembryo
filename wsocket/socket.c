@@ -1,9 +1,9 @@
-/* * 
+/* *
  * * This file is part of NetEmbryo
  *
- * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
+ * Copyright (C) 2009 by LScube team <team@lscube.org>
  * See AUTHORS for more details
- * 
+ *
  * NetEmbryo is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with NetEmbryo; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *  
+ *
  * */
 
 /**
@@ -30,17 +30,17 @@
 #include <string.h>
 /**
  * wraps accept
- * @return -1 on error 
+ * @return -1 on error
  * @return the socket descriptor
  * @note doesn't shutdown the listened one
  **/
 
 int sock_accept(int sock)
 {
-    int new_fd;      
+    int new_fd;
     struct sockaddr_in their_addr; /* connector's address information */
     socklen_t sin_size;
-    
+
     memset(&their_addr, 0, sizeof(struct sockaddr_in));
 
     sin_size = sizeof(struct sockaddr_in);
@@ -96,10 +96,10 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
     }
 
     if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
-        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));    
+        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));
         return WSOCK_ERRADDR;
     }
-    
+
     ressave = res;
     bind_new = (*sock < 0);
 
@@ -134,7 +134,7 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
         }
 #endif
                 if (setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, &param,
-                    sizeof(int))) 
+                    sizeof(int)))
                         net_log(NET_LOG_ERR,
                                 "setsockopts(SO_REUSEADDR) failed");
 
@@ -210,10 +210,10 @@ int sock_connect(char const *host, char const *port, int *sock, sock_type sockty
     }
 
     if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
-        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));    
+        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));
         return WSOCK_ERRADDR;
     }
-    
+
     ressave = res;
 
     connect_new = (*sock < 0);
@@ -280,14 +280,14 @@ int sock_get_port(const struct sockaddr *sa)
     switch (sa->sa_family) {
         case AF_INET: {
             struct sockaddr_in    *sin = (struct sockaddr_in *) sa;
-    
+
             return(sin->sin_port);
         }
 
 #ifdef    IPV6
         case AF_INET6: {
             struct sockaddr_in6    *sin6 = (struct sockaddr_in6 *) sa;
-    
+
             return(sin6->sin6_port);
         }
 #endif
