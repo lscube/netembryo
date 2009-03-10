@@ -41,7 +41,7 @@ m4_define([netembryo_lt_revision], [0])
 m4_define([netembryo_lt_current], [8])
 m4_define([netembryo_lt_age],     [8])
 
-AC_INIT([netembryo], [netembryo_version], [http://streaming.polito.it])
+AC_INIT([netembryo], [netembryo_version], [http://lscube.org])
 
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(m4)

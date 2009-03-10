@@ -1,7 +1,7 @@
 /* * 
  * * This file is part of NetEmbryo
  *
- * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
+ * Copyright (C) 2009 by LScube team <team@lscube.org>
  * See AUTHORS for more details
  * 
  * NetEmbryo is free software; you can redistribute it and/or

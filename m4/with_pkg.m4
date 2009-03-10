@@ -1,6 +1,6 @@
 dnl with_pkg.m4 - Macros to ease the usage of pkg-config.    -*- Autoconf -*-
 dnl 
-dnl Copyright © 2008 Luca Barbato <lu_zero@gentoo.org>,
+dnl Copyright © 2009 Luca Barbato <lu_zero@gentoo.org>,
 dnl                  Diego Pettenò <flameeyes@gentoo.org>
 dnl
 dnl This program is free software; you can redistribute it and/or modify

@@ -1,6 +1,6 @@
 dnl Macros to check the presence of generic (non-typed) symbols.
-dnl Copyright (c) 2006-2007 Diego Pettenò <flameeyes@gmail.com>
-dnl Copyright (c) 2006-2007 xine project
+dnl Copyright (c) 2006-2009 Diego Pettenò <flameeyes@gmail.com>
+dnl Copyright (c) 2006-2009 xine project
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
