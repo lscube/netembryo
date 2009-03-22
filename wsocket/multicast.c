@@ -35,7 +35,9 @@
 #   include <net/if.h>
 #endif
 
-#ifdef _DARWIN_C_SOURCE
+/* The following defines are needed to emulate the Linux interface on
+ * BSD-based systems like FreeBSD and OS X */
+#if !defined(IPV6_ADD_MEMBERSHIP) && defined(IPV6_JOIN_GROUP)
 #define IPV6_ADD_MEMBERSHIP IPV6_JOIN_GROUP
 #define IPV6_DROP_MEMBERSHIP IPV6_LEAVE_GROUP
 #endif
