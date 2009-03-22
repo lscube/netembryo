@@ -5,10 +5,10 @@ AC_DEFUN([LSC_CHECK_SCTP], [
     AS_HELP_STRING([--enable-sctp], [enable SCTP support [[default=yes]]]),,
 	enable_sctp="yes")
 
-  AC_MSG_CHECKING([whether to enable SCTP support])  
+  AC_MSG_CHECKING([whether to enable SCTP support])
   AS_IF([test "x$enable_sctp" = "xyes"], [
     AC_MSG_RESULT([yes, checking prerequisites])
-    
+
     AC_CHECK_TYPE([struct sctp_sndrcvinfo], [
         AC_CHECK_LIB(sctp,sctp_recvmsg, [
           SCTP_LIBS="-lsctp"
