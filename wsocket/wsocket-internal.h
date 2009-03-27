@@ -28,7 +28,7 @@
 #ifndef WSOCKET_INTERNAL_H
 #define WSOCKET_INTERNAL_H
 
-#ifdef HAVE_LIBSCTP
+#ifdef HAVE_SCTP
 #include <netinet/sctp.h>
 #define MAX_SCTP_STREAMS 15
 #endif
