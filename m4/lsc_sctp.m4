@@ -10,11 +10,14 @@ AC_DEFUN([LSC_CHECK_SCTP], [
     AC_MSG_RESULT([yes, checking prerequisites])
 
     AC_CHECK_TYPE([struct sctp_sndrcvinfo], [
-        AC_CHECK_LIB(sctp,sctp_recvmsg, [
-          SCTP_LIBS="-lsctp"
+        save_LIBS="$LIBS"
+        AC_SEARCH_LIBS([sctp_recvmsg], [sctp], [
+          SCTP_LIBS="${LIBS%${save_LIBS}}"
 	  have_sctp=yes
 	  AC_DEFINE([HAVE_LIBSCTP], [1], [Define this if you have libsctp])
-	])],
+	])
+	LIBS="$save_LIBS"
+	],
       AC_MSG_WARN([SCTP disabled: headers not found]),
       [#include <netinet/sctp.h>
       ])
