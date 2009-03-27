@@ -28,6 +28,15 @@
 #include "wsocket.h"
 #include "wsocket-internal.h"
 #include <string.h>
+
+#ifdef HAVE_LIBSCTP
+/* FreeBSD and Mac OS X don't have SOL_SCTP and re-use IPPROTO_SCTP
+   for setsockopt() */
+# if !defined(SOL_SCTP)
+#  define SOL_SCTP IPPROTO_SCTP
+# endif
+#endif
+
 /**
  * wraps accept
  * @return -1 on error
