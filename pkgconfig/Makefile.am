@@ -8,8 +8,5 @@ endif
 
 CLEANFILES = libnetembryo-sctp.pc libnetembryo-sctp-uninstalled.pc
 
-libnetembryo-sctp.pc: libnetembryo.pc
-	ln -s $< $@
-
-libnetembryo-sctp-uninstalled.pc: libnetembryo-uninstalled.pc
+libnetembryo-sctp%: libnetembryo%
 	ln -s $< $@
