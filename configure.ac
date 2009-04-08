@@ -38,8 +38,8 @@ m4_define([netembryo_version],
           [netembryo_major_version.netembryo_minor_version.netembryo_micro_version])
 
 m4_define([netembryo_lt_revision], [0])
-m4_define([netembryo_lt_current], [8])
-m4_define([netembryo_lt_age],     [8])
+m4_define([netembryo_lt_current], [9])
+m4_define([netembryo_lt_age],     [0])
 
 AC_INIT([netembryo], [netembryo_version], [http://www.lscube.org])
 
