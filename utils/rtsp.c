@@ -53,6 +53,7 @@ static const char *const rtsp_responses[1000] = {
     [456] = "Header Field Not Valid for Resource",
     [457] = "Invalid Range",
     [459] = "Aggregate Operation Not Allowed",
+    [460] = "Only Aggregate Operation Allowed",
     [461] = "Unsupported Transport",
     [500] = "Internal Server Error",
     [501] = "Not Implemented",
