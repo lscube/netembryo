@@ -49,6 +49,7 @@ typedef enum {
     RTSP_InvalidMethodInState = 455,
     RTSP_HeaderFieldNotValidforResource = 456,
     RTSP_InvalidRange = 457,
+    RTSP_AggregateNotAllowed = 459,
     RTSP_UnsupportedTransport = 461,
     RTSP_InternalServerError = 500,
     RTSP_NotImplemented = 501,
