@@ -18,10 +18,6 @@ libnetembryo_la_LIBADD = \
 	wsocket/libwsocket.la \
 	utils/libutils.la
 
-if HAVE_SCTP
-libnetembryo_la_LIBADD += $(SCTP_LIBS)
-endif
-
 libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 ACLOCAL_AMFLAGS = -I m4
