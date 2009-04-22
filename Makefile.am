@@ -9,6 +9,7 @@ EXTRA_DIST = Doxyfile
 lib_LTLIBRARIES = libnetembryo.la
 
 pkginclude_HEADERS =    netembryo/wsocket.h \
+			netembryo/wsocket-internal.h \
 			netembryo/url.h \
 			netembryo/rtsp.h
 

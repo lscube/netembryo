@@ -30,7 +30,7 @@ dnl    libname.so.(*_lt_current - *_lt_age).*_lt_age.*_lt_revision
 
 m4_define([netembryo_major_version], [0])
 m4_define([netembryo_minor_version], [1])
-m4_define([netembryo_micro_version], [0])
+m4_define([netembryo_micro_version], [1])
 m4_define([netembryo_interface_age], [0])
 m4_define([netembryo_binary_age],
           [m4_eval(100 * netembryo_minor_version + netembryo_micro_version)])
