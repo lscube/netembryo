@@ -115,7 +115,7 @@ LSC_DEBUG_STATUS
 AC_MSG_NOTICE([config files successfully generated!
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
-NetEmbryo sctp support enabled .... : $enable_sctp
+NetEmbryo sctp support enabled .... : $have_sctp
 NetEmbryo ssl support enabled ..... : $have_ssl
 
  'make' will now compile NetEmbryo and 'su -c make install' will install it.
