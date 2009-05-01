@@ -28,7 +28,7 @@
 START_TEST (test_connect_lscube)
 {
   Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
-  
+
   fail_if(socket == NULL,
 	  "Unable to connect");
 
@@ -113,7 +113,7 @@ END_TEST
 
 void add_testcases_sock(Suite *s) {
   TCase *tc = tcase_create("Socket interface tests");
-  
+
   tcase_add_test(tc, test_connect_lscube);
   tcase_add_test(tc, test_remote_host_lscube);
   /* this has to be fixed, as it reports the local host IP rather than

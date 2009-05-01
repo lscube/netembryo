@@ -31,13 +31,13 @@ START_TEST(local_hostname)
 
   FILE *hn_fd = popen("hostname", "r");
   size_t len = fread(hostname_output, 1, sizeof(hostname_output)-1, hn_fd);
-  
+
   fail_unless(feof(hn_fd), "Hostname too long for buffer");
   fclose(hn_fd);
 
   fail_if(get_local_hostname(hostname_buffer, sizeof(hostname_buffer)-1),
 	  "Unable to get local hostname");
-  
+
   /* Skip the last character read from hostname(1) as it's a newline */
   fail_if(strncmp(hostname_output, hostname_buffer, len-1),
 	  "The hostname does not corrispond to the retrieved one ('%s' vs '%s')",
@@ -47,8 +47,8 @@ END_TEST
 
 void add_testcases_hostname(Suite *s) {
   TCase *tc = tcase_create("Hostname tests");
-  
+
   tcase_add_test(tc, local_hostname);
-  
+
   suite_add_tcase(s, tc);
 }

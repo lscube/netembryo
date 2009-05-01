@@ -1,9 +1,9 @@
-/* * 
+/* *
  * * This file is part of NetEmbryo
  *
  * Copyright (C) 2007 by LScube team <team@streaming.polito.it>
  * See AUTHORS for more details
- * 
+ *
  * NetEmbryo is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU Lesser General Public
  * License along with NetEmbryo; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
- *  
+ *
  * */
 
 #include "wsocket.h"
@@ -73,7 +73,7 @@ in_port_t get_remote_port(Sock *s)
 in_port_t get_local_port(Sock *s)
 {
     int32_t port;
-    
+
     if(!(s->local_port)) {
         if((port = sock_get_port((struct sockaddr *)&(s->local_stg))) < 0)
             return 0;

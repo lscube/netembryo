@@ -36,7 +36,7 @@ static void test_url(char * url, char * protocol, char * hostname, char * port, 
     else if ( protocol && protocol )
       fail_unless(strcmp(turl.protocol, protocol) == 0,
 		  "Protocol identified differs from specified: '%s' vs '%s'", turl.protocol, protocol);
-    
+
     if ( hostname && !turl.hostname )
       fail("Expected hostname specified, but no hostname identified");
     else if ( !hostname && turl.hostname )
@@ -52,7 +52,7 @@ static void test_url(char * url, char * protocol, char * hostname, char * port, 
     else if ( port && port )
       fail_unless(strcmp(turl.port, port) == 0,
 		  "Port identified differs from specified: '%s' vs '%s'", turl.port, port);
-    
+
     if ( path && !turl.path )
       fail("Expected path specified, but no path identified");
     else if ( !path && turl.path )
@@ -60,7 +60,7 @@ static void test_url(char * url, char * protocol, char * hostname, char * port, 
     else if ( path && path )
       fail_unless(strcmp(turl.path, path) == 0,
 		  "Path identified differs from specified: '%s' vs '%s'", turl.path, path);
-    
+
     Url_destroy(&turl);
 }
 
@@ -109,7 +109,7 @@ END_TEST
 
 void add_testcases_url(Suite *s) {
   TCase *tc = tcase_create("URL handling tests");
-  
+
   tcase_add_test(tc, long_url);
   tcase_add_test(tc, split_url);
   tcase_add_test(tc, no_proto);
