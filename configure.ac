@@ -89,8 +89,23 @@ PKG_WITH_MODULES([OPENSSL], [openssl >= 0.9.8],
 AC_SUBST(OPENSSL_REQUIRES)
 AM_CONDITIONAL(ENABLE_SSL, [test "$have_ssl" = "yes"])
 
-PKG_HAVE_WITH_MODULES([CHECK], [check],
-  [Enable unit testing with 'check'])
+AC_ARG_ENABLE([tests],
+  [AS_HELP_STRING([--enable-tests], [Enable test building (requires gawk, glib, ctags)])],
+  [], [enable_tests=auto])
+
+AS_IF([test "x$enable_tests" != "no"],
+  [have_tests=yes
+   PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.20], [], [have_tests=no])
+   AC_CHECK_PROGS([GAWK], [gawk])
+   AS_IF([test "x$GAWK" = "x"], [have_tests=no])
+   AC_CHECK_PROGS([EXUBERANT_CTAGS], [exuberant-ctags])
+   AS_IF([test "x$EXUBERANT_CTAGS" = "x"], [have_tests=no])
+  ])
+
+AS_IF([test "x$enable_tests" = "xyes" && test "x$have_tests" = "xno"],
+  [AC_MSG_ERROR([Required software for testing not found])])
+
+AM_CONDITIONAL([BUILD_TESTS], [test "x$have_tests" = "xyes"])
 
 LT_CURRENT=netembryo_lt_current
 LT_REVISION=netembryo_lt_revision
@@ -117,6 +132,7 @@ NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
 NetEmbryo sctp support enabled .... : $have_sctp
 NetEmbryo ssl support enabled ..... : $have_ssl
+NetEmbryo tests ................... : $have_tests
 
  'make' will now compile NetEmbryo and 'su -c make install' will install it.
  Note: On non-Linux systems you might need to use 'gmake' instead of 'make'.

@@ -1,5 +1,5 @@
 /* *
- * * This file is part of NetEmbryo
+ * * This file is part of NetEmbryo and feng
  *
  * Copyright (C) 2008 by LScube team <team@streaming.polito.it>
  * See AUTHORS for more details
@@ -20,27 +20,26 @@
  *
  * */
 
-#include <stdlib.h>
-#include <check.h>
+#ifndef GTEST_EXTRA_H
+#define GTEST_EXTRA_H
 
-extern void add_testcases_hostname(Suite *);
-extern void add_testcases_url(Suite *);
-extern void add_testcases_url_encode(Suite *);
-extern void add_testcases_url_decode(Suite *);
-extern void add_testcases_sock(Suite *);
+#include <glib.h>
 
-int main() {
-  int number_failed;
-  Suite *s = suite_create("Netembryo");
+#define gte_fail(...)                           \
+    do {                                        \
+        g_printerr(__VA_ARGS__);               \
+        g_assert_not_reached();                 \
+    } while(0)
 
-  add_testcases_hostname(s);
-  add_testcases_url(s);
-  add_testcases_sock(s);
+#define gte_fail_if(cond, ...)                  \
+    do {                                        \
+        if ( (cond) ) {                         \
+            g_printerr(__VA_ARGS__);            \
+            g_assert_not_reached();             \
+        }                                       \
+    } while(0)                                  \
 
-  SRunner *sr = srunner_create (s);
-  srunner_run_all (sr, CK_VERBOSE);
-  number_failed = srunner_ntests_failed (sr);
-  srunner_free (sr);
+#define gte_fail_unless(cond, ...)              \
+    gte_fail_if(!(cond), __VA_ARGS__)
 
-  return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
-}
+#endif

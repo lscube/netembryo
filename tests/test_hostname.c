@@ -21,10 +21,11 @@
  * */
 
 #include "netembryo/wsocket.h"
-#include <string.h>
-#include <check.h>
+#include <stdio.h>
+#include <glib.h>
+#include "gtest-extra.h"
 
-START_TEST(local_hostname)
+void test_local_hostname()
 {
   char hostname_output[1024] = { 0, };
   char hostname_buffer[1024] = { 0, };
@@ -32,23 +33,15 @@ START_TEST(local_hostname)
   FILE *hn_fd = popen("hostname", "r");
   size_t len = fread(hostname_output, 1, sizeof(hostname_output)-1, hn_fd);
 
-  fail_unless(feof(hn_fd), "Hostname too long for buffer");
+  gte_fail_if( !feof(hn_fd),
+               "Hostname too long for buffer");
   fclose(hn_fd);
 
-  fail_if(get_local_hostname(hostname_buffer, sizeof(hostname_buffer)-1),
-	  "Unable to get local hostname");
+  gte_fail_if( get_local_hostname(hostname_buffer, sizeof(hostname_buffer)-1),
+               "Unable to get local hostname");
 
   /* Skip the last character read from hostname(1) as it's a newline */
-  fail_if(strncmp(hostname_output, hostname_buffer, len-1),
-	  "The hostname does not corrispond to the retrieved one ('%s' vs '%s')",
-	  hostname_output, hostname_buffer);
-}
-END_TEST
+  hostname_output[len-1] = '\0';
 
-void add_testcases_hostname(Suite *s) {
-  TCase *tc = tcase_create("Hostname tests");
-
-  tcase_add_test(tc, local_hostname);
-
-  suite_add_tcase(s, tc);
+  g_assert_cmpstr(hostname_buffer, ==, hostname_output);
 }

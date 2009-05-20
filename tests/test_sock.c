@@ -21,9 +21,8 @@
  * */
 
 #include "netembryo/wsocket.h"
-#include <assert.h>
-#include <string.h>
-#include <check.h>
+#include <glib.h>
+#include "gtest-extra.h"
 
 /* Beacon used for testing echos from server */
 static const char test_beacon[] = "1234567890abcdefghijklmnopqrstuvwxyz";
@@ -33,171 +32,130 @@ static const char test_host[] = "www.lscube.org";
 static const char test_port[] = "80";
 static const char test_ipv4[] = "194.116.73.70";
 
-START_TEST (test_connect_lscube)
+void test_connect_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
 
-  fail_if(socket == NULL,
-	  "Unable to connect");
+  g_assert(socket);
 
   Sock_close(socket);
 }
-END_TEST
 
-START_TEST (test_remote_host_lscube)
+void test_remote_host_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   char *remote_host = get_remote_host(socket);
 
-  fail_if(strcmp(remote_host, test_ipv4) != 0,
-	  "Remote host is not %s: %s",
-      test_ipv4, remote_host);
+  g_assert_cmpstr(remote_host, ==, test_ipv4);
 
   Sock_close(socket);
 }
-END_TEST
 
-START_TEST (test_local_host_lscube)
+#if 0
+void test_local_host_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   char actual_local_host[1024];
   char *local_host = get_local_host(socket);
 
   /* There's a test for this already so just accept it to be fine */
-  assert(get_local_hostname(actual_local_host, sizeof(actual_local_host)) != -1);
+  g_assert(get_local_hostname(actual_local_host, sizeof(actual_local_host)) != -1);
 
-  fail_if(strcmp(local_host, actual_local_host) != 0,
-	  "Local host is not %s: %s",
-	  actual_local_host, local_host);
+  g_assert_cmpstr(local_host, ==, actual_local_host);
 
   Sock_close(socket);
 }
-END_TEST
+#endif
 
-START_TEST (test_remote_port_lscube)
+void test_remote_port_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   in_port_t remote_port = get_remote_port(socket);
 
-  fail_if(remote_port != 80,
-	  "Remote port is not 80: %u",
-	  remote_port);
+  g_assert_cmpint(remote_port, ==, 80);
 
   Sock_close(socket);
 }
-END_TEST
 
-START_TEST (test_local_port_lscube)
+void test_local_port_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   in_port_t local_port = get_local_port(socket);
 
-  fail_if(local_port == 0,
-	  "Null local port: %u", local_port);
+  g_assert_cmpint(local_port, !=, 0);
 
   Sock_close(socket);
 }
-END_TEST
 
-START_TEST (test_flags_lscube)
+void test_flags_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
-  fail_if(Sock_flags(socket) != 0x00,
-	  "Non-null socket flags: %x", Sock_flags(socket));
+
+  g_assert_cmphex(Sock_flags(socket), ==, 0x00);
 
   Sock_close(socket);
 }
-END_TEST
 
-START_TEST (test_type_lscube)
+void test_type_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
-  fail_if(Sock_type(socket) != TCP,
-	  "Non-TCP socket: %x", Sock_type(socket));
+
+  g_assert_cmphex(Sock_type(socket), ==, TCP);
 
   Sock_close(socket);
 }
-END_TEST
 
-START_TEST(test_socket_pair_forwards)
+void test_socket_pair_forwards()
 {
     char beacon_in[sizeof(test_beacon)] = { 0, };
     Sock *pair[2];
 
-    fail_if( Sock_socketpair(pair) != 0,
-            "Unable to create local socket pair");
+    g_assert_cmpint(Sock_socketpair(pair), ==, 0);
 
-    fail_if( Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
-             "Unable to write to local socket");
+    g_assert_cmpint(Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0),
+                    ==, sizeof(test_beacon));
 
-    fail_if( Sock_read(pair[1], beacon_in, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
-             "Unable to read from local socket");
+    g_assert_cmpint(Sock_read(pair[1], beacon_in, sizeof(test_beacon), NULL, 0),
+                    ==, sizeof(test_beacon));
 
-    fail_if( memcmp(test_beacon, beacon_in, sizeof(test_beacon)) != 0,
-             "Written and read data differ");
+    g_assert_cmpstr(test_beacon, ==, beacon_in);
 
     Sock_close(pair[0]);
     Sock_close(pair[1]);
 }
-END_TEST
 
-START_TEST(test_socket_pair_backwards)
+void test_socket_pair_backwards()
 {
     char beacon_in[sizeof(test_beacon)] = { 0, };
     Sock *pair[2];
 
-    fail_if( Sock_socketpair(pair) != 0,
-            "Unable to create local socket pair");
+    g_assert_cmpint(Sock_socketpair(pair), ==, 0);
 
-    fail_if( Sock_write(pair[1], test_beacon, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
-             "Unable to write to local socket");
+    g_assert_cmpint(Sock_write(pair[1], test_beacon, sizeof(test_beacon), NULL, 0),
+                    ==, sizeof(test_beacon));
 
-    fail_if( Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
-             "Unable to read from local socket");
+    g_assert_cmpint(Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, 0),
+                    ==, sizeof(test_beacon));
 
-    fail_if( memcmp(test_beacon, beacon_in, sizeof(test_beacon)) != 0,
-             "Written and read data differ");
+    g_assert_cmpstr(test_beacon, ==, beacon_in);
 
     Sock_close(pair[0]);
     Sock_close(pair[1]);
 }
-END_TEST
 
-START_TEST(test_socket_pair_crosstalk)
+void test_socket_pair_crosstalk()
 {
     char beacon_in[sizeof(test_beacon)] = { 0, };
     Sock *pair[2];
 
-    fail_if( Sock_socketpair(pair) != 0,
-            "Unable to create local socket pair");
+    g_assert_cmpint(Sock_socketpair(pair), ==, 0);
 
-    fail_if( Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
-             "Unable to write to local socket");
+    g_assert_cmpint(Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0),
+                    ==, sizeof(test_beacon));
 
-    fail_if( Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, MSG_DONTWAIT) > 0,
-             "Cross-talk in local socket");
+    g_assert_cmpint(Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, MSG_DONTWAIT),
+                    <=, 0);
 
     Sock_close(pair[0]);
     Sock_close(pair[1]);
-}
-END_TEST
-
-void add_testcases_sock(Suite *s) {
-  TCase *tc = tcase_create("Socket interface tests");
-
-  tcase_add_test(tc, test_connect_lscube);
-  tcase_add_test(tc, test_remote_host_lscube);
-  /* this has to be fixed, as it reports the local host IP rather than
-     name and we haven't an easy way to compare that, yet;
-  */
-  // tcase_add_test(tc, test_local_host_lscube);
-  tcase_add_test(tc, test_remote_port_lscube);
-  tcase_add_test(tc, test_local_port_lscube);
-  tcase_add_test(tc, test_flags_lscube);
-  tcase_add_test(tc, test_type_lscube);
-  tcase_add_test(tc, test_socket_pair_forwards);
-  tcase_add_test(tc, test_socket_pair_backwards);
-  tcase_add_test(tc, test_socket_pair_crosstalk);
-
-  suite_add_tcase(s, tc);
 }
