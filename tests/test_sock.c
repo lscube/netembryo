@@ -28,9 +28,14 @@
 /* Beacon used for testing echos from server */
 static const char test_beacon[] = "1234567890abcdefghijklmnopqrstuvwxyz";
 
+/* Change this if the lscube.org server changes */
+static const char test_host[] = "www.lscube.org";
+static const char test_port[] = "80";
+static const char test_ipv4[] = "194.116.73.70";
+
 START_TEST (test_connect_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
 
   fail_if(socket == NULL,
 	  "Unable to connect");
@@ -41,12 +46,12 @@ END_TEST
 
 START_TEST (test_remote_host_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   char *remote_host = get_remote_host(socket);
 
-  fail_if(strcmp(remote_host, "130.192.86.145") != 0,
-	  "Remote host is not 130.192.86.145: %s",
-	  remote_host);
+  fail_if(strcmp(remote_host, test_ipv4) != 0,
+	  "Remote host is not %s: %s",
+      test_ipv4, remote_host);
 
   Sock_close(socket);
 }
@@ -54,7 +59,7 @@ END_TEST
 
 START_TEST (test_local_host_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   char actual_local_host[1024];
   char *local_host = get_local_host(socket);
 
@@ -71,7 +76,7 @@ END_TEST
 
 START_TEST (test_remote_port_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   in_port_t remote_port = get_remote_port(socket);
 
   fail_if(remote_port != 80,
@@ -84,7 +89,7 @@ END_TEST
 
 START_TEST (test_local_port_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   in_port_t local_port = get_local_port(socket);
 
   fail_if(local_port == 0,
@@ -96,7 +101,7 @@ END_TEST
 
 START_TEST (test_flags_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   fail_if(Sock_flags(socket) != 0x00,
 	  "Non-null socket flags: %x", Sock_flags(socket));
 
@@ -106,7 +111,7 @@ END_TEST
 
 START_TEST (test_type_lscube)
 {
-  Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
   fail_if(Sock_type(socket) != TCP,
 	  "Non-TCP socket: %x", Sock_type(socket));
 
