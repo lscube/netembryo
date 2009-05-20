@@ -141,7 +141,7 @@ int Sock_listen(Sock *s, int backlog);
 
 int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
 
-int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
+int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags);
 
 int Sock_close(Sock *s);
 

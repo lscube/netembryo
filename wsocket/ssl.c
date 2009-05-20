@@ -165,7 +165,7 @@ int SSL_sock_read(SSL *ssl, void *buffer, int nbyte) {
  * @return: Number of bytes written
  */
 
-int SSL_sock_write(SSL *ssl, void *buffer, int nbyte) {
+int SSL_sock_write(SSL *ssl, const void *buffer, int nbyte) {
     return(SSL_write(ssl,buffer,nbyte));
 }
 

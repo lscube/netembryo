@@ -716,7 +716,7 @@ int Sock_socketpair(Sock *pair[]) {
  * @param flags Flags to be passed to posix send() function.
  */
 
-int Sock_write(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
+int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags)
 {
 #ifdef HAVE_SCTP
     struct sctp_sndrcvinfo sinfo;
