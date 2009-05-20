@@ -25,6 +25,9 @@
 #include <string.h>
 #include <check.h>
 
+/* Beacon used for testing echos from server */
+static const char test_beacon[] = "1234567890abcdefghijklmnopqrstuvwxyz";
+
 START_TEST (test_connect_lscube)
 {
   Sock *socket = Sock_connect("live.polito.it", "80", NULL, TCP, NULL);
@@ -111,6 +114,69 @@ START_TEST (test_type_lscube)
 }
 END_TEST
 
+START_TEST(test_socket_pair_forwards)
+{
+    char beacon_in[sizeof(test_beacon)] = { 0, };
+    Sock *pair[2];
+
+    fail_if( Sock_socketpair(pair) != 0,
+            "Unable to create local socket pair");
+
+    fail_if( Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
+             "Unable to write to local socket");
+
+    fail_if( Sock_read(pair[1], beacon_in, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
+             "Unable to read from local socket");
+
+    fail_if( memcmp(test_beacon, beacon_in, sizeof(test_beacon)) != 0,
+             "Written and read data differ");
+
+    Sock_close(pair[0]);
+    Sock_close(pair[1]);
+}
+END_TEST
+
+START_TEST(test_socket_pair_backwards)
+{
+    char beacon_in[sizeof(test_beacon)] = { 0, };
+    Sock *pair[2];
+
+    fail_if( Sock_socketpair(pair) != 0,
+            "Unable to create local socket pair");
+
+    fail_if( Sock_write(pair[1], test_beacon, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
+             "Unable to write to local socket");
+
+    fail_if( Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
+             "Unable to read from local socket");
+
+    fail_if( memcmp(test_beacon, beacon_in, sizeof(test_beacon)) != 0,
+             "Written and read data differ");
+
+    Sock_close(pair[0]);
+    Sock_close(pair[1]);
+}
+END_TEST
+
+START_TEST(test_socket_pair_crosstalk)
+{
+    char beacon_in[sizeof(test_beacon)] = { 0, };
+    Sock *pair[2];
+
+    fail_if( Sock_socketpair(pair) != 0,
+            "Unable to create local socket pair");
+
+    fail_if( Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0) != sizeof(test_beacon),
+             "Unable to write to local socket");
+
+    fail_if( Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, MSG_DONTWAIT) > 0,
+             "Cross-talk in local socket");
+
+    Sock_close(pair[0]);
+    Sock_close(pair[1]);
+}
+END_TEST
+
 void add_testcases_sock(Suite *s) {
   TCase *tc = tcase_create("Socket interface tests");
 
@@ -124,6 +190,9 @@ void add_testcases_sock(Suite *s) {
   tcase_add_test(tc, test_local_port_lscube);
   tcase_add_test(tc, test_flags_lscube);
   tcase_add_test(tc, test_type_lscube);
+  tcase_add_test(tc, test_socket_pair_forwards);
+  tcase_add_test(tc, test_socket_pair_backwards);
+  tcase_add_test(tc, test_socket_pair_crosstalk);
 
   suite_add_tcase(s, tc);
 }
