@@ -53,7 +53,7 @@ char *get_local_host(Sock *s)
     return s->local_host;
 }
 
-inline int get_local_hostname(char *localhostname, size_t len) //return 0 if ok
+int get_local_hostname(char *localhostname, size_t len) //return 0 if ok
 {
     //return getnameinfo((struct sockaddr *)&(s->local_stg), sizeof(s->local_stg), localhostname, len, NULL, 0, 0);
     return gethostname(localhostname, len);
