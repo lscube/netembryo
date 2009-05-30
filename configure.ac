@@ -46,7 +46,8 @@ AC_INIT([netembryo], [netembryo_version], [http://www.lscube.org])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE(dist-bzip2 no-dist-gzip foreign)
+AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip foreign]
+                 m4_ifdef([AM_SILENT_RULES], [silent-rules]))
 AM_MAINTAINER_MODE
 
 AC_PREFIX_DEFAULT("/usr")
