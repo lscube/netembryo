@@ -73,7 +73,7 @@ static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
 
 /**
  * Create a new socket accepting a new connection from a listening socket.
- * @param main Listening socket.
+ * @param s Listening socket.
  * @param octx optional ssl global context
  * @return the newly allocated Sock
  */
@@ -530,7 +530,7 @@ void net_log(int level, const char *fmt, ...)
 
 /**
  * Init internal structures.
- * @param log_function Pointer to a proper log function, if NULL messages will
+ * @param log_func Pointer to a proper log function, if NULL messages will
  * be sent to stderr.
  */
 
@@ -624,7 +624,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 /**
  * Change destination address for a non connected protocol socket (like UDP).
  * @param s Existing non connected socket.
- * @param dst Destination address.
+ * @param sa Destination address.
  */
 
 int Sock_set_dest(Sock *s, struct sockaddr *sa) {
