@@ -124,6 +124,7 @@ AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([pkgconfig/Makefile])
 AC_CONFIG_FILES([pkgconfig/libnetembryo.pc])
 AC_CONFIG_FILES([pkgconfig/libnetembryo-uninstalled.pc])
+AC_CONFIG_FILES([Doxyfile])
 
 AC_OUTPUT
 
