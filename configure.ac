@@ -102,6 +102,8 @@ AS_IF([test "x$enable_tests" != "no"],
    AC_CHECK_PROGS([EXUBERANT_CTAGS], [exuberant-ctags])
    AS_IF([test "x$EXUBERANT_CTAGS" = "x"], [have_tests=no])
   ])
+AC_SUBST([GAWK])
+AC_SUBST([EXUBERANT_CTAGS])
 
 AS_IF([test "x$enable_tests" = "xyes" && test "x$have_tests" = "xno"],
   [AC_MSG_ERROR([Required software for testing not found])])
