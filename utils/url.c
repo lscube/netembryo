@@ -35,9 +35,9 @@
  * @return Always 0, errors will be reported by setting to NULL the field of
  *         the Url structure that the function was not able to parse.
  */
-int Url_init(Url * url, char * urlname)
+int Url_init(Url * url, const char * urlname)
 {
-    char * protocol_begin, * hostname_begin, * port_begin, * path_begin;
+    const char * protocol_begin, * hostname_begin, * port_begin, * path_begin;
     size_t protocol_len, hostname_len, port_len, path_len;
 
     memset(url, 0, sizeof(Url));
