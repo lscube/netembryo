@@ -42,7 +42,7 @@ typedef struct
     char * path; //!< The path of the specific object to access (/path/to/resource.ext)
 } Url;
 
-int Url_init(Url * url, const char * urlname);
+void Url_init(Url * url, const char * urlname);
 void Url_destroy(Url * url);
 
 /**

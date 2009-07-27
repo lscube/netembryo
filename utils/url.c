@@ -32,10 +32,8 @@
  *            Url_destroy must be used to free it if we already initialized
  *            the structure before)
  * @param urlname The URI to parse to create the Url informations
- * @return Always 0, errors will be reported by setting to NULL the field of
- *         the Url structure that the function was not able to parse.
  */
-int Url_init(Url * url, const char * urlname)
+void Url_init(Url * url, const char * urlname)
 {
     const char * protocol_begin, * hostname_begin, * port_begin, * path_begin;
     size_t protocol_len, hostname_len, port_len, path_len;
@@ -99,8 +97,6 @@ int Url_init(Url * url, const char * urlname)
     url->hostname = (char*)malloc(hostname_len+1);
     strncpy(url->hostname, hostname_begin, hostname_len);
     url->hostname[hostname_len] = '\0';
-
-    return 0;
 }
 
 /**
