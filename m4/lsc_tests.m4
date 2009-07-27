@@ -5,8 +5,8 @@ AC_DEFUN([LSC_TESTS], [
       [AS_HELP_STRING([--enable-tests], [Enable test building (requires gawk, glib, ctags)])],
       [], [enable_tests=auto])
 
-    AC_ARG_VAR([GAWK], [Path to a GNU awk-compatible program])
-    AC_ARG_VAR([EXUBERANT_CTAGS], [Path to an exuberant ctags-compatible program])
+    AC_ARG_VAR([GAWK], [path to a GNU awk-compatible program])
+    AC_ARG_VAR([EXUBERANT_CTAGS], [path to an exuberant ctags-compatible program])
     AS_IF([test "x$enable_tests" != "no"],
       [have_tests=yes
        PKG_CHECK_MODULES([GTESTER], [glib-2.0 >= 2.20], [], [have_tests=no])
