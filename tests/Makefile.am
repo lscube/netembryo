@@ -4,8 +4,8 @@ TESTS = testsuite
 check_PROGRAMS = $(TESTS)
 endif
 
-INCLUDES = -I$(top_srcdir) $(GLIB_CFLAGS)
-LDADD = ../libnetembryo.la $(GLIB_LIBS)
+INCLUDES = -I$(top_srcdir) $(GTESTER_CFLAGS)
+LDADD = ../libnetembryo.la $(GTESTER_LIBS)
 
 BUILT_SOURCES = gtestmain.c
 
