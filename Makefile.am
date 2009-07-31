@@ -1,5 +1,15 @@
 EXTRA_DIST = Doxyfile
 
+dist_doc_DATA = AUTHORS ChangeLog README TODO
+
+if CHANGELOG_REGEN
+ChangeLog:
+	$(AM_V_GEN)GIT_DIR="${srcdir}/.git" git log --pretty > $@
+
+# Always regenerate!
+.PHONY: ChangeLog
+endif
+
 lib_LTLIBRARIES = libnetembryo.la
 
 pkginclude_HEADERS =    netembryo/wsocket.h \
