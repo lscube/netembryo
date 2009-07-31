@@ -47,28 +47,7 @@ AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([dist-bzip2 no-dist-gzip foreign subdir-objects])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-AM_MAINTAINER_MODE
-
-AC_PREFIX_DEFAULT("/usr")
-
-AC_PROG_CC_C99
-AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
-  AC_MSG_ERROR([no C99 compiler found, feng requires a C99 compiler.])
-])
-
-AC_USE_SYSTEM_EXTENSIONS
-dnl Force usage of POSIX.1-2001 (clock_gettime)
-dnl Force usage of _XOPEN_SOURCE (strdup)
-CPPFLAGS="${CPPFLAGS} -D_POSIX_C_SOURCE=200112L -D_XOPEN_SOURCE=600"
-
-dnl Enable some further OS-specific extensions that AC_USE_SYSTEM_EXTENSIONS
-dnl does not enable at least up to autoconf 2.63.
-dnl These extensions are needed to have struct ip_mreq for multicast support.
-AC_CANONICAL_HOST
-AS_CASE([$host_os],
-	[darwin*], [CPPFLAGS="${CPPFLAGS} -D_DARWIN_C_SOURCE"],
-	[freebsd[[78]]*], [CPPFLAGS="${CPPFLAGS} -D__BSD_VISIBLE=1"])
+LSC_INIT
 
 dnl Check for LibTool Dynamic Loading
 AC_PROG_LIBTOOL
@@ -77,10 +56,6 @@ AC_SUBST([LIBTOOL_DEPS])
 
 LSC_CHECK_IPV6
 LSC_CHECK_SCTP
-
-LSC_ERRORS
-LSC_DEBUG
-LSC_TESTS
 
 PKG_WITH_MODULES([OPENSSL], [openssl >= 0.9.8],
   [have_ssl="yes";
