@@ -26,7 +26,7 @@
  */
 
 #include "ssl.h"
-#include "wsocket.h"
+#include "netembryo/wsocket.h"
 
 /**
  * It initializes the global context ssl

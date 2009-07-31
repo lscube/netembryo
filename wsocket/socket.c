@@ -25,8 +25,8 @@
  * low level socket management
  */
 
-#include "wsocket.h"
-#include "wsocket-internal.h"
+#include "netembryo/wsocket.h"
+#include "netembryo/wsocket-internal.h"
 #include <string.h>
 
 #ifdef HAVE_SCTP

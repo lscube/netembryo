@@ -27,8 +27,8 @@
 
 #include <config.h>
 #include <string.h>
-#include "wsocket.h"
-#include "wsocket-internal.h"
+#include "netembryo/wsocket.h"
+#include "netembryo/wsocket-internal.h"
 
 #ifndef WIN32
 # include <sys/ioctl.h>

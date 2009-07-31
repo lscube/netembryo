@@ -27,7 +27,7 @@
 
 #include <config.h>
 #include <arpa/inet.h>
-#include "wsocket.h"
+#include "netembryo/wsocket.h"
 #include <string.h>
 
 #ifndef WIN32
