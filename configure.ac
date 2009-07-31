@@ -76,7 +76,6 @@ AC_SUBST(LT_AGE)
 AC_SUBST(LIBS)
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_FILES([tests/Makefile])
 AC_CONFIG_FILES([pkgconfig/Makefile])
 AC_CONFIG_FILES([pkgconfig/libnetembryo.pc])
 AC_CONFIG_FILES([pkgconfig/libnetembryo-uninstalled.pc])

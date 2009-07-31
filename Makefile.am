@@ -1,6 +1,4 @@
-SUBDIRS =	pkgconfig \
-		. \
-		tests
+SUBDIRS = pkgconfig
 
 EXTRA_DIST = Doxyfile
 
@@ -39,3 +37,29 @@ endif
 libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
 
 ACLOCAL_AMFLAGS = -I m4
+
+if BUILD_TESTS
+TESTS = tests/testsuite
+
+check_PROGRAMS = $(TESTS)
+endif
+
+BUILT_SOURCES = tests/gtestmain.c
+
+tests_testsuite_SOURCES = \
+	tests/test_hostname.c \
+	tests/test_url.c \
+	tests/test_sock.c \
+	tests/gtest-extra.h
+tests_testsuite_CFLAGS = $(GTESTER_CFLAGS)
+tests_testsuite_LDADD = libnetembryo.la $(GTESTER_LIBS)
+
+dist_tests_testsuite_SOURCES = tests/gtestmain.c
+
+tests/gtestmain.c: $(tests_testsuite_SOURCES)
+	$(EXUBERANT_CTAGS) -f - --file-scope=no $^ | \
+		sort -k 2 | $(EGREP) '^test_' | \
+		$(GAWK) -f $(srcdir)/tests/genmain.awk \
+		> $@
+
+DISTCLEANFILES = $(BUILT_SOURCES)
