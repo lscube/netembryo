@@ -24,7 +24,7 @@ libnetembryo_la_LIBADD = $(GLIB_LIBS)
 
 if ENABLE_SSL
 libnetembryo_la_SOURCES += \
-			wsocket/ssl.c
+			wsocket/ssl.c \
 			wsocket/ssl.h
 libnetembryo_la_CFLAGS += $(OPENSSL_CFLAGS)
 libnetembryo_la_LIBADD += $(OPENSSL_LIBS)
