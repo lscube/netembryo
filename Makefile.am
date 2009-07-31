@@ -1,5 +1,3 @@
-SUBDIRS = pkgconfig
-
 EXTRA_DIST = Doxyfile
 
 lib_LTLIBRARIES = libnetembryo.la
@@ -22,6 +20,15 @@ libnetembryo_la_SOURCES = \
 libnetembryo_la_CFLAGS = $(GLIB_CFLAGS)
 libnetembryo_la_LIBADD = $(GLIB_LIBS)
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = pkgconfig/libnetembryo.pc
+
+noinst_DATA =
+
+libnetembryo-sctp%: libnetembryo%
+	@$(mkdir_p) $(dir $@)
+	$(AM_V_GEN)$(LN_S) -f $< $@
+
 if ENABLE_SSL
 libnetembryo_la_SOURCES += \
 			wsocket/ssl.c \
@@ -32,6 +39,9 @@ endif
 
 if HAVE_SCTP
 libnetembryo_la_LIBADD += $(SCTP_LIBS)
+
+pkgconfig_DATA += pkgconfig/libnetembryo-sctp.pc
+noinst_DATA += pkgconfig/libnetembryo-sctp-uninstalled.pc
 endif
 
 libnetembryo_la_LDFLAGS = -version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE)
@@ -64,3 +74,4 @@ tests/gtestmain.c: $(tests_testsuite_SOURCES)
 		> $@
 
 DISTCLEANFILES = $(BUILT_SOURCES)
+CLEANFILES = libnetembryo-sctp.pc libnetembryo-sctp-uninstalled.pc
