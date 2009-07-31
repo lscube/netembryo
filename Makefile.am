@@ -25,9 +25,9 @@ pkgconfig_DATA = pkgconfig/libnetembryo.pc
 
 noinst_DATA =
 
-libnetembryo-sctp%: libnetembryo%
+pkgconfig/libnetembryo-sctp%: pkgconfig/libnetembryo%
 	@$(mkdir_p) $(dir $@)
-	$(AM_V_GEN)$(LN_S) -f $< $@
+	$(AM_V_GEN)$(LN_S) -f $(notdir $<) $@
 
 if ENABLE_SSL
 libnetembryo_la_SOURCES += \
