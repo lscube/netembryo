@@ -25,6 +25,12 @@
  * low level socket management
  */
 
+#include "config.h"
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 #include "netembryo/wsocket.h"
 #include "netembryo/wsocket-internal.h"
 #include <string.h>
