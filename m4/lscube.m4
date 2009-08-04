@@ -135,6 +135,7 @@ AC_DEFUN([LSC_INIT], [
 
   LSC_SYSTEM_EXTENSIONS
 
+  AM_PROG_CC_C_O
   AC_PROG_CC_C99
   AS_IF([test "x$ac_cv_prog_cc_c99" = "xno"], [
     AC_MSG_ERROR([no C99 compiler found, $PACKAGE requires a C99 compiler.])
