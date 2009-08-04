@@ -32,6 +32,7 @@ dnl
 
 AC_DEFUN([PKG_WITH_MODULES],
 [
+AC_REQUIRE([PKG_PROG_PKG_CONFIG])
 m4_pushdef([with_arg], m4_tolower([$1]))
 
 m4_pushdef([description],
