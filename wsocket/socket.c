@@ -29,7 +29,7 @@
 #include "netembryo/wsocket-internal.h"
 #include <string.h>
 
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
 /* FreeBSD and Mac OS X don't have SOL_SCTP and re-use IPPROTO_SCTP
    for setsockopt() */
 # if !defined(SOL_SCTP)
@@ -68,7 +68,7 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
     int bind_new;
     struct addrinfo *res, *ressave;
     struct addrinfo hints;
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
     struct sctp_initmsg initparams;
     struct sctp_event_subscribe subscribe;
 #endif
@@ -87,7 +87,7 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
 
     switch (socktype) {
     case SCTP:
-#ifndef HAVE_SCTP
+#ifndef ENABLE_SCTP
         net_log(NET_LOG_ERR, "SCTP protocol not compiled in\n");
         return WSOCK_ERROR;
         break;
@@ -113,14 +113,14 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
     bind_new = (*sock < 0);
 
     do {
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
         if (socktype == SCTP)
             res->ai_protocol = IPPROTO_SCTP;
 #endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
         if (bind_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
             continue;
 
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
         if (socktype == SCTP) {
             // Enable the propagation of packets headers
             memset(&subscribe, 0, sizeof(subscribe));
@@ -186,7 +186,7 @@ int sock_connect(char const *host, char const *port, int *sock, sock_type sockty
     int n, connect_new;
     struct addrinfo *res, *ressave;
     struct addrinfo hints;
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
     struct sctp_initmsg initparams;
     struct sctp_event_subscribe subscribe;
 #endif
@@ -201,7 +201,7 @@ int sock_connect(char const *host, char const *port, int *sock, sock_type sockty
 #endif
     switch (socktype) {
     case SCTP:
-#ifndef HAVE_SCTP
+#ifndef ENABLE_SCTP
         net_log(NET_LOG_FATAL, "SCTP protocol not compiled in\n");
         return WSOCK_ERROR;
         break;
@@ -228,14 +228,14 @@ int sock_connect(char const *host, char const *port, int *sock, sock_type sockty
     connect_new = (*sock < 0);
 
     do {
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
         if (socktype == SCTP)
             res->ai_protocol = IPPROTO_SCTP;
 #endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
         if (connect_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
             continue;
 
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
         if (socktype == SCTP) {
             // Enable the propagation of packets headers
             memset(&subscribe, 0, sizeof(subscribe));

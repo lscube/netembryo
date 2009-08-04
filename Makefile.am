@@ -47,7 +47,7 @@ libnetembryo_la_CFLAGS += $(OPENSSL_CFLAGS)
 libnetembryo_la_LIBADD += $(OPENSSL_LIBS)
 endif
 
-if HAVE_SCTP
+if ENABLE_SCTP
 libnetembryo_la_LIBADD += $(SCTP_LIBS)
 
 pkgconfig_DATA += pkgconfig/libnetembryo-sctp.pc

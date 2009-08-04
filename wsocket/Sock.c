@@ -595,7 +595,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
             return recv(s->fd, buffer, nbytes, flags);
             break;
         case SCTP:
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
             if (!protodata) {
                 return -1;
             }
@@ -718,7 +718,7 @@ int Sock_socketpair(Sock *pair[]) {
 
 int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags)
 {
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
     struct sctp_sndrcvinfo sinfo;
 #endif
 
@@ -742,7 +742,7 @@ int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int fla
                     protodata, sizeof(struct sockaddr_storage));
             break;
         case SCTP:
-#ifdef HAVE_SCTP
+#ifdef ENABLE_SCTP
             if (!protodata) {
                 protodata = &sinfo;
                 memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
