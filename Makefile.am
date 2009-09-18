@@ -14,12 +14,10 @@ lib_LTLIBRARIES = libnetembryo.la
 
 pkginclude_HEADERS =    netembryo/wsocket.h \
 			netembryo/wsocket-internal.h \
-			netembryo/url.h \
-			netembryo/rtsp.h
+			netembryo/url.h
 
 libnetembryo_la_SOURCES = \
 			utils/url.c \
-			utils/rtsp.c \
 			\
 			wsocket/multicast.c \
 			wsocket/socket.c \
