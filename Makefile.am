@@ -62,9 +62,9 @@ if BUILD_TESTS
 TESTS = tests/testsuite
 
 check_PROGRAMS = $(TESTS)
-endif
 
 BUILT_SOURCES = tests/gtestmain.c
+endif
 
 tests_testsuite_SOURCES = \
 	tests/test_hostname.c \
