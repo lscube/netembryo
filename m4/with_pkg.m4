@@ -47,7 +47,7 @@ m4_case(def_arg,
             [m4_pushdef([with_without],[--with-]with_arg)])
 
 AC_ARG_WITH(with_arg,
-     AS_HELP_STRING(with_without, description[ @<:@default=]def_arg[@:>@]),,
+     AS_HELP_STRING(with_without, description[ @<:@]def_arg[@:>@]),,
     [AS_TR_SH([with_]with_arg)=def_arg])
 
 AS_CASE([$AS_TR_SH([with_]with_arg)],
