@@ -1,8 +1,63 @@
 dnl -*- autoconf -*-
 
+AC_DEFUN([LSC_CHECK_SCTP], [
+  have_sctp=no
+
+  AC_ARG_ENABLE(sctp,
+    AS_HELP_STRING([--enable-sctp], [enable SCTP support @<:@auto@:>@]),,
+	enable_sctp="yes")
+
+  AC_MSG_CHECKING([whether to enable SCTP support])
+  AS_IF([test "x$enable_sctp" = "xyes"], [
+    AC_MSG_RESULT([yes, checking prerequisites])
+
+    AC_CHECK_HEADERS([sys/socket.h])
+
+    AC_CHECK_TYPE([struct sctp_sndrcvinfo], [
+        save_LIBS="$LIBS"
+        AC_SEARCH_LIBS([sctp_recvmsg], [sctp], [
+          SCTP_LIBS="${LIBS%${save_LIBS}}"
+	  have_sctp=yes
+	  AC_DEFINE([ENABLE_SCTP], [1], [Define this if you have libsctp])
+	])
+	LIBS="$save_LIBS"
+	],
+      AC_MSG_WARN([SCTP disabled: headers not found]),
+      [#ifdef HAVE_SYS_SOCKET_H
+       #include <sys/socket.h>
+       #endif
+       #include <netinet/sctp.h>
+      ])
+  ], [
+    AC_MSG_RESULT([no, disabled by user])
+  ])
+
+  AC_SUBST([SCTP_LIBS])
+
+  AM_CONDITIONAL([ENABLE_SCTP], [test "x$have_sctp" = "xyes"])
+])
+
+AC_DEFUN([LSC_CHECK_IPV6], [
+  AC_ARG_ENABLE(ipv6,
+    AS_HELP_STRING([--enable-ipv6], [enable IPv6 support @<:@yes@:>@]),,
+    enable_ipv6="yes")
+
+  AC_MSG_CHECKING([whether to check for IPv6])
+  AS_IF([test "x$enable_ipv6" = "xyes"], [
+    AC_MSG_RESULT([yes])
+    AC_CHECK_TYPE(struct sockaddr_in6,
+      AC_DEFINE([IPV6], 1, [Define IPv6 support]),,
+      [
+       #include <netinet/in.h>
+    ])
+  ], [
+    AC_MSG_RESULT([no])
+  ])
+])
+
 AC_DEFUN([LSC_DEBUG_ENABLE], [
   AC_ARG_ENABLE(debug,
-    AS_HELP_STRING([--enable-debug], [enable gcc debugging flags [[default=no]]]),,
+    AS_HELP_STRING([--enable-debug], [enable gcc debugging flags @<:@no@:>@]),,
     enable_debug="no")
 ])
 
@@ -10,7 +65,7 @@ AC_DEFUN([LSC_MUDFLAP], [
   AC_REQUIRE([LSC_DEBUG_ENABLE])
 
   AC_ARG_ENABLE(mudflap,
-    AS_HELP_STRING([--enable-mudflap], [enable mudflap support (implies --enable-debug) [[default=no]]]),,
+    AS_HELP_STRING([--enable-mudflap], [enable mudflap support (implies --enable-debug) @<:@no@:>@]),,
     enable_mudflap="no")
 
   AS_IF([test "$enable_mudflap" = "yes"], [
@@ -32,8 +87,7 @@ AC_DEFUN([LSC_DEBUG], [
   dnl Only enable the best of the two
   CC_CHECK_CFLAGS_APPEND([-Wformat=2 -Wformat], [break;])
   dnl The new style is likely going to be the only supported one in the future
-  CC_CHECK_CFLAGS_APPEND([-Werror=implicit ]dnl
-                         [-Werror=implicit-function-declaration ]dnl
+  CC_CHECK_CFLAGS_APPEND([-Werror=implicit-function-declaration ]dnl
                          [-Werror-implicit-function-declaration],
                          [break;])
   dnl Make sure that there are no random return values
@@ -50,7 +104,7 @@ AC_DEFUN([LSC_ERRORS], [
   AC_REQUIRE([CC_CHECK_WERROR])
 
   AC_ARG_ENABLE(errors,
-    AS_HELP_STRING([--enable-errors], [make gcc warnings behave like errors: none, normal, pedantic [[default=none]]]))
+    AS_HELP_STRING([--enable-errors], [make gcc warnings behave like errors: none, normal, pedantic @<:@none@:>@]))
 
   case "$enable_errors" in
     pedantic)
@@ -76,7 +130,7 @@ debug enabled ................ : $enable_debug
 
 AC_DEFUN([LSC_TESTS], [
     AC_ARG_ENABLE([tests],
-      [AS_HELP_STRING([--enable-tests], [Enable test building (requires gawk, glib, ctags)])],
+      [AS_HELP_STRING([--enable-tests], [enable test building (requires gawk, glib, ctags) @<:@auto@:>@])],
       [], [enable_tests=auto])
 
     AC_ARG_VAR([GAWK], [path to a GNU awk-compatible program])
