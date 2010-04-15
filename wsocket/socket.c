@@ -148,12 +148,8 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
                 }
         }
 #endif
-                if (setsockopt(*sock, SOL_SOCKET, SO_REUSEADDR, &param,
-                    sizeof(int)))
-                        net_log(NET_LOG_ERR,
-                                "setsockopts(SO_REUSEADDR) failed");
 
-                if (bind(*sock, res->ai_addr, res->ai_addrlen) == 0)
+        if (bind(*sock, res->ai_addr, res->ai_addrlen) == 0)
             break;
 
         if (bind_new) {
