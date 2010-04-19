@@ -97,14 +97,14 @@ Sock * Sock_accept(Sock *s, void * octx)
         return NULL;
 
     if ((res = sock_accept(s->fd)) < 0) {
-        net_log(NET_LOG_ERR, "System error in sock_accept().\n");
+        net_log(NET_LOG_DEBUG, "System error in sock_accept().\n");
         return NULL;
     }
 
 #if ENABLE_SSL
     if(ctx) {
         if( !(ssl_con = SSL_sock_accept(res, ctx)) ) {
-            net_log(NET_LOG_ERR, "Unable to accept SSL connection.\n");
+            net_log(NET_LOG_DEBUG, "Unable to accept SSL connection.\n");
             sock_close(res);
             return NULL;
         }
@@ -136,7 +136,7 @@ Sock * Sock_accept(Sock *s, void * octx)
 
     if(getpeername(res, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR,
+        net_log(NET_LOG_DEBUG,
                 "Unable to get remote address in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
@@ -154,7 +154,7 @@ Sock * Sock_accept(Sock *s, void * octx)
 
     remote_port = sock_get_port(sa_p);
     if(remote_port < 0) {
-        net_log(NET_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+        net_log(NET_LOG_DEBUG, "Unable to get remote port in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
     }
@@ -166,7 +166,7 @@ Sock * Sock_accept(Sock *s, void * octx)
 
     if(getsockname(res, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR, "Unable to get remote port in Sock_accept().\n");
+        net_log(NET_LOG_DEBUG, "Unable to get remote port in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
     }
@@ -183,7 +183,7 @@ Sock * Sock_accept(Sock *s, void * octx)
 
     local_port = sock_get_port(sa_p);
     if(local_port < 0) {
-        net_log(NET_LOG_ERR, "Unable to get local port in Sock_accept().\n");
+        net_log(NET_LOG_DEBUG, "Unable to get local port in Sock_accept().\n");
         Sock_close(new_s);
         return NULL;
     }
@@ -222,7 +222,7 @@ Sock * Sock_bind(char const *host, char const *port, Sock *sock,
 #if ENABLE_SSL
     if ((octx)) {
         if(socktype != TCP) {
-            net_log(NET_LOG_ERR, "SSL can't work on this protocol.\n");
+            net_log(NET_LOG_DEBUG, "SSL can't work on this protocol.\n");
             return NULL;
         }
     }
@@ -233,7 +233,7 @@ Sock * Sock_bind(char const *host, char const *port, Sock *sock,
     }
 
     if (sock_bind(host, port, &sockfd, socktype)) {
-        net_log(NET_LOG_ERR, "Error in low level sock_bind().\n");
+        net_log(NET_LOG_DEBUG, "Error in low level sock_bind().\n");
         return NULL;
     }
 
@@ -269,7 +269,7 @@ Sock * Sock_bind(char const *host, char const *port, Sock *sock,
     local_port = sock_get_port(sa_p);
 
     if(local_port < 0) {
-        net_log(NET_LOG_ERR, "Unable to get local port in Sock_bind().\n");
+        net_log(NET_LOG_DEBUG, "Unable to get local port in Sock_bind().\n");
         Sock_close(s);
         return NULL;
     } else
@@ -365,14 +365,14 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     }
 
     if (sock_connect(host, port, &sockfd, socktype)) {
-            net_log(NET_LOG_ERR, "Sock_connect() failure.\n");
+            net_log(NET_LOG_DEBUG, "Sock_connect() failure.\n");
             return NULL;
     }
 
 #if ENABLE_SSL
     if((ctx)) {
         if (sock_SSL_connect(&ssl_con, sockfd, ctx))
-            net_log (NET_LOG_ERR, "Sock_connect() failure in SSL init.\n");
+            net_log (NET_LOG_DEBUG, "Sock_connect() failure in SSL init.\n");
             sock_close(sockfd);
             return NULL;
     }
@@ -409,7 +409,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 
     if(getsockname(s->fd, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR,
+        net_log(NET_LOG_DEBUG,
                 "Unable to get remote port in Sock_connect().\n");
         Sock_close(s);
         return NULL;
@@ -428,7 +428,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     local_port = sock_get_port(sa_p);
 
     if(local_port < 0) {
-        net_log(NET_LOG_ERR,
+        net_log(NET_LOG_DEBUG,
                 "Unable to get local port in Sock_connect().\n");
         Sock_close(s);
         return NULL;
@@ -440,7 +440,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 
     if(getpeername(s->fd, sa_p, &sa_len))
     {
-        net_log(NET_LOG_ERR,
+        net_log(NET_LOG_DEBUG,
                 "Unable to get remote address in Sock_connect().\n");
         Sock_close(s);
         return NULL;
@@ -458,7 +458,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 
     remote_port = sock_get_port(sa_p);
     if(remote_port < 0) {
-        net_log(NET_LOG_ERR,
+        net_log(NET_LOG_DEBUG,
                 "Unable to get remote port in Sock_connect().\n");
         Sock_close(s);
         return NULL;
@@ -487,7 +487,7 @@ static void net_log_default(int level, const char *fmt, va_list args)
         case NET_LOG_FATAL:
             fprintf(stderr, "[fatal error] ");
             break;
-        case NET_LOG_ERR:
+        case NET_LOG_DEBUG:
             fprintf(stderr, "[error] ");
             break;
         case NET_LOG_WARN:
@@ -678,7 +678,7 @@ int Sock_socketpair(Sock *pair[]) {
         return -1;
 
     if ((res = socketpair(AF_UNIX, SOCK_DGRAM, 0, sdpair)) < 0) {
-        net_log(NET_LOG_ERR, "Sock_socketpair() failure.\n");
+        net_log(NET_LOG_DEBUG, "Sock_socketpair() failure.\n");
         return res;
     }
 
