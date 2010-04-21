@@ -487,9 +487,6 @@ static void net_log_default(int level, const char *fmt, va_list args)
         case NET_LOG_FATAL:
             fprintf(stderr, "[fatal error] ");
             break;
-        case NET_LOG_DEBUG:
-            fprintf(stderr, "[error] ");
-            break;
         case NET_LOG_WARN:
             fprintf(stderr, "[warning] ");
             break;
