@@ -70,7 +70,7 @@ int sock_accept(int sock)
 
 int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
 {
-    int n, param = 1;
+    int n;
     int bind_new;
     struct addrinfo *res, *ressave;
     struct addrinfo hints;
