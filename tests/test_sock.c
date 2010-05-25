@@ -159,3 +159,21 @@ void test_socket_pair_crosstalk()
     Sock_close(pair[0]);
     Sock_close(pair[1]);
 }
+
+void test_random_port()
+{
+    Sock *sock = Sock_bind("localhost", NULL, NULL, TCP, NULL);
+    g_assert(sock);
+
+    g_assert_cmpuint(sock->local_port, !=, 0);
+
+    Sock_close(sock);
+}
+
+void test_all_interfaces()
+{
+    Sock *sock = Sock_bind(NULL, "65123", NULL, TCP, NULL);
+    g_assert(sock);
+
+    Sock_close(sock);
+}
