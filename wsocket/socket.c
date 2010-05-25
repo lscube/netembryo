@@ -132,20 +132,20 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
             memset(&subscribe, 0, sizeof(subscribe));
             subscribe.sctp_data_io_event = 1;
             if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
-                    sizeof(subscribe)) < 0) {
+                           sizeof(subscribe)) < 0) {
                 net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sctp_open.\n");
                 return WSOCK_ERROR;
-                }
+            }
 
             // Setup number of streams to be used for SCTP connection
             memset(&initparams, 0, sizeof(initparams));
             initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
             initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
             if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
-                    sizeof(initparams)) < 0) {
+                           sizeof(initparams)) < 0) {
                 net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sctp_open.\n");
                 return WSOCK_ERROR;
-                }
+            }
         }
 #endif
 
@@ -243,10 +243,10 @@ int sock_connect(char const *host, char const *port, int *sock, sock_type sockty
             memset(&subscribe, 0, sizeof(subscribe));
             subscribe.sctp_data_io_event = 1;
             if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
-                    sizeof(subscribe)) < 0) {
+                           sizeof(subscribe)) < 0) {
                 net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
                 return WSOCK_ERROR;
-                }
+            }
 
 
             // Setup number of streams to be used for SCTP connection
@@ -254,10 +254,10 @@ int sock_connect(char const *host, char const *port, int *sock, sock_type sockty
             initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
             initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
             if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
-                    sizeof(initparams)) < 0) {
+                           sizeof(initparams)) < 0) {
                 net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
                 return WSOCK_ERROR;
-                }
+            }
         }
 #endif
 
