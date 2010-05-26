@@ -436,38 +436,48 @@ int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     return -1;
 }
 
-int neb_sock_simple_write(Sock *s,
-                          const void *buffer, size_t nbytes,
-                          int flags)
-{
+/**
+ * Convenience function to alias to tcp and local cases.
+ *
+ */
+int neb_sock_write(Sock *s,
+                   const void *buffer,
+                   size_t nbytes,
+                   int flags) {
     assert(s != NULL);
-    assert(s->socktype != SCTP);
 
     switch(s->socktype) {
+    case TCP:
+    case LOCAL:
+        return send(s->fd, buffer, nbytes, flags);
     case UDP:
         return sendto(s->fd, buffer, nbytes, flags,
                       (struct sockaddr*)&s->remote_stg,
                       sizeof(struct sockaddr_storage));
-    case TCP:
-    case LOCAL:
-        return send(s->fd, buffer, nbytes, flags);
+
+#ifdef ENABLE_SCTP
+    case SCTP:
+        return neb_sock_write_stream(s,
+                                     buffer, nbytes,
+                                     flags, 0);
+#endif
+
     default:
-        assert(1 != 1);
+        assert(1 == 0);
         return -1;
     }
 }
 
 #ifdef ENABLE_SCTP
-int neb_sock_sctp_write(Sock *s,
-                        const void *buffer, size_t nbytes,
-                        int stream, int flags)
+int neb_sock_write_stream(Sock *s,
+                          const void *buffer, size_t nbytes,
+                          int flags, int stream)
 {
     const struct sctp_sndrcvinfo sctp_info = {
         .sinfo_stream = stream
     };
 
-    assert(s != NULL);
-    assert(s->socktype == SCTP);
+    assert(s != NULL && s->socktype == SCTP);
 
     return sctp_send(s->fd,
                      buffer, nbytes,
