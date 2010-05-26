@@ -24,9 +24,6 @@
 #include <glib.h>
 #include "gtest-extra.h"
 
-/* Beacon used for testing echos from server */
-static const char test_beacon[] = "1234567890abcdefghijklmnopqrstuvwxyz";
-
 /* Change this if the lscube.org server changes */
 static const char test_host[] = "www.lscube.org";
 static const char test_port[] = "80";
@@ -103,61 +100,6 @@ void test_type_lscube()
   g_assert_cmphex(Sock_type(socket), ==, TCP);
 
   Sock_close(socket);
-}
-
-void test_socket_pair_forwards()
-{
-    char beacon_in[sizeof(test_beacon)] = { 0, };
-    Sock *pair[2];
-
-    g_assert_cmpint(Sock_socketpair(pair), ==, 0);
-
-    g_assert_cmpint(Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0),
-                    ==, sizeof(test_beacon));
-
-    g_assert_cmpint(Sock_read(pair[1], beacon_in, sizeof(test_beacon), NULL, 0),
-                    ==, sizeof(test_beacon));
-
-    g_assert_cmpstr(test_beacon, ==, beacon_in);
-
-    Sock_close(pair[0]);
-    Sock_close(pair[1]);
-}
-
-void test_socket_pair_backwards()
-{
-    char beacon_in[sizeof(test_beacon)] = { 0, };
-    Sock *pair[2];
-
-    g_assert_cmpint(Sock_socketpair(pair), ==, 0);
-
-    g_assert_cmpint(Sock_write(pair[1], test_beacon, sizeof(test_beacon), NULL, 0),
-                    ==, sizeof(test_beacon));
-
-    g_assert_cmpint(Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, 0),
-                    ==, sizeof(test_beacon));
-
-    g_assert_cmpstr(test_beacon, ==, beacon_in);
-
-    Sock_close(pair[0]);
-    Sock_close(pair[1]);
-}
-
-void test_socket_pair_crosstalk()
-{
-    char beacon_in[sizeof(test_beacon)] = { 0, };
-    Sock *pair[2];
-
-    g_assert_cmpint(Sock_socketpair(pair), ==, 0);
-
-    g_assert_cmpint(Sock_write(pair[0], test_beacon, sizeof(test_beacon), NULL, 0),
-                    ==, sizeof(test_beacon));
-
-    g_assert_cmpint(Sock_read(pair[0], beacon_in, sizeof(test_beacon), NULL, MSG_DONTWAIT),
-                    <=, 0);
-
-    Sock_close(pair[0]);
-    Sock_close(pair[1]);
 }
 
 void test_random_port()

@@ -147,18 +147,10 @@ int Sock_close(Sock *s);
 
 void Sock_init(void (*log_function)(int level, const char *fmt, va_list list));
 
-int Sock_compare(Sock *p, Sock *q);
-
-int Sock_socketpair(Sock *pair[]);
-
-int Sock_set_dest(Sock *s, struct sockaddr *dst);
-
 /** low level access macros */
 #define Sock_fd(A) ((A)->fd)
 #define Sock_type(A) ((A)->socktype)
 #define Sock_flags(A) ((A)->flags)
-
-int Sock_set_props(Sock *s, int request, int *on);
 
 /*get_info.c*/
 char * get_remote_host(Sock *);

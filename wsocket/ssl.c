@@ -29,64 +29,6 @@
 #include "netembryo/wsocket.h"
 
 /**
- * It initializes the global context ssl
- * @param : path of the server certificate
- * @param : cert verification mode @see SSL_CTX_set_verify
- * @return: 0 on success;
- */
-SSL_CTX * Sock_init_ctx(char *key, char * cafile, char * capath)
-{
-    SSL_CTX *global_ctx = NULL;
-    char cipher[] = "ALL:eNULL";
-    int s_server_session_id_context = 1;
-    SSL_METHOD *method;
-
-    SSL_load_error_strings();
-    SSL_library_init();
-
-    method = SSLv23_method();
-    global_ctx = SSL_CTX_new(method);
-    if(!global_ctx) {
-        net_log(NET_LOG_ERR,"Creation of a new SSL_CTX object failed");
-        return NULL;
-    }
-
-    /* Loads a certificate chain from file into ctx */
-    if(!(SSL_CTX_use_certificate_chain_file(global_ctx,key))) {
-        net_log(NET_LOG_ERR,"Failure in reading certificate file");
-        return NULL;
-    }
-
-    /* Adds the first private key found in file to ctx */
-    if(!(SSL_CTX_use_PrivateKey_file(global_ctx,key,SSL_FILETYPE_PEM))) {
-        net_log(NET_LOG_ERR,"Failure in reading key file");
-        return NULL;
-    }
-
-    /* Set default locations for trusted CA certificates */
-    if(!(SSL_CTX_load_verify_locations(global_ctx, cafile, capath))) {
-        net_log(NET_LOG_ERR,"Failure in reading CA list");
-        return NULL;
-    }
-
-    /* Set context within which session can be reused */
-    SSL_CTX_set_session_id_context(global_ctx,
-                                   (void*)&s_server_session_id_context,
-        sizeof(s_server_session_id_context));
-
-    /* Choose list of available SSL_CIPHER */
-    SSL_CTX_set_cipher_list(global_ctx,cipher);
-
-    /* Manipulate SSL engine options */
-    //SSL_CTX_set_options(ctx,SSL_OP_ALL);
-
-    SSL_CTX_set_verify(global_ctx,SSL_VERIFY_PEER,0);
-
-    return global_ctx;
-}
-
-
-/**
  * The Function establishes a new ssl connection
  * @param : the socket descriptor
  * @return: pointer to new structure ssl

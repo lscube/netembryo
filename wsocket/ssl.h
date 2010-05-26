@@ -29,8 +29,6 @@
 #include <string.h>
 #include <openssl/ssl.h>
 
-
-SSL_CTX * init_ctx(char *key, char * cafile, char * capath);
 int sock_SSL_connect(SSL **ssl_con, int sockfd, SSL_CTX * ssl_ctx);
 SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx);
 int SSL_close_connection(SSL *ssl,int sockfd);

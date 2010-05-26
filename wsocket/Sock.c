@@ -324,17 +324,6 @@ int Sock_close(Sock *s)
 }
 
 /**
- * Compare two sockets.
- * @param p Existing socket.
- * @param q Existing socket.
- */
-
-int Sock_compare(Sock *p, Sock *q)
-{
-    return memcmp(p, q, sizeof(Sock));
-}
-
-/**
  * Establish a connection to a remote host.
  * @param host Remote host to connect to (may be a hostname).
  * @param port Remote port to connect to.
@@ -616,91 +605,6 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 #endif
 
     return -1;
-}
-
-/**
- * Change destination address for a non connected protocol socket (like UDP).
- * @param s Existing non connected socket.
- * @param sa Destination address.
- */
-
-int Sock_set_dest(Sock *s, struct sockaddr *sa) {
-
-    if (!s)
-        return -1;
-
-    if (s->socktype != UDP) {
-        net_log(NET_LOG_FATAL,
-                "Only UDP socket can change destination address\n");
-        return -1;
-    }
-
-    switch (sa->sa_family) {
-    case AF_INET:
-        memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in));
-        break;
-    case AF_INET6:
-        memcpy(&(s->remote_stg), sa, sizeof(struct sockaddr_in6));
-        break;
-    default:
-        break;
-    }
-    return 0;
-}
-
-/**
- * Set ioctl properties for socket
- * @return Usually, on success zero. A few ioctls use the return value as an
- * output parameter and return a nonnegative value on success. On error, -1 is
- * returned, and errno is set appropriately.
- */
-
-int Sock_set_props(Sock *s, int request, int *on)
-{
-    if (!s)
-        return -1;
-    return ioctl(s->fd, request, on);
-}
-
-/**
- * Creates and connect together two sockets.
- * @param pair A vector large enough for two socket structures.
- */
-
-int Sock_socketpair(Sock *pair[]) {
-
-    int sdpair[2], i, res;
-
-    if (!pair)
-        return -1;
-
-    if ((res = socketpair(AF_UNIX, SOCK_DGRAM, 0, sdpair)) < 0) {
-        net_log(NET_LOG_DEBUG, "Sock_socketpair() failure.\n");
-        return res;
-    }
-
-    if (!(pair[0] = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL,
-                "Unable to allocate first Sock struct in Sock_socketpair().\n");
-        close (sdpair[0]);
-        close (sdpair[1]);
-        return -1;
-    }
-    if (!(pair[1] = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL,
-                "Unable to allocate second Sock struct in Sock_socketpair().\n");
-        close (sdpair[0]);
-        close (sdpair[1]);
-        free(pair[0]);
-        return -1;
-    }
-
-    for (i = 0; i < 2; i++) {
-        pair[i]->fd = sdpair[i];
-        pair[i]->socktype = LOCAL;
-    }
-
-    return res;
 }
 
 /**
