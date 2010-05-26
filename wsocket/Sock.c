@@ -34,10 +34,6 @@
 # include <sys/ioctl.h>
 #endif
 
-#if ENABLE_SSL
-#include "ssl.c"
-#endif
-
 /**
  * Tell if an address is multicast
  */
@@ -88,11 +84,6 @@ Sock * Sock_accept(Sock *s, void * octx)
     struct sockaddr *sa_p = NULL;
     socklen_t sa_len = 0;
 
-#if ENABLE_SSL
-    SSL_CTX * ctx = octx;
-    SSL *ssl_con = NULL;
-#endif
-
     if (!s)
         return NULL;
 
@@ -101,23 +92,9 @@ Sock * Sock_accept(Sock *s, void * octx)
         return NULL;
     }
 
-#if ENABLE_SSL
-    if(ctx) {
-        if( !(ssl_con = _netembryo_ssl_accept(res, ctx)) ) {
-            net_log(NET_LOG_DEBUG, "Unable to accept SSL connection.\n");
-            close(res);
-            return NULL;
-        }
-    }
-#endif
-
     if (!(new_s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL,
                 "Unable to allocate a Sock struct in Sock_accept().\n");
-#if ENABLE_SSL
-        if(ctx)
-            _netembryo_ssl_close(ssl_con, res);
-#endif
         close(res);
         return NULL;
     }
@@ -125,11 +102,6 @@ Sock * Sock_accept(Sock *s, void * octx)
     new_s->fd = res;
     new_s->socktype = s->socktype;
     new_s->flags = s->flags;
-
-#if ENABLE_SSL
-    if(ctx)
-        new_s->ssl = ssl_con;
-#endif
 
     sa_p = (struct sockaddr *) &(new_s->remote_stg);
     sa_len = sizeof(struct sockaddr_storage);
@@ -219,15 +191,6 @@ Sock * Sock_bind(char const *host, char const *port, Sock *sock,
     char local_host[128];
     int local_port;
 
-#if ENABLE_SSL
-    if ((octx)) {
-        if(socktype != TCP) {
-            net_log(NET_LOG_DEBUG, "SSL can't work on this protocol.\n");
-            return NULL;
-        }
-    }
-#endif
-
     if(sock) {
         sockfd = sock->fd;
     }
@@ -309,11 +272,6 @@ int Sock_close(Sock *s)
             mcast_leave(s->fd,(struct sockaddr *) &(s->local_stg));
     }
 
-#if ENABLE_SSL
-    if(s->ssl)
-        _netembryo_ssl_close(s->ssl, s->fd);
-#endif
-
     res = close(s->fd);
 
     free(s->remote_host);
@@ -344,10 +302,6 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     socklen_t sa_len = 0;
     int local_port;
     int remote_port;
-#if ENABLE_SSL
-    SSL_CTX * ctx = octx;
-    SSL *ssl_con;
-#endif
 
     if(binded) {
         sockfd = binded->fd;
@@ -358,16 +312,6 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
             return NULL;
     }
 
-#if ENABLE_SSL
-    if((ctx)) {
-        if (_netembryo_ssl_connect(&ssl_con, sockfd, ctx))
-            net_log (NET_LOG_DEBUG, "Sock_connect() failure in SSL init.\n");
-            close(sockfd);
-            return NULL;
-    }
-    else
-#endif
-
     if (binded) {
         s = binded;
         free(s->local_host);
@@ -376,21 +320,12 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
         s->remote_host = NULL;
     } else if (!(s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
-#if ENABLE_SSL
-        if(ctx)
-            _netembryo_ssl_close(ssl_con, sockfd);
-#endif
         close (sockfd);
         return NULL;
     }
 
     s->fd = sockfd;
     s->socktype = socktype;
-#if ENABLE_SSL
-    s->ssl = NULL;
-    if(ctx)
-        s->ssl = ssl_con;
-#endif
     s->flags = 0;
 
     sa_p = (struct sockaddr *) &(s->local_stg);
@@ -522,11 +457,6 @@ void net_log(int level, const char *fmt, ...)
 
 void Sock_init(void (*log_func)(int, const char*, va_list))
 {
-#if ENABLE_SSL
-    SSL_library_init();
-    SSL_load_error_strings();
-#endif
-
     if (log_func)
         net_vlog = log_func;
 
@@ -564,11 +494,6 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     if(!s)
         return -1;
 
-#if ENABLE_SSL
-    if (s->ssl)
-        SSL_read(s->ssl, buffer, nbytes);
-    else {
-#endif
         switch(s->socktype) {
         case UDP:
             if (!protodata) {
@@ -600,9 +525,6 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
         default:
             break;
         }
-#if ENABLE_SSL
-    }
-#endif
 
     return -1;
 }
@@ -626,11 +548,6 @@ int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int fla
     if (!s)
         return -1;
 
-#if ENABLE_SSL
-    if(s->ssl)
-        return SSL_write(s->ssl, buffer, nbytes);
-    else {
-#endif
         switch (s->socktype) {
         case TCP:
             return send(s->fd, buffer, nbytes, flags);
@@ -658,8 +575,5 @@ int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int fla
         default:
             break;
         }
-#if ENABLE_SSL
-    }
-#endif
     return -1;
 }

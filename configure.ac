@@ -57,28 +57,14 @@ AC_SUBST([LIBTOOL_DEPS])
 LSC_CHECK_IPV6
 LSC_CHECK_SCTP
 
-PKG_WITH_MODULES([OPENSSL], [openssl >= 0.9.8],
-  [have_ssl="yes";
-   OPENSSL_REQUIRES="openssl >= 0.9.8";
-   AC_DEFINE(ENABLE_SSL, 1, [Define if ssl is enabled])], [have_ssl="no"],
-  [Enable SSL support through OpenSSL], [yes])
-
-AM_CONDITIONAL(ENABLE_SSL, [test "$have_ssl" = "yes"])
-
 AS_IF([test "x$enable_shared" = "xyes"], [
-  OPENSSL_REQUIRES_PUBLIC=
-  OPENSSL_REQUIRES_PRIVATE=$OPENSSL_REQUIRES
   LIBS_PUBLIC=
   LIBS_PRIVATE="$LIBS $SCTP_LIBS"
 ], [
-  OPENSSL_REQUIRES_PUBLIC=$OPENSSL_REQUIRES
-  OPENSSL_REQUIRES_PRIVATE=
   LIBS_PUBLIC="$LIBS $SCTP_LIBS"
   LIBS_PRIVATE=
 ])
 
-AC_SUBST(OPENSSL_REQUIRES_PUBLIC)
-AC_SUBST(OPENSSL_REQUIRES_PRIVATE)
 AC_SUBST(LIBS_PUBLIC)
 AC_SUBST(LIBS_PRIVATE)
 
@@ -103,7 +89,6 @@ AC_MSG_NOTICE([config files successfully generated!
 NetEmbryo version is .............. : $VERSION
 NetEmbryo Install prefix .......... : $prefix
 NetEmbryo sctp support enabled .... : $have_sctp
-NetEmbryo ssl support enabled ..... : $have_ssl
 NetEmbryo tests ................... : $have_tests
 
  'make' will now compile NetEmbryo and 'su -c make install' will install it.

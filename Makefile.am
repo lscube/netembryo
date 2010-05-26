@@ -29,7 +29,6 @@ libnetembryo_la_SOURCES = \
 			wsocket/sock_ntop_host.c \
 			wsocket/get_info.c \
 			wsocket/Sock.c
-EXTRA_DIST += wsocket/ssl.c
 
 libnetembryo_la_CFLAGS = $(GLIB_CFLAGS)
 libnetembryo_la_LIBADD = $(GLIB_LIBS)
@@ -42,11 +41,6 @@ noinst_DATA =
 pkgconfig/libnetembryo-sctp%: pkgconfig/libnetembryo%
 	@$(mkdir_p) $(dir $@)
 	$(AM_V_GEN)$(LN_S) -f $(notdir $<) $@
-
-if ENABLE_SSL
-libnetembryo_la_CFLAGS += $(OPENSSL_CFLAGS)
-libnetembryo_la_LIBADD += $(OPENSSL_LIBS)
-endif
 
 if ENABLE_SCTP
 libnetembryo_la_LIBADD += $(SCTP_LIBS)
