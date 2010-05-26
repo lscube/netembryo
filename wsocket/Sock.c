@@ -70,10 +70,9 @@ static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
 /**
  * Create a new socket accepting a new connection from a listening socket.
  * @param s Listening socket.
- * @param octx optional ssl global context
  * @return the newly allocated Sock
  */
-Sock * Sock_accept(Sock *s, void * octx)
+Sock * Sock_accept(Sock *s)
 {
     int res = -1;
     char remote_host[128]; /*Unix Domain is largest*/
@@ -177,11 +176,10 @@ Sock * Sock_accept(Sock *s, void * octx)
  *        be used.
  * @param sock Pointer to a pre-created socket
  * @param socktype The type of socket to be created.
- * @param octx Optional ssl global context
  */
 
 Sock * Sock_bind(char const *host, char const *port, Sock *sock,
-                 sock_type socktype, void * octx)
+                 sock_type socktype)
 {
 
     Sock *s = NULL;
@@ -288,11 +286,10 @@ int Sock_close(Sock *s)
  * @param binded Pointer to a pre-binded socket (useful for connect from
  *        a specific interface/port), if NULL a new socket will be created.
  * @param socktype The type of socket to be created.
- * @param octx Optional ssl global context
  */
 
 Sock * Sock_connect(char const *host, char const *port, Sock *binded,
-                    sock_type socktype, void * octx)
+                    sock_type socktype)
 {
     Sock *s;
     char remote_host[128]; /*Unix Domain is largest*/

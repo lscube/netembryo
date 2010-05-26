@@ -31,7 +31,7 @@ static const char test_ipv4[] = "194.116.73.70";
 
 void test_connect_lscube()
 {
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP);
 
   g_assert(socket);
 
@@ -40,7 +40,7 @@ void test_connect_lscube()
 
 void test_remote_host_lscube()
 {
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP);
   char *remote_host = get_remote_host(socket);
 
   g_assert_cmpstr(remote_host, ==, test_ipv4);
@@ -50,7 +50,7 @@ void test_remote_host_lscube()
 
 void test_remote_port_lscube()
 {
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP);
   in_port_t remote_port = get_remote_port(socket);
 
   g_assert_cmpint(remote_port, ==, 80);
@@ -60,7 +60,7 @@ void test_remote_port_lscube()
 
 void test_local_port_lscube()
 {
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP);
   in_port_t local_port = get_local_port(socket);
 
   g_assert_cmpint(local_port, !=, 0);
@@ -70,7 +70,7 @@ void test_local_port_lscube()
 
 void test_flags_lscube()
 {
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP);
 
   g_assert_cmphex(Sock_flags(socket), ==, 0x00);
 
@@ -79,7 +79,7 @@ void test_flags_lscube()
 
 void test_type_lscube()
 {
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
+  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP);
 
   g_assert_cmphex(Sock_type(socket), ==, TCP);
 
@@ -88,7 +88,7 @@ void test_type_lscube()
 
 void test_random_port()
 {
-    Sock *sock = Sock_bind("localhost", NULL, NULL, TCP, NULL);
+    Sock *sock = Sock_bind("localhost", NULL, NULL, TCP);
     g_assert(sock);
 
     g_assert_cmpuint(sock->local_port, !=, 0);
@@ -98,7 +98,7 @@ void test_random_port()
 
 void test_all_interfaces()
 {
-    Sock *sock = Sock_bind(NULL, "65123", NULL, TCP, NULL);
+    Sock *sock = Sock_bind(NULL, "65123", NULL, TCP);
     g_assert(sock);
 
     Sock_close(sock);

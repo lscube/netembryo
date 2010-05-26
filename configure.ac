@@ -29,8 +29,8 @@ dnl  * in Linux, the library will be named
 dnl    libname.so.(*_lt_current - *_lt_age).*_lt_age.*_lt_revision
 
 m4_define([netembryo_major_version], [0])
-m4_define([netembryo_minor_version], [1])
-m4_define([netembryo_micro_version], [2])
+m4_define([netembryo_minor_version], [2])
+m4_define([netembryo_micro_version], [0])
 m4_define([netembryo_interface_age], [0])
 m4_define([netembryo_binary_age],
           [m4_eval(100 * netembryo_minor_version + netembryo_micro_version)])
@@ -38,7 +38,7 @@ m4_define([netembryo_version],
           [netembryo_major_version.netembryo_minor_version.netembryo_micro_version])
 
 m4_define([netembryo_lt_revision], [0])
-m4_define([netembryo_lt_current], [9])
+m4_define([netembryo_lt_current], [10])
 m4_define([netembryo_lt_age],     [0])
 
 AC_INIT([netembryo], [netembryo_version], [http://www.lscube.org])
