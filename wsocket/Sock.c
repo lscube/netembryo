@@ -41,28 +41,28 @@
 static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
 {
     switch (family) {
-        case AF_INET: {
-            struct in_addr *in;
-            in = &(((struct sockaddr_in *) stg)->sin_addr);
-            return IN_IS_ADDR_MULTICAST(ntohl(in->s_addr));
-        }
+    case AF_INET: {
+        struct in_addr *in;
+        in = &(((struct sockaddr_in *) stg)->sin_addr);
+        return IN_IS_ADDR_MULTICAST(ntohl(in->s_addr));
+    }
 #ifdef  IPV6
-        case AF_INET6: {
-            struct in6_addr *in6;
-            in6 = &(((struct sockaddr_in6 *) stg)->sin6_addr);
-            return IN6_IS_ADDR_MULTICAST(in6);
-        }
+    case AF_INET6: {
+        struct in6_addr *in6;
+        in6 = &(((struct sockaddr_in6 *) stg)->sin6_addr);
+        return IN6_IS_ADDR_MULTICAST(in6);
+    }
 #endif
 #ifdef  AF_UNIX
-        case AF_UNIX:
-            return -1;
+    case AF_UNIX:
+        return -1;
 #endif
 #ifdef  HAVE_SOCKADDR_DL_STRUCT
-        case AF_LINK:
-            return -1;
+    case AF_LINK:
+        return -1;
 #endif
-        default:
-            return -1;
+    default:
+        return -1;
     }
 }
 
@@ -107,12 +107,12 @@ Sock * Sock_accept(Sock *s, void * octx)
     sa_len = sizeof(struct sockaddr_storage);
 
     if(getpeername(res, sa_p, &sa_len))
-    {
-        net_log(NET_LOG_DEBUG,
-                "Unable to get remote address in Sock_accept().\n");
-        Sock_close(new_s);
-        return NULL;
-    }
+        {
+            net_log(NET_LOG_DEBUG,
+                    "Unable to get remote address in Sock_accept().\n");
+            Sock_close(new_s);
+            return NULL;
+        }
 
     if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
         memset(remote_host, 0, sizeof(remote_host));
@@ -137,11 +137,11 @@ Sock * Sock_accept(Sock *s, void * octx)
     sa_len = sizeof(struct sockaddr_storage);
 
     if(getsockname(res, sa_p, &sa_len))
-    {
-        net_log(NET_LOG_DEBUG, "Unable to get remote port in Sock_accept().\n");
-        Sock_close(new_s);
-        return NULL;
-    }
+        {
+            net_log(NET_LOG_DEBUG, "Unable to get remote port in Sock_accept().\n");
+            Sock_close(new_s);
+            return NULL;
+        }
 
     if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
         memset(local_host, 0, sizeof(local_host));
@@ -163,8 +163,8 @@ Sock * Sock_accept(Sock *s, void * octx)
         new_s->local_port = ntohs(local_port);
 
     net_log(NET_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
-        "remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
-        new_s->remote_host, new_s->remote_port);
+            "remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
+            new_s->remote_host, new_s->remote_port);
 
     return new_s;
 }
@@ -308,8 +308,8 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     }
 
     if (sock_connect(host, port, &sockfd, socktype)) {
-            net_log(NET_LOG_DEBUG, "Sock_connect() failure.\n");
-            return NULL;
+        net_log(NET_LOG_DEBUG, "Sock_connect() failure.\n");
+        return NULL;
     }
 
     if (binded) {
@@ -332,12 +332,12 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     sa_len = sizeof(struct sockaddr_storage);
 
     if(getsockname(s->fd, sa_p, &sa_len))
-    {
-        net_log(NET_LOG_DEBUG,
-                "Unable to get remote port in Sock_connect().\n");
-        Sock_close(s);
-        return NULL;
-    }
+        {
+            net_log(NET_LOG_DEBUG,
+                    "Unable to get remote port in Sock_connect().\n");
+            Sock_close(s);
+            return NULL;
+        }
 
     if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
         memset(local_host, 0, sizeof(local_host));
@@ -363,12 +363,12 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     sa_len = sizeof(struct sockaddr_storage);
 
     if(getpeername(s->fd, sa_p, &sa_len))
-    {
-        net_log(NET_LOG_DEBUG,
-                "Unable to get remote address in Sock_connect().\n");
-        Sock_close(s);
-        return NULL;
-    }
+        {
+            net_log(NET_LOG_DEBUG,
+                    "Unable to get remote address in Sock_connect().\n");
+            Sock_close(s);
+            return NULL;
+        }
 
     if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
         memset(remote_host, 0, sizeof(remote_host));
@@ -408,32 +408,32 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 static void net_log_default(int level, const char *fmt, va_list args)
 {
     switch (level) {
-        case NET_LOG_FATAL:
-            fprintf(stderr, "[fatal error] ");
-            break;
-        case NET_LOG_WARN:
-            fprintf(stderr, "[warning] ");
-            break;
-        case NET_LOG_DEBUG:
+    case NET_LOG_FATAL:
+        fprintf(stderr, "[fatal error] ");
+        break;
+    case NET_LOG_WARN:
+        fprintf(stderr, "[warning] ");
+        break;
+    case NET_LOG_DEBUG:
 #ifdef DEBUG
-            fprintf(stderr, "[debug] ");
+        fprintf(stderr, "[debug] ");
 #else
-            return;
+        return;
 #endif
-            break;
-        case NET_LOG_VERBOSE:
+        break;
+    case NET_LOG_VERBOSE:
 #ifdef VERBOSE
-            fprintf(stderr, "[verbose debug] ");
+        fprintf(stderr, "[verbose debug] ");
 #else
-            return;
+        return;
 #endif
-            break;
-        case NET_LOG_INFO:
-            fprintf(stderr, "[info] ");
-            break;
-        default:
-            fprintf(stderr, "[unk] ");
-            break;
+        break;
+    case NET_LOG_INFO:
+        fprintf(stderr, "[info] ");
+        break;
+    default:
+        fprintf(stderr, "[unk] ");
+        break;
     }
 
     vfprintf(stderr, fmt, args);
@@ -494,37 +494,37 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     if(!s)
         return -1;
 
-        switch(s->socktype) {
-        case UDP:
-            if (!protodata) {
-                protodata = &s->remote_stg;
-            }
-            return recvfrom(s->fd, buffer, nbytes, flags,
-                (struct sockaddr *) protodata, &sa_len);
-            break;
-        case TCP:
-            return recv(s->fd, buffer, nbytes, flags);
-            break;
-        case SCTP:
-#ifdef ENABLE_SCTP
-            if (!protodata) {
-                return -1;
-            }
-            return sctp_recvmsg(s->fd, buffer, nbytes, NULL,
-                 0, (struct sctp_sndrcvinfo *) protodata, &flags);
-            /* flags is discarted: usage may include detection of
-             * incomplete packet due to small buffer or detection of
-             * notification data (this last should be probably
-             * handled inside netembryo).
-             */
-#endif
-            break;
-        case LOCAL:
-            return recv(s->fd, buffer, nbytes, flags);
-            break;
-        default:
-            break;
+    switch(s->socktype) {
+    case UDP:
+        if (!protodata) {
+            protodata = &s->remote_stg;
         }
+        return recvfrom(s->fd, buffer, nbytes, flags,
+                        (struct sockaddr *) protodata, &sa_len);
+        break;
+    case TCP:
+        return recv(s->fd, buffer, nbytes, flags);
+        break;
+    case SCTP:
+#ifdef ENABLE_SCTP
+        if (!protodata) {
+            return -1;
+        }
+        return sctp_recvmsg(s->fd, buffer, nbytes, NULL,
+                            0, (struct sctp_sndrcvinfo *) protodata, &flags);
+        /* flags is discarted: usage may include detection of
+         * incomplete packet due to small buffer or detection of
+         * notification data (this last should be probably
+         * handled inside netembryo).
+         */
+#endif
+        break;
+    case LOCAL:
+        return recv(s->fd, buffer, nbytes, flags);
+        break;
+    default:
+        break;
+    }
 
     return -1;
 }
@@ -548,32 +548,32 @@ int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int fla
     if (!s)
         return -1;
 
-        switch (s->socktype) {
-        case TCP:
-            return send(s->fd, buffer, nbytes, flags);
-            break;
-        case UDP:
-            if (!protodata) {
-                protodata = &(s->remote_stg);
-            }
-            return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *)
-                    protodata, sizeof(struct sockaddr_storage));
-            break;
-        case SCTP:
-#ifdef ENABLE_SCTP
-            if (!protodata) {
-                protodata = &sinfo;
-                memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
-            }
-            return sctp_send(s->fd, buffer, nbytes,
-                (struct sctp_sndrcvinfo *) protodata, flags);
-#endif
-            break;
-        case LOCAL:
-            return send(s->fd, buffer, nbytes, flags);
-            break;
-        default:
-            break;
+    switch (s->socktype) {
+    case TCP:
+        return send(s->fd, buffer, nbytes, flags);
+        break;
+    case UDP:
+        if (!protodata) {
+            protodata = &(s->remote_stg);
         }
+        return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *)
+                      protodata, sizeof(struct sockaddr_storage));
+        break;
+    case SCTP:
+#ifdef ENABLE_SCTP
+        if (!protodata) {
+            protodata = &sinfo;
+            memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
+        }
+        return sctp_send(s->fd, buffer, nbytes,
+                         (struct sctp_sndrcvinfo *) protodata, flags);
+#endif
+        break;
+    case LOCAL:
+        return send(s->fd, buffer, nbytes, flags);
+        break;
+    default:
+        break;
+    }
     return -1;
 }
