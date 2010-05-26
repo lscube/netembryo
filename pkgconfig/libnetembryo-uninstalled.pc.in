@@ -6,6 +6,6 @@ Description: network sockets abstraction library
 Version: @VERSION@
 Requires.private: @OPENSSL_REQUIRES@
 Libs: -L${libdir} -lnetembryo
-Libs.private: @LIBS@
+Libs.private: @LIBS@ @SCTP_LIBS@
 Cflags: -I${includedir}
 
