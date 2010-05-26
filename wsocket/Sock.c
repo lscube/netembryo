@@ -35,7 +35,7 @@
 #endif
 
 #if ENABLE_SSL
-#include "ssl.h"
+#include "ssl.c"
 #endif
 
 /**
@@ -103,7 +103,7 @@ Sock * Sock_accept(Sock *s, void * octx)
 
 #if ENABLE_SSL
     if(ctx) {
-        if( !(ssl_con = SSL_sock_accept(res, ctx)) ) {
+        if( !(ssl_con = _netembryo_ssl_accept(res, ctx)) ) {
             net_log(NET_LOG_DEBUG, "Unable to accept SSL connection.\n");
             close(res);
             return NULL;
@@ -116,7 +116,7 @@ Sock * Sock_accept(Sock *s, void * octx)
                 "Unable to allocate a Sock struct in Sock_accept().\n");
 #if ENABLE_SSL
         if(ctx)
-            SSL_close_connection(ssl_con, res);
+            _netembryo_ssl_close(ssl_con, res);
 #endif
         close(res);
         return NULL;
@@ -311,7 +311,7 @@ int Sock_close(Sock *s)
 
 #if ENABLE_SSL
     if(s->ssl)
-        SSL_close_connection(s->ssl, s->fd);
+        _netembryo_ssl_close(s->ssl, s->fd);
 #endif
 
     res = close(s->fd);
@@ -360,7 +360,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
 
 #if ENABLE_SSL
     if((ctx)) {
-        if (sock_SSL_connect(&ssl_con, sockfd, ctx))
+        if (_netembryo_ssl_connect(&ssl_con, sockfd, ctx))
             net_log (NET_LOG_DEBUG, "Sock_connect() failure in SSL init.\n");
             close(sockfd);
             return NULL;
@@ -378,7 +378,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
         net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in Sock_connect().\n");
 #if ENABLE_SSL
         if(ctx)
-            SSL_close_connection(ssl_con, sockfd);
+            _netembryo_ssl_close(ssl_con, sockfd);
 #endif
         close (sockfd);
         return NULL;

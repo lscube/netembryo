@@ -25,8 +25,7 @@
  * SSL support
  */
 
-#include "ssl.h"
-#include "netembryo/wsocket.h"
+#include <openssl/ssl.h>
 
 /**
  * The Function establishes a new ssl connection
@@ -34,7 +33,7 @@
  * @return: pointer to new structure ssl
  */
 
-SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx) {
+static SSL *_netembryo_ssl_accept(int sockfd, SSL_CTX * global_ctx) {
 
     SSL *ssl;
 
@@ -65,7 +64,7 @@ SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx) {
  * @return: '1' success operation, otherwise '0'
  */
 
-int SSL_close_connection(SSL *ssl, int sockfd) {
+static int _netembryo_ssl_close(SSL *ssl, int sockfd) {
 
     int exit;
 
@@ -82,7 +81,7 @@ int SSL_close_connection(SSL *ssl, int sockfd) {
 }
 
 
-int sock_SSL_connect(SSL **ssl_con, int sockfd, SSL_CTX * ssl_ctx)
+static int _netembryo_ssl_connect(SSL **ssl_con, int sockfd, SSL_CTX * ssl_ctx)
 {
     int ssl_err;
 
