@@ -55,29 +55,26 @@
 typedef unsigned short sa_family_t;
 typedef unsigned short in_port_t;
 typedef unsigned int in_addr_t;
-
-const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt);
-int inet_pton(int af, const char *src, void *dst);
 #endif
 
 /** flags definition*/
 typedef enum {
-/** ssl flags */
+    /** ssl flags */
     IS_SSL = 0x1,
     IS_TLS = 0x3, /**< setting this will also set IS_SSL */
-/** multicast flags */
+    /** multicast flags */
     IS_MULTICAST = 0x4
 } sock_flags;
 
 /** socket type definition */
 typedef enum {
-/** socket fd not valid */
+    /** socket fd not valid */
     SOCK_NONE,
-/** IP based protcols */
+    /** IP based protcols */
     TCP,
     UDP,
     SCTP,
-/** Local socket (Unix) */
+    /** Local socket (Unix) */
     LOCAL
 } sock_type;
 
@@ -131,32 +128,69 @@ void net_log(int, const char*, ...);
  * @{
  */
 
-Sock * Sock_connect(char const *host, char const *port, Sock *binded, sock_type socktype);
+/**
+ * Establish a connection to a remote host.
+ * @param host Remote host to connect to (may be a hostname).
+ * @param port Remote port to connect to.
+ * @param binded Pointer to a pre-binded socket (useful for connect from
+ *        a specific interface/port), if NULL a new socket will be created.
+ * @param socktype The type of socket to be created.
+ */
+Sock * neb_sock_connect(const char const *host,
+                        const char const *port,
+                        Sock *binded,
+                        sock_type socktype);
 
-Sock * Sock_bind(char const *host, char const *port, Sock *sock, sock_type socktype);
+/**
+ * Create a new socket and binds it to an address/port.
+ * @param host Local address to be used by this socket, if NULL the socket will
+ *        be bound to all interfaces.
+ * @param port Local port to be used by this socket, if NULL a random port will
+ *        be used.
+ * @param sock Pointer to a pre-created socket
+ * @param socktype The type of socket to be created.
+ */
+Sock * neb_sock_bind(const char const *host,
+                     const char const *port,
+                     Sock *sock,
+                     sock_type socktype);
 
-Sock * Sock_accept(Sock *main);
+/**
+ * Create a new socket accepting a new connection from a listening socket.
+ * @param s Listening socket.
+ * @return the newly allocated Sock
+ */
+Sock * neb_sock_accept(Sock *main);
 
-int Sock_listen(Sock *s, int backlog);
+/**
+ * Put a socket in listening state.
+ * @param s Existing socket.
+ * @param backlog Number of connection that may wait to be accepted.
+ */
+int neb_sock_listen(Sock *s, int backlog);
 
-int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
+/**
+ * Read data from a socket.
+ * @param s Existing socket.
+ * @param buffer Buffer reserved for receiving data.
+ * @param nbytes Size of the buffer.
+ * @param protodata Pointer to data depending from socket protocol, if NULL a
+ *        suitable default value will be used.
+ * @param flags Flags to be passed to posix recv() function.
+ */
+int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
 
-int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags);
+int neb_sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags);
 
-int Sock_close(Sock *s);
+int neb_sock_close(Sock *s);
 
 void Sock_init(void (*log_function)(int level, const char *fmt, va_list list));
 
-/** low level access macros */
-#define Sock_fd(A) ((A)->fd)
-#define Sock_type(A) ((A)->socktype)
-#define Sock_flags(A) ((A)->flags)
-
 /*get_info.c*/
-char * get_remote_host(Sock *);
-char * get_local_host(Sock *);
-in_port_t get_remote_port(Sock *);
-in_port_t get_local_port(Sock *);
+const char *neb_sock_remote_host(Sock *);
+const char *neb_sock_local_host(Sock *);
+in_port_t neb_sock_remote_port(Sock *);
+in_port_t neb_sock_local_port(Sock *);
 
 /**
  * @}

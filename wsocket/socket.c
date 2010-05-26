@@ -40,7 +40,7 @@
  * @note doesn't shutdown the listened one
  **/
 
-static int sock_accept(int sock)
+static int _neb_sock_accept(int sock)
 {
     int new_fd;
     struct sockaddr_in their_addr; /* connector's address information */
@@ -58,7 +58,7 @@ static int sock_accept(int sock)
  * bind wrapper
  */
 
-static int sock_bind(const char const *host, const char const *port, int *sock, sock_type socktype)
+static int _neb_sock_bind(const char const *host, const char const *port, int *sock, sock_type socktype)
 {
     int n;
     int bind_new;
@@ -161,7 +161,7 @@ static int sock_bind(const char const *host, const char const *port, int *sock, 
  * wraps connect
  */
 
-static int sock_connect(const char const *host, const char const *port, int *sock, sock_type socktype)
+static int _neb_sock_connect(const char const *host, const char const *port, int *sock, sock_type socktype)
 {
     int n, connect_new;
     struct addrinfo *res, *ressave;

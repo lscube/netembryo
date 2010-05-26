@@ -28,7 +28,7 @@
 #include <netinet/in.h>
 #endif
 
-char *get_remote_host(Sock *s)
+const char *neb_sock_remote_host(Sock *s)
 {
     char str[128];
 
@@ -40,7 +40,7 @@ char *get_remote_host(Sock *s)
     return s->remote_host;
 }
 
-char *get_local_host(Sock *s)
+const char *neb_sock_local_host(Sock *s)
 {
     char str[128]; /*Unix domain is largest*/
 
@@ -52,7 +52,7 @@ char *get_local_host(Sock *s)
     return s->local_host;
 }
 
-in_port_t get_remote_port(Sock *s)
+in_port_t neb_sock_remote_port(Sock *s)
 {
     int32_t port;
     if(!(s->remote_port)) {
@@ -63,7 +63,7 @@ in_port_t get_remote_port(Sock *s)
     return s->remote_port;
 }
 
-in_port_t get_local_port(Sock *s)
+in_port_t neb_sock_local_port(Sock *s)
 {
     int32_t port;
 

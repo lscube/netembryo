@@ -31,6 +31,11 @@
 # include <sys/un.h>
 #endif
 
+#ifdef WIN32
+const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt);
+int inet_pton(int af, const char *src, void *dst);
+#endif
+
 #include <string.h>
 
 #ifdef WIN32
