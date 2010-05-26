@@ -444,10 +444,10 @@ int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
  * @param flags Flags to be passed to posix send() function.
  */
 
-int neb_sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags)
+int neb_sock_write(Sock *s, const void *buffer, int nbytes, const void *protodata, int flags)
 {
 #ifdef ENABLE_SCTP
-    struct sctp_sndrcvinfo sinfo;
+    static const struct sctp_sndrcvinfo sinfo;
 #endif
 
     if (!s)
@@ -466,10 +466,8 @@ int neb_sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int
         break;
     case SCTP:
 #ifdef ENABLE_SCTP
-        if (!protodata) {
+        if (!protodata)
             protodata = &sinfo;
-            memset(protodata, 0, sizeof(struct sctp_sndrcvinfo));
-        }
         return sctp_send(s->fd, buffer, nbytes,
                          (struct sctp_sndrcvinfo *) protodata, flags);
 #endif

@@ -204,7 +204,7 @@ int neb_sock_listen(Sock *s, int backlog);
  */
 int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
 
-int neb_sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags);
+int neb_sock_write(Sock *s, const void *buffer, int nbytes, const void *protodata, int flags);
 
 int neb_sock_close(Sock *s);
 
