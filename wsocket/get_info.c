@@ -21,7 +21,7 @@
  * */
 
 #include "netembryo/wsocket.h"
-#include "netembryo/wsocket-internal.h"
+#include "wsocket-internal.h"
 #include <string.h>
 
 #ifndef WIN32

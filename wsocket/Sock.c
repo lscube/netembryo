@@ -33,7 +33,7 @@
 #include <string.h>
 
 #include "netembryo/wsocket.h"
-#include "netembryo/wsocket-internal.h"
+#include "wsocket-internal.h"
 
 #ifndef WIN32
 # include <sys/ioctl.h>

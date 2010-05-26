@@ -16,7 +16,6 @@ distcheck-hook:
 lib_LTLIBRARIES = libnetembryo.la
 
 pkginclude_HEADERS =    netembryo/wsocket.h \
-			netembryo/wsocket-internal.h \
 			netembryo/url.h \
 			netembryo/rtsp.h
 
@@ -24,6 +23,7 @@ libnetembryo_la_SOURCES = \
 			utils/url.c \
 			utils/rtsp.c \
 			\
+			wsocket/wsocket-internal.h \
 			wsocket/multicast.c \
 			wsocket/sock_ntop_host.c \
 			wsocket/get_info.c \
