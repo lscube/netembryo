@@ -32,6 +32,8 @@
 #include <netdb.h>
 #include <string.h>
 
+#include <assert.h>
+
 #include "netembryo/wsocket.h"
 #include "wsocket-internal.h"
 
@@ -434,49 +436,41 @@ int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
     return -1;
 }
 
-/**
- * Read data to a socket
- * @param s Existing socket.
- * @param buffer Buffer of data to be sent.
- * @param nbytes Amount of data to be sent.
- * @param protodata Pointer to data depending from socket protocol, if NULL a
- *        suitable default value will be used.
- * @param flags Flags to be passed to posix send() function.
- */
-
-int neb_sock_write(Sock *s, const void *buffer, int nbytes, const void *protodata, int flags)
+int neb_sock_simple_write(Sock *s,
+                          const void *buffer, size_t nbytes,
+                          int flags)
 {
-#ifdef ENABLE_SCTP
-    static const struct sctp_sndrcvinfo sinfo;
-#endif
+    assert(s != NULL);
+    assert(s->socktype != SCTP);
 
-    if (!s)
-        return -1;
-
-    switch (s->socktype) {
-    case TCP:
-        return send(s->fd, buffer, nbytes, flags);
-        break;
+    switch(s->socktype) {
     case UDP:
-        if (!protodata) {
-            protodata = &(s->remote_stg);
-        }
-        return sendto(s->fd, buffer, nbytes, flags, (struct sockaddr *)
-                      protodata, sizeof(struct sockaddr_storage));
-        break;
-    case SCTP:
-#ifdef ENABLE_SCTP
-        if (!protodata)
-            protodata = &sinfo;
-        return sctp_send(s->fd, buffer, nbytes,
-                         (struct sctp_sndrcvinfo *) protodata, flags);
-#endif
-        break;
+        return sendto(s->fd, buffer, nbytes, flags,
+                      (struct sockaddr*)&s->remote_stg,
+                      sizeof(struct sockaddr_storage));
+    case TCP:
     case LOCAL:
         return send(s->fd, buffer, nbytes, flags);
-        break;
     default:
-        break;
+        assert(1 != 1);
+        return -1;
     }
-    return -1;
 }
+
+#ifdef ENABLE_SCTP
+int neb_sock_sctp_write(Sock *s,
+                        const void *buffer, size_t nbytes,
+                        int stream, int flags)
+{
+    const struct sctp_sndrcvinfo sctp_info = {
+        .sinfo_stream = stream
+    };
+
+    assert(s != NULL);
+    assert(s->socktype == SCTP);
+
+    return sctp_send(s->fd,
+                     buffer, nbytes,
+                     &sctp_info, flags);
+}
+#endif
