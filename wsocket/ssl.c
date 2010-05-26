@@ -82,35 +82,6 @@ int SSL_close_connection(SSL *ssl, int sockfd) {
 }
 
 
-/**
- * This function reads at most nbyte from the connection ssl
- * @param : pointer to structure ssl
- * @param : buffer to store bytes that are read.
- * @param : maximum number of bytes to write to the buffer
- * @return: 'number of bytes read' success operation, otherwise '0'
- */
-
-int SSL_sock_read(SSL *ssl, void *buffer, int nbyte) {
-
-    if(ssl)
-        return(SSL_read(ssl,buffer,nbyte));
-    else
-        return 0;
-}
-
-
-/**
- * This function writes up to nbyte from buffer to socket ssl
- * @param : pointer to structure ssl
- * @param : buffer to store bytes that are read.
- * @param : maximum number of bytes to write to the buffer
- * @return: Number of bytes written
- */
-
-int SSL_sock_write(SSL *ssl, const void *buffer, int nbyte) {
-    return(SSL_write(ssl,buffer,nbyte));
-}
-
 int sock_SSL_connect(SSL **ssl_con, int sockfd, SSL_CTX * ssl_ctx)
 {
     int ssl_err;

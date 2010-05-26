@@ -566,7 +566,7 @@ int Sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 
 #if ENABLE_SSL
     if (s->ssl)
-        SSL_sock_read(s->ssl, buffer, nbytes);
+        SSL_read(s->ssl, buffer, nbytes);
     else {
 #endif
         switch(s->socktype) {
@@ -628,7 +628,7 @@ int Sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int fla
 
 #if ENABLE_SSL
     if(s->ssl)
-        return SSL_sock_write(s->ssl, buffer, nbytes);
+        return SSL_write(s->ssl, buffer, nbytes);
     else {
 #endif
         switch (s->socktype) {

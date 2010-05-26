@@ -32,5 +32,3 @@
 int sock_SSL_connect(SSL **ssl_con, int sockfd, SSL_CTX * ssl_ctx);
 SSL *SSL_sock_accept(int sockfd, SSL_CTX * global_ctx);
 int SSL_close_connection(SSL *ssl,int sockfd);
-int SSL_sock_read(SSL *ssl,void *buffer,int nbyte);
-int SSL_sock_write(SSL *ssl,const void *buffer,int nbyte);
