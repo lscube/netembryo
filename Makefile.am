@@ -70,7 +70,6 @@ BUILT_SOURCES = tests/gtestmain.c
 endif
 
 tests_testsuite_SOURCES = \
-	tests/test_hostname.c \
 	tests/test_url.c \
 	tests/test_sock.c \
 	tests/gtest-extra.h

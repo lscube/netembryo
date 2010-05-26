@@ -48,22 +48,6 @@ void test_remote_host_lscube()
   Sock_close(socket);
 }
 
-#if 0
-void test_local_host_lscube()
-{
-  Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);
-  char actual_local_host[1024];
-  char *local_host = get_local_host(socket);
-
-  /* There's a test for this already so just accept it to be fine */
-  g_assert(get_local_hostname(actual_local_host, sizeof(actual_local_host)) != -1);
-
-  g_assert_cmpstr(local_host, ==, actual_local_host);
-
-  Sock_close(socket);
-}
-#endif
-
 void test_remote_port_lscube()
 {
   Sock *socket = Sock_connect(test_host, test_port, NULL, TCP, NULL);

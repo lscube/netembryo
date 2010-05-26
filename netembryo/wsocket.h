@@ -155,7 +155,6 @@ void Sock_init(void (*log_function)(int level, const char *fmt, va_list list));
 /*get_info.c*/
 char * get_remote_host(Sock *);
 char * get_local_host(Sock *);
-int get_local_hostname(char *localhostname, size_t len); // return 0 if ok
 in_port_t get_remote_port(Sock *);
 in_port_t get_local_port(Sock *);
 

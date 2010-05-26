@@ -26,7 +26,6 @@
 
 #ifndef WIN32
 #include <netinet/in.h>
-#include <netdb.h> // for getnameinfo()
 #endif
 
 char *get_remote_host(Sock *s)
@@ -51,12 +50,6 @@ char *get_local_host(Sock *s)
         s->local_host = strdup(str);
         }
     return s->local_host;
-}
-
-int get_local_hostname(char *localhostname, size_t len) //return 0 if ok
-{
-    //return getnameinfo((struct sockaddr *)&(s->local_stg), sizeof(s->local_stg), localhostname, len, NULL, 0, 0);
-    return gethostname(localhostname, len);
 }
 
 in_port_t get_remote_port(Sock *s)
