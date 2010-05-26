@@ -49,10 +49,6 @@
  * @{
  */
 
-int sock_connect(char const *host, char const *port, int *sock, sock_type socktype);
-int sock_bind(char const *host, char const *port, int *sock, sock_type socktype);
-int sock_accept(int sock);
-
 /**
  * @return the address in human readable string format
  */

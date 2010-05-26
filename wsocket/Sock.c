@@ -26,13 +26,20 @@
  */
 
 #include <config.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <string.h>
+
 #include "netembryo/wsocket.h"
 #include "netembryo/wsocket-internal.h"
 
 #ifndef WIN32
 # include <sys/ioctl.h>
 #endif
+
+#include "socket.c"
 
 /**
  * Tell if an address is multicast

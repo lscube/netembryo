@@ -25,10 +25,11 @@ libnetembryo_la_SOURCES = \
 			utils/rtsp.c \
 			\
 			wsocket/multicast.c \
-			wsocket/socket.c \
 			wsocket/sock_ntop_host.c \
 			wsocket/get_info.c \
 			wsocket/Sock.c
+
+EXTRA_DIST += wsocket/socket.c
 
 libnetembryo_la_CFLAGS = $(GLIB_CFLAGS)
 libnetembryo_la_LIBADD = $(GLIB_LIBS)

@@ -25,16 +25,6 @@
  * low level socket management
  */
 
-#include "config.h"
-
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
-#include "netembryo/wsocket.h"
-#include "netembryo/wsocket-internal.h"
-#include <string.h>
-
 #ifdef ENABLE_SCTP
 /* FreeBSD and Mac OS X don't have SOL_SCTP and re-use IPPROTO_SCTP
    for setsockopt() */
@@ -50,7 +40,7 @@
  * @note doesn't shutdown the listened one
  **/
 
-int sock_accept(int sock)
+static int sock_accept(int sock)
 {
     int new_fd;
     struct sockaddr_in their_addr; /* connector's address information */
@@ -68,7 +58,7 @@ int sock_accept(int sock)
  * bind wrapper
  */
 
-int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
+static int sock_bind(const char const *host, const char const *port, int *sock, sock_type socktype)
 {
     int n;
     int bind_new;
@@ -171,7 +161,7 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
  * wraps connect
  */
 
-int sock_connect(char const *host, char const *port, int *sock, sock_type socktype)
+static int sock_connect(const char const *host, const char const *port, int *sock, sock_type socktype)
 {
     int n, connect_new;
     struct addrinfo *res, *ressave;
