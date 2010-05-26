@@ -105,7 +105,7 @@ Sock * Sock_accept(Sock *s, void * octx)
     if(ctx) {
         if( !(ssl_con = SSL_sock_accept(res, ctx)) ) {
             net_log(NET_LOG_DEBUG, "Unable to accept SSL connection.\n");
-            sock_close(res);
+            close(res);
             return NULL;
         }
     }
@@ -118,7 +118,7 @@ Sock * Sock_accept(Sock *s, void * octx)
         if(ctx)
             SSL_close_connection(ssl_con, res);
 #endif
-        sock_close(res);
+        close(res);
         return NULL;
     }
 
@@ -240,7 +240,7 @@ Sock * Sock_bind(char const *host, char const *port, Sock *sock,
     if (!(s = calloc(1, sizeof(Sock)))) {
         net_log(NET_LOG_FATAL,
                 "Unable to allocate a Sock struct in Sock_bind().\n");
-        sock_close(sockfd);
+        close(sockfd);
         return NULL;
     }
 
@@ -314,7 +314,7 @@ int Sock_close(Sock *s)
         SSL_close_connection(s->ssl, s->fd);
 #endif
 
-    res = sock_close(s->fd);
+    res = close(s->fd);
 
     free(s->remote_host);
     free(s->local_host);
@@ -362,7 +362,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
     if((ctx)) {
         if (sock_SSL_connect(&ssl_con, sockfd, ctx))
             net_log (NET_LOG_DEBUG, "Sock_connect() failure in SSL init.\n");
-            sock_close(sockfd);
+            close(sockfd);
             return NULL;
     }
     else
@@ -380,7 +380,7 @@ Sock * Sock_connect(char const *host, char const *port, Sock *binded,
         if(ctx)
             SSL_close_connection(ssl_con, sockfd);
 #endif
-        sock_close (sockfd);
+        close (sockfd);
         return NULL;
     }
 
@@ -543,7 +543,7 @@ int Sock_listen(Sock *s, int backlog)
 {
     if (!s)
         return -1;
-    return sock_listen(s->fd, backlog);
+    return listen(s->fd, backlog);
 }
 
 /**

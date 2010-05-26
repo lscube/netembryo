@@ -168,16 +168,6 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
 }
 
 /**
- * wraps close
- * @bug remove it or extend it!
- */
-
-int sock_close(int s)
-{
-    return close(s);
-}
-
-/**
  * wraps connect
  */
 
@@ -304,14 +294,3 @@ int sock_get_port(const struct sockaddr *sa)
 
     return -1;
 }
-
-/**
- * wraps listen
- * @bug extend or remove!
- */
-
-int sock_listen(int s, int backlog)
-{
-    return listen(s, backlog);
-}
-
