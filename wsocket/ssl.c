@@ -64,20 +64,16 @@ static SSL *_netembryo_ssl_accept(int sockfd, SSL_CTX * global_ctx) {
  * @return: '1' success operation, otherwise '0'
  */
 
-static int _netembryo_ssl_close(SSL *ssl, int sockfd) {
-
-    int exit;
-
-    exit = SSL_shutdown(ssl);
-    if(!exit) {
-        shutdown(sockfd,SHUT_WR);
-        SSL_shutdown(ssl);
-    } else {
+static void _netembryo_ssl_close(SSL *ssl, int sockfd)
+{
+    if(SSL_shutdown(ssl) != 0) {
         net_log(NET_LOG_ERR,"Shutdown failed");
-        return 0;
+        return;
     }
+
+    shutdown(sockfd,SHUT_WR);
+    SSL_shutdown(ssl);
     SSL_free(ssl);
-    return 1;
 }
 
 
