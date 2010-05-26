@@ -88,12 +88,12 @@ Sock * neb_sock_accept(Sock *s)
         return NULL;
 
     if ((res = _neb_sock_accept(s->fd)) < 0) {
-        net_log(NET_LOG_DEBUG, "System error in _neb_sock_accept().\n");
+        neb_log(NEB_LOG_DEBUG, "System error in _neb_sock_accept().\n");
         return NULL;
     }
 
     if (!(new_s = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate a Sock struct in neb_sock_accept().\n");
         close(res);
         return NULL;
@@ -108,7 +108,7 @@ Sock * neb_sock_accept(Sock *s)
 
     if(getpeername(res, sa_p, &sa_len))
         {
-            net_log(NET_LOG_DEBUG,
+            neb_log(NEB_LOG_DEBUG,
                     "Unable to get remote address in neb_sock_accept().\n");
             neb_sock_close(new_s);
             return NULL;
@@ -118,7 +118,7 @@ Sock * neb_sock_accept(Sock *s)
         memset(remote_host, 0, sizeof(remote_host));
 
     if (!(new_s->remote_host = strdup(remote_host))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate remote host in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
@@ -126,7 +126,7 @@ Sock * neb_sock_accept(Sock *s)
 
     remote_port = sock_get_port(sa_p);
     if(remote_port < 0) {
-        net_log(NET_LOG_DEBUG, "Unable to get remote port in neb_sock_accept().\n");
+        neb_log(NEB_LOG_DEBUG, "Unable to get remote port in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
     }
@@ -138,7 +138,7 @@ Sock * neb_sock_accept(Sock *s)
 
     if(getsockname(res, sa_p, &sa_len))
         {
-            net_log(NET_LOG_DEBUG, "Unable to get remote port in neb_sock_accept().\n");
+            neb_log(NEB_LOG_DEBUG, "Unable to get remote port in neb_sock_accept().\n");
             neb_sock_close(new_s);
             return NULL;
         }
@@ -147,7 +147,7 @@ Sock * neb_sock_accept(Sock *s)
         memset(local_host, 0, sizeof(local_host));
 
     if (!(new_s->local_host = strdup(local_host))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate local host in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
@@ -155,14 +155,14 @@ Sock * neb_sock_accept(Sock *s)
 
     local_port = sock_get_port(sa_p);
     if(local_port < 0) {
-        net_log(NET_LOG_DEBUG, "Unable to get local port in neb_sock_accept().\n");
+        neb_log(NEB_LOG_DEBUG, "Unable to get local port in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
     }
     else
         new_s->local_port = ntohs(local_port);
 
-    net_log(NET_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
+    neb_log(NEB_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
             "remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
             new_s->remote_host, new_s->remote_port);
 
@@ -185,12 +185,12 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
     }
 
     if (_neb_sock_bind(host, port, &sockfd, socktype)) {
-        net_log(NET_LOG_DEBUG, "Error in low level sock_bind().\n");
+        neb_log(NEB_LOG_DEBUG, "Error in low level sock_bind().\n");
         return NULL;
     }
 
     if (!(s = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate a Sock struct in neb_sock_bind().\n");
         close(sockfd);
         return NULL;
@@ -212,7 +212,7 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
         memset(local_host, 0, sizeof(local_host));
 
     if (!(s->local_host = strdup(local_host))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate local host in neb_sock_bind().\n");
         neb_sock_close(s);
         return NULL;
@@ -221,13 +221,13 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
     local_port = sock_get_port(sa_p);
 
     if(local_port < 0) {
-        net_log(NET_LOG_DEBUG, "Unable to get local port in neb_sock_bind().\n");
+        neb_log(NEB_LOG_DEBUG, "Unable to get local port in neb_sock_bind().\n");
         neb_sock_close(s);
         return NULL;
     } else
         s->local_port = ntohs(local_port);
 
-    net_log(NET_LOG_DEBUG,
+    neb_log(NEB_LOG_DEBUG,
             "Socket bound with addr=\"%s\" and port=\"%u\".\n",
             s->local_host, s->local_port);
 
@@ -287,7 +287,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     }
 
     if (_neb_sock_connect(host, port, &sockfd, socktype)) {
-        net_log(NET_LOG_DEBUG, "neb_sock_connect() failure.\n");
+        neb_log(NEB_LOG_DEBUG, "neb_sock_connect() failure.\n");
         return NULL;
     }
 
@@ -298,7 +298,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
         free(s->remote_host);
         s->remote_host = NULL;
     } else if (!(s = calloc(1, sizeof(Sock)))) {
-        net_log(NET_LOG_FATAL, "Unable to allocate a Sock struct in neb_sock_connect().\n");
+        neb_log(NEB_LOG_FATAL, "Unable to allocate a Sock struct in neb_sock_connect().\n");
         close (sockfd);
         return NULL;
     }
@@ -312,7 +312,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
 
     if(getsockname(s->fd, sa_p, &sa_len))
         {
-            net_log(NET_LOG_DEBUG,
+            neb_log(NEB_LOG_DEBUG,
                     "Unable to get remote port in neb_sock_connect().\n");
             neb_sock_close(s);
             return NULL;
@@ -322,7 +322,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
         memset(local_host, 0, sizeof(local_host));
 
     if (!(s->local_host = strdup(local_host))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate local host in neb_sock_connect().\n");
         neb_sock_close(s);
         return NULL;
@@ -331,7 +331,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     local_port = sock_get_port(sa_p);
 
     if(local_port < 0) {
-        net_log(NET_LOG_DEBUG,
+        neb_log(NEB_LOG_DEBUG,
                 "Unable to get local port in neb_sock_connect().\n");
         neb_sock_close(s);
         return NULL;
@@ -343,7 +343,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
 
     if(getpeername(s->fd, sa_p, &sa_len))
         {
-            net_log(NET_LOG_DEBUG,
+            neb_log(NEB_LOG_DEBUG,
                     "Unable to get remote address in neb_sock_connect().\n");
             neb_sock_close(s);
             return NULL;
@@ -353,7 +353,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
         memset(remote_host, 0, sizeof(remote_host));
 
     if (!(s->remote_host = strdup(remote_host))) {
-        net_log(NET_LOG_FATAL,
+        neb_log(NEB_LOG_FATAL,
                 "Unable to allocate remote host in neb_sock_connect().\n");
         neb_sock_close(s);
         return NULL;
@@ -361,14 +361,14 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
 
     remote_port = sock_get_port(sa_p);
     if(remote_port < 0) {
-        net_log(NET_LOG_DEBUG,
+        neb_log(NEB_LOG_DEBUG,
                 "Unable to get remote port in neb_sock_connect().\n");
         neb_sock_close(s);
         return NULL;
     } else
         s->remote_port = ntohs(remote_port);
 
-    net_log(NET_LOG_DEBUG,
+    neb_log(NEB_LOG_DEBUG,
             "Socket connected between local=\"%s\":%u and remote=\"%s\":%u.\n",
             s->local_host, s->local_port, s->remote_host, s->remote_port);
 
@@ -382,64 +382,6 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     }
 
     return s;
-}
-
-static void net_log_default(int level, const char *fmt, va_list args)
-{
-    switch (level) {
-    case NET_LOG_FATAL:
-        fprintf(stderr, "[fatal error] ");
-        break;
-    case NET_LOG_WARN:
-        fprintf(stderr, "[warning] ");
-        break;
-    case NET_LOG_DEBUG:
-#ifdef DEBUG
-        fprintf(stderr, "[debug] ");
-#else
-        return;
-#endif
-        break;
-    case NET_LOG_VERBOSE:
-#ifdef VERBOSE
-        fprintf(stderr, "[verbose debug] ");
-#else
-        return;
-#endif
-        break;
-    case NET_LOG_INFO:
-        fprintf(stderr, "[info] ");
-        break;
-    default:
-        fprintf(stderr, "[unk] ");
-        break;
-    }
-
-    vfprintf(stderr, fmt, args);
-}
-
-static void (*net_vlog)(int, const char*, va_list) = net_log_default;
-
-void net_log(int level, const char *fmt, ...)
-{
-    va_list vl;
-    va_start(vl, fmt);
-    net_vlog(level, fmt, vl);
-    va_end(vl);
-}
-
-/**
- * Init internal structures.
- * @param log_func Pointer to a proper log function, if NULL messages will
- * be sent to stderr.
- */
-
-void Sock_init(void (*log_func)(int, const char*, va_list))
-{
-    if (log_func)
-        net_vlog = log_func;
-
-    return;
 }
 
 int neb_sock_listen(Sock *s, int backlog)

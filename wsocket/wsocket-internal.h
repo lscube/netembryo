@@ -43,6 +43,8 @@
 #endif
 #endif //IPV6
 
+void neb_log(NebLogLevel level, const char *fmt, ...);
+
 /**
  * @defgroup NetEmbryo_Internals Low level wrappers
  * @brief Low level internal implementations, private

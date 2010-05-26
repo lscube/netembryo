@@ -22,6 +22,7 @@ pkginclude_HEADERS =    netembryo/wsocket.h \
 libnetembryo_la_SOURCES = \
 			utils/url.c \
 			utils/rtsp.c \
+			utils/log.c \
 			\
 			wsocket/wsocket-internal.h \
 			wsocket/multicast.c \
@@ -65,6 +66,7 @@ endif
 tests_testsuite_SOURCES = \
 	tests/test_url.c \
 	tests/test_sock.c \
+	tests/utils.c \
 	tests/gtest-extra.h
 tests_testsuite_CFLAGS = $(GTESTER_CFLAGS)
 tests_testsuite_LDADD = libnetembryo.la $(GTESTER_LIBS)

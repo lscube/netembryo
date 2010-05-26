@@ -109,17 +109,41 @@ typedef struct {
 #define WSOCK_ERRADDR    3
 #define WSOCK_ERRPORT    4
 
-/** log facilities */
-/* Outputs the messages using the default logger or a custom one passed to
- * Sock_init() */
-void net_log(int, const char*, ...);
-/* levels to be implemented by log function */
-#define NET_LOG_FATAL 0
-#define NET_LOG_ERR 1
-#define NET_LOG_WARN 2
-#define NET_LOG_INFO 3
-#define NET_LOG_DEBUG 4
-#define NET_LOG_VERBOSE 5
+/**
+ * @defgroup neb_logging Logging facilities
+ * @{
+ */
+
+/**
+ * Levels used by the logging functions
+ */
+typedef enum {
+    NEB_LOG_FATAL,
+    NEB_LOG_ERR,
+    NEB_LOG_WARN,
+    NEB_LOG_INFO,
+    NEB_LOG_DEBUG,
+    NEB_LOG_VERBOSE,
+    NEB_LOG_UNKNOWN
+} NebLogLevel;
+
+/**
+ * @brief Variable-argument logging function
+ *
+ * @param level The level of the log message
+ * @param fmt printf(3)-formatted format string
+ * @param args arguments for the format string
+ *
+ * This function can be replaced by re-defining it in the final
+ * executable or other library using netembryo; since what is
+ * presented by netembryo is only a weak reference, the loader will
+ * take care of making use of the later-defined function instead.
+ */
+void neb_vlog(NebLogLevel level, const char *fmt, va_list args);
+
+/**
+ * @}
+ */
 
 /** @defgroup NetEmbryo_Socket Sockets Access Interface
  *
@@ -183,8 +207,6 @@ int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
 int neb_sock_write(Sock *s, const void *buffer, int nbytes, void *protodata, int flags);
 
 int neb_sock_close(Sock *s);
-
-void Sock_init(void (*log_function)(int level, const char *fmt, va_list list));
 
 /*get_info.c*/
 const char *neb_sock_remote_host(Sock *);

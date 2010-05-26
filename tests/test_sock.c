@@ -41,7 +41,7 @@ void test_connect_lscube()
 void test_remote_host_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
-  char *remote_host = neb_sock_remote_host(socket);
+  const char *remote_host = neb_sock_remote_host(socket);
 
   g_assert_cmpstr(remote_host, ==, test_ipv4);
 

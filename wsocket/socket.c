@@ -86,7 +86,7 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
 #ifdef ENABLE_SCTP
         hints.ai_socktype = SOCK_SEQPACKET;
 #else
-        net_log(NET_LOG_ERR, "SCTP protocol not compiled in\n");
+        neb_log(NET_LOG_ERR, "SCTP protocol not compiled in\n");
         return WSOCK_ERROR;
 #endif
         break;
@@ -97,13 +97,13 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
         hints.ai_socktype = SOCK_DGRAM;
         break;
     default:
-        net_log(NET_LOG_ERR, "Unknown socket type specified\n");
+        neb_log(NEB_LOG_ERR, "Unknown socket type specified\n");
         return WSOCK_ERROR;
         break;
     }
 
     if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
-        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));
+        neb_log(NEB_LOG_ERR, "%s\n", gai_strerror(n));
         return WSOCK_ERRADDR;
     }
 
@@ -121,7 +121,7 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
             subscribe.sctp_data_io_event = 1;
             if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
                            sizeof(subscribe)) < 0) {
-                net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sctp_open.\n");
+                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sctp_open.\n");
                 return WSOCK_ERROR;
             }
 
@@ -131,7 +131,7 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
             initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
             if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
                            sizeof(initparams)) < 0) {
-                net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sctp_open.\n");
+                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sctp_open.\n");
                 return WSOCK_ERROR;
             }
         }
@@ -182,7 +182,7 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
     switch (socktype) {
     case SCTP:
 #ifndef ENABLE_SCTP
-        net_log(NET_LOG_FATAL, "SCTP protocol not compiled in\n");
+        neb_log(NEB_LOG_FATAL, "SCTP protocol not compiled in\n");
         return WSOCK_ERROR;
         break;
 #endif    // else go down to TCP case (SCTP and TCP are both SOCK_STREAM type)
@@ -193,13 +193,13 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
         hints.ai_socktype = SOCK_DGRAM;
         break;
     default:
-        net_log(NET_LOG_ERR, "Unknown socket type specified\n");
+        neb_log(NEB_LOG_ERR, "Unknown socket type specified\n");
         return WSOCK_ERROR;
         break;
     }
 
     if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
-        net_log(NET_LOG_ERR, "%s\n", gai_strerror(n));
+        neb_log(NEB_LOG_ERR, "%s\n", gai_strerror(n));
         return WSOCK_ERRADDR;
     }
 
@@ -222,7 +222,7 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
             subscribe.sctp_data_io_event = 1;
             if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
                            sizeof(subscribe)) < 0) {
-                net_log(NET_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
+                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
                 return WSOCK_ERROR;
             }
 
@@ -233,7 +233,7 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
             initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
             if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
                            sizeof(initparams)) < 0) {
-                net_log(NET_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
+                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
                 return WSOCK_ERROR;
             }
         }
