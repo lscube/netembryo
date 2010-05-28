@@ -93,11 +93,13 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
 
     switch (socktype) {
     case SCTP:
-#ifndef ENABLE_SCTP
+#ifdef ENABLE_SCTP
+        hints.ai_socktype = SOCK_SEQPACKET;
+#else
         net_log(NET_LOG_ERR, "SCTP protocol not compiled in\n");
         return WSOCK_ERROR;
+#endif
         break;
-#endif    // else go down to TCP case (SCTP and TCP are both SOCK_STREAM type)
     case TCP:
         hints.ai_socktype = SOCK_STREAM;
         break;
@@ -119,10 +121,6 @@ int sock_bind(char const *host, char const *port, int *sock, sock_type socktype)
     bind_new = (*sock < 0);
 
     do {
-#ifdef ENABLE_SCTP
-        if (socktype == SCTP)
-            res->ai_protocol = IPPROTO_SCTP;
-#endif // TODO: remove this code when SCTP will be supported from getaddrinfo()
         if (bind_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
             continue;
 
