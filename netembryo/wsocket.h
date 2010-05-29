@@ -109,6 +109,8 @@ typedef struct {
 #define WSOCK_ERRADDR    3
 #define WSOCK_ERRPORT    4
 
+#define NETEMBRYO_MAX_SCTP_STREAMS 15
+
 /**
  * @defgroup neb_logging Logging facilities
  * @{

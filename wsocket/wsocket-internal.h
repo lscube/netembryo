@@ -30,7 +30,6 @@
 
 #ifdef ENABLE_SCTP
 #include <netinet/sctp.h>
-#define MAX_SCTP_STREAMS 15
 #endif
 
 #ifndef IN_IS_ADDR_MULTICAST

@@ -127,8 +127,8 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
 
             // Setup number of streams to be used for SCTP connection
             memset(&initparams, 0, sizeof(initparams));
-            initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
-            initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
+            initparams.sinit_max_instreams = NETEMBRYO_MAX_SCTP_STREAMS;
+            initparams.sinit_num_ostreams = NETEMBRYO_MAX_SCTP_STREAMS;
             if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
                            sizeof(initparams)) < 0) {
                 neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sctp_open.\n");
@@ -229,8 +229,8 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
 
             // Setup number of streams to be used for SCTP connection
             memset(&initparams, 0, sizeof(initparams));
-            initparams.sinit_max_instreams = MAX_SCTP_STREAMS;
-            initparams.sinit_num_ostreams = MAX_SCTP_STREAMS;
+            initparams.sinit_max_instreams = NETEMBRYO_MAX_SCTP_STREAMS;
+            initparams.sinit_num_ostreams = NETEMBRYO_MAX_SCTP_STREAMS;
             if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
                            sizeof(initparams)) < 0) {
                 neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
