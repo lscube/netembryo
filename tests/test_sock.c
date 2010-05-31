@@ -68,15 +68,6 @@ void test_local_port_lscube()
   neb_sock_close(socket);
 }
 
-void test_flags_lscube()
-{
-  Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
-
-  g_assert_cmphex(socket->flags, ==, 0x00);
-
-  neb_sock_close(socket);
-}
-
 void test_type_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);

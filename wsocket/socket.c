@@ -207,7 +207,6 @@ static int _neb_sock_setup(Sock *s, int sd, int socktype)
 
     s->fd = sd;
     s->socktype = socktype;
-    s->flags = 0;
 
     sa_p = (struct sockaddr *)&(s->local_stg);
     sa_len = sizeof(struct sockaddr_storage);

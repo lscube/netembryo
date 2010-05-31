@@ -57,13 +57,6 @@ typedef unsigned short in_port_t;
 typedef unsigned int in_addr_t;
 #endif
 
-/** flags definition*/
-typedef enum {
-    /** ssl flags */
-    IS_SSL = 0x1,
-    IS_TLS = 0x3, /**< setting this will also set IS_SSL */
-} sock_flags;
-
 /** socket type definition */
 typedef enum {
     /** socket fd not valid */
@@ -84,8 +77,6 @@ typedef struct {
     int fd;    ///< low level socket file descriptor
     struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
     struct sockaddr_storage remote_stg;    ///< low level address storage from getpeername
-    /** flags */
-    sock_flags flags;
     /** human readable data */
     char *remote_host; ///< remote host stored as dinamic string
     char *local_host; ///< local host stored as dinamic string

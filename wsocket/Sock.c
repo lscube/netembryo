@@ -67,7 +67,6 @@ Sock * neb_sock_accept(Sock *s)
 
     new_s->fd = res;
     new_s->socktype = s->socktype;
-    new_s->flags = s->flags;
 
     sa_p = (struct sockaddr *) &(new_s->remote_stg);
     sa_len = sizeof(struct sockaddr_storage);
