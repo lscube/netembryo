@@ -83,6 +83,37 @@ static struct addrinfo *_neb_sock_getaddrinfo(const char const *host,
     return res;
 }
 
+static int _neb_sock_sctp_setparams(int sd)
+{
+#ifdef ENABLE_SCTP
+    struct sctp_initmsg initparams;
+    struct sctp_event_subscribe subscribe;
+
+    // Enable the propagation of packets headers
+    memset(&subscribe, 0, sizeof(subscribe));
+    subscribe.sctp_data_io_event = 1;
+    if (setsockopt(sd, SOL_SCTP, SCTP_EVENTS, &subscribe,
+                   sizeof(subscribe)) < 0) {
+        neb_log(NEB_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
+        return WSOCK_ERROR;
+    }
+
+    // Setup number of streams to be used for SCTP connection
+    memset(&initparams, 0, sizeof(initparams));
+    initparams.sinit_max_instreams = NETEMBRYO_MAX_SCTP_STREAMS;
+    initparams.sinit_num_ostreams = NETEMBRYO_MAX_SCTP_STREAMS;
+    if (setsockopt(sd, SOL_SCTP, SCTP_INITMSG, &initparams,
+                   sizeof(initparams)) < 0) {
+        neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
+        return WSOCK_ERROR;
+    }
+
+    return WSOCK_OK;
+#else
+    return WSOCK_ERROR;
+#endif
+}
+
 /**
  * bind wrapper
  */
@@ -91,10 +122,6 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
 {
     int bind_new;
     struct addrinfo *res, *ressave;
-#ifdef ENABLE_SCTP
-    struct sctp_initmsg initparams;
-    struct sctp_event_subscribe subscribe;
-#endif
 
     if ( (ressave = res = _neb_sock_getaddrinfo(host, port, socktype)) == NULL ) {
         return WSOCK_ERRADDR;
@@ -106,28 +133,9 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
         if (bind_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
             continue;
 
-#ifdef ENABLE_SCTP
-        if (socktype == SCTP) {
-            // Enable the propagation of packets headers
-            memset(&subscribe, 0, sizeof(subscribe));
-            subscribe.sctp_data_io_event = 1;
-            if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
-                           sizeof(subscribe)) < 0) {
-                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sctp_open.\n");
-                return WSOCK_ERROR;
-            }
-
-            // Setup number of streams to be used for SCTP connection
-            memset(&initparams, 0, sizeof(initparams));
-            initparams.sinit_max_instreams = NETEMBRYO_MAX_SCTP_STREAMS;
-            initparams.sinit_num_ostreams = NETEMBRYO_MAX_SCTP_STREAMS;
-            if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
-                           sizeof(initparams)) < 0) {
-                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sctp_open.\n");
-                return WSOCK_ERROR;
-            }
-        }
-#endif
+        if ( socktype == SCTP &&
+             _neb_sock_sctp_setparams(*sock) < 0 )
+            continue;
 
         if (bind(*sock, res->ai_addr, res->ai_addrlen) == 0)
             break;
@@ -157,10 +165,6 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
 {
     int connect_new;
     struct addrinfo *res, *ressave;
-#ifdef ENABLE_SCTP
-    struct sctp_initmsg initparams;
-    struct sctp_event_subscribe subscribe;
-#endif
 
     if ( (ressave = res = _neb_sock_getaddrinfo(host, port, socktype)) == NULL ) {
         return WSOCK_ERRADDR;
@@ -172,29 +176,9 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
         if (connect_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
             continue;
 
-#ifdef ENABLE_SCTP
-        if (socktype == SCTP) {
-            // Enable the propagation of packets headers
-            memset(&subscribe, 0, sizeof(subscribe));
-            subscribe.sctp_data_io_event = 1;
-            if (setsockopt(*sock, SOL_SCTP, SCTP_EVENTS, &subscribe,
-                           sizeof(subscribe)) < 0) {
-                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_EVENTS) error in sock_connect.\n");
-                return WSOCK_ERROR;
-            }
-
-
-            // Setup number of streams to be used for SCTP connection
-            memset(&initparams, 0, sizeof(initparams));
-            initparams.sinit_max_instreams = NETEMBRYO_MAX_SCTP_STREAMS;
-            initparams.sinit_num_ostreams = NETEMBRYO_MAX_SCTP_STREAMS;
-            if (setsockopt(*sock, SOL_SCTP, SCTP_INITMSG, &initparams,
-                           sizeof(initparams)) < 0) {
-                neb_log(NEB_LOG_ERR, "setsockopts(SCTP_INITMSG) error in sock_connect.\n");
-                return WSOCK_ERROR;
-            }
-        }
-#endif
+        if ( socktype == SCTP &&
+             _neb_sock_sctp_setparams(*sock) < 0 )
+            continue;
 
         if (connect(*sock, res->ai_addr, res->ai_addrlen) == 0)
             break;
