@@ -34,25 +34,6 @@
 
 void neb_log(NebLogLevel level, const char *fmt, ...);
 
-/**
- * @defgroup NetEmbryo_Internals Low level wrappers
- * @brief Low level internal implementations, private
- * @{
- */
-
-/**
- * @return the address in human readable string format
- */
-void sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
-
-/**
- * @return the port in network byte order (use ntohs to change it)
- */
-int sock_get_port(const struct sockaddr *sa);
-
-/**
- * @}
- * @}
- */
+void _neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p);
 
 #endif // WSOCKET_INTERNAL_H

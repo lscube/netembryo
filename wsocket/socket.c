@@ -200,38 +200,10 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
     return WSOCK_OK;
 }
 
-/**
- * get the port from a sockaddr
- * @return the port or -1 on error
- */
-
-int sock_get_port(const struct sockaddr *sa)
-{
-    switch (sa->sa_family) {
-        case AF_INET: {
-            struct sockaddr_in    *sin = (struct sockaddr_in *) sa;
-
-            return(sin->sin_port);
-        }
-
-#ifdef    IPV6
-        case AF_INET6: {
-            struct sockaddr_in6    *sin6 = (struct sockaddr_in6 *) sa;
-
-            return(sin6->sin6_port);
-        }
-#endif
-    }
-
-    return -1;
-}
-
 static int _neb_sock_setup(Sock *s, int sd, int socktype)
 {
     struct sockaddr *sa_p;
     socklen_t sa_len;
-    char local_host[128];
-    int local_port;
 
     s->fd = sd;
     s->socktype = socktype;
@@ -243,19 +215,7 @@ static int _neb_sock_setup(Sock *s, int sd, int socktype)
     if(getsockname(s->fd, sa_p, &sa_len) < 0)
         return -1;
 
-    sock_ntop_host(sa_p, local_host, sizeof(local_host));
-
-    if (!(s->local_host = strdup(local_host))) {
-        neb_log(NEB_LOG_FATAL,
-                "Unable to allocate local host in neb_sock_bind().\n");
-        return -1;
-    }
-
-    if((local_port = sock_get_port(sa_p)) < 0) {
-        neb_log(NEB_LOG_DEBUG, "unable to get local port.\n");
-        return -1;
-    } else
-        s->local_port = ntohs(local_port);
+    _neb_sock_parse_address(sa_p, &s->local_host, &s->local_port);
 
     return 0;
 }

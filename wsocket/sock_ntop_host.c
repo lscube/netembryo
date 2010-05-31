@@ -32,6 +32,7 @@
 #endif
 
 #include <string.h>
+#include <assert.h>
 
 #ifdef WIN32
 static const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
@@ -81,7 +82,7 @@ static int inet_pton(int af, const char *src, void *dst)
 #endif
 
 
-void sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
+static void _neb_sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 {
     switch (sa->sa_family) {
     case AF_INET: {
@@ -138,4 +139,41 @@ void sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 
  error:
     memset(str, 0, len);
+}
+
+/**
+ * get the port from a sockaddr
+ * @return the port or -1 on error
+ */
+static int _neb_sock_get_port(const struct sockaddr *sa)
+{
+    switch (sa->sa_family) {
+    case AF_INET: {
+        struct sockaddr_in *sin = (struct sockaddr_in *) sa;
+
+        return(sin->sin_port);
+    }
+
+#ifdef IPV6
+    case AF_INET6: {
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
+
+        return(sin6->sin6_port);
+    }
+#endif
+    }
+
+    assert(0);
+}
+
+void _neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p)
+{
+    char host[128];
+
+    _neb_sock_ntop_host(sa, host, sizeof(host));
+
+    *host_p = strdup(host);
+    *port_p = ntohs(_neb_sock_get_port(sa));
+
+    assert(*host_p != NULL);
 }
