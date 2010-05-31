@@ -31,15 +31,10 @@
 # include <sys/un.h>
 #endif
 
-#ifdef WIN32
-const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt);
-int inet_pton(int af, const char *src, void *dst);
-#endif
-
 #include <string.h>
 
 #ifdef WIN32
-const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
+static const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
 {
         if (af == AF_INET)
         {
@@ -47,8 +42,7 @@ const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
                 memset(&in, 0, sizeof(in));
                 in.sin_family = AF_INET;
                 memcpy(&in.sin_addr, src, sizeof(struct in_addr));
-                getnameinfo((struct sockaddr *)&in, sizeof(struct
-sockaddr_in), dst, cnt, NULL, 0, NI_NUMERICHOST);
+                getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), dst, cnt, NULL, 0, NI_NUMERICHOST);
                 return dst;
         }
         else if (af == AF_INET6)
@@ -57,14 +51,13 @@ sockaddr_in), dst, cnt, NULL, 0, NI_NUMERICHOST);
                 memset(&in, 0, sizeof(in));
                 in.sin6_family = AF_INET6;
                 memcpy(&in.sin6_addr, src, sizeof(struct in_addr6));
-                getnameinfo((struct sockaddr *)&in, sizeof(struct
-sockaddr_in6), dst, cnt, NULL, 0, NI_NUMERICHOST);
+                getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in6), dst, cnt, NULL, 0, NI_NUMERICHOST);
                 return dst;
         }
         return NULL;
 }
 
-int inet_pton(int af, const char *src, void *dst)
+static int inet_pton(int af, const char *src, void *dst)
 {
         struct addrinfo hints, *res, *ressave;
 
