@@ -33,27 +33,21 @@
 # endif
 #endif
 
-/**
- * bind wrapper
- */
-
-static int _neb_sock_bind(const char const *host, const char const *port, int *sock, sock_type socktype)
+static struct addrinfo *_neb_sock_getaddrinfo(const char const *host,
+                                              const char *const port,
+                                              sock_type socktype)
 {
-    int n;
-    int bind_new;
-    struct addrinfo *res, *ressave;
+    struct addrinfo *res;
     struct addrinfo hints;
-#ifdef ENABLE_SCTP
-    struct sctp_initmsg initparams;
-    struct sctp_event_subscribe subscribe;
-#endif
+    int n;
 
-    memset(&hints, 0, sizeof(struct addrinfo));
+    memset(&hints, 0, sizeof(hints));
 
     if (host == NULL)
         hints.ai_flags = AI_PASSIVE;
     else
         hints.ai_flags = AI_CANONNAME;
+
 #ifdef IPV6
     hints.ai_family = AF_UNSPEC;
 #else
@@ -77,16 +71,35 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
         break;
     default:
         neb_log(NEB_LOG_ERR, "Unknown socket type specified\n");
-        return WSOCK_ERROR;
+        return NULL;
         break;
     }
 
     if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
         neb_log(NEB_LOG_ERR, "%s\n", gai_strerror(n));
+        return NULL;
+    }
+
+    return res;
+}
+
+/**
+ * bind wrapper
+ */
+
+static int _neb_sock_bind(const char const *host, const char const *port, int *sock, sock_type socktype)
+{
+    int bind_new;
+    struct addrinfo *res, *ressave;
+#ifdef ENABLE_SCTP
+    struct sctp_initmsg initparams;
+    struct sctp_event_subscribe subscribe;
+#endif
+
+    if ( (ressave = res = _neb_sock_getaddrinfo(host, port, socktype)) == NULL ) {
         return WSOCK_ERRADDR;
     }
 
-    ressave = res;
     bind_new = (*sock < 0);
 
     do {
@@ -142,49 +155,16 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
 
 static int _neb_sock_connect(const char const *host, const char const *port, int *sock, sock_type socktype)
 {
-    int n, connect_new;
+    int connect_new;
     struct addrinfo *res, *ressave;
-    struct addrinfo hints;
 #ifdef ENABLE_SCTP
     struct sctp_initmsg initparams;
     struct sctp_event_subscribe subscribe;
 #endif
 
-    memset(&hints, 0, sizeof(struct addrinfo));
-
-    hints.ai_flags = AI_CANONNAME;
-#ifdef IPV6
-    hints.ai_family = AF_UNSPEC;
-#else
-    hints.ai_family = AF_INET;
-#endif
-    switch (socktype) {
-    case SCTP:
-#ifdef ENABLE_SCTP
-        hints.ai_socktype = SOCK_SEQPACKET;
-#else
-        neb_log(NET_LOG_ERR, "SCTP protocol not compiled in\n");
-        return WSOCK_ERROR;
-#endif
-        break;
-    case TCP:
-        hints.ai_socktype = SOCK_STREAM;
-        break;
-    case UDP:
-        hints.ai_socktype = SOCK_DGRAM;
-        break;
-    default:
-        neb_log(NEB_LOG_ERR, "Unknown socket type specified\n");
-        return WSOCK_ERROR;
-        break;
-    }
-
-    if ((n = getaddrinfo(host, port, &hints, &res)) != 0) {
-        neb_log(NEB_LOG_ERR, "%s\n", gai_strerror(n));
+    if ( (ressave = res = _neb_sock_getaddrinfo(host, port, socktype)) == NULL ) {
         return WSOCK_ERRADDR;
     }
-
-    ressave = res;
 
     connect_new = (*sock < 0);
 
