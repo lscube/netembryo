@@ -202,19 +202,11 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
 
 static int _neb_sock_setup(Sock *s, int sd, int socktype)
 {
-    struct sockaddr *sa_p;
-    socklen_t sa_len;
-
     s->fd = sd;
     s->socktype = socktype;
 
-    sa_p = (struct sockaddr *)&(s->local_stg);
-    sa_len = sizeof(struct sockaddr_storage);
-
-    if(getsockname(s->fd, sa_p, &sa_len) < 0)
+    if ( _neb_sock_local_addr(s) )
         return -1;
-
-    _neb_sock_parse_address(sa_p, &s->local_host, &s->local_port);
 
     return 0;
 }

@@ -34,6 +34,7 @@
 
 void neb_log(NebLogLevel level, const char *fmt, ...);
 
-void _neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p);
+int _neb_sock_remote_addr(Sock *s);
+int _neb_sock_local_addr(Sock *s);
 
 #endif // WSOCKET_INTERNAL_H

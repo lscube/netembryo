@@ -47,8 +47,6 @@ Sock * neb_sock_accept(Sock *s)
 {
     int res = -1;
     Sock *new_s = NULL;
-    struct sockaddr *sa_p = NULL;
-    socklen_t sa_len = 0;
 
     if (!s)
         return NULL;
@@ -68,28 +66,19 @@ Sock * neb_sock_accept(Sock *s)
     new_s->fd = res;
     new_s->socktype = s->socktype;
 
-    sa_p = (struct sockaddr *) &(new_s->remote_stg);
-    sa_len = sizeof(struct sockaddr_storage);
-
-    if(getpeername(res, sa_p, &sa_len)) {
+    if ( _neb_sock_remote_addr(s) ) {
         neb_log(NEB_LOG_DEBUG,
                 "Unable to get remote address in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
     }
 
-    _neb_sock_parse_address(sa_p, &new_s->remote_host, &new_s->remote_port);
-
-    sa_p = (struct sockaddr *) &(new_s->remote_stg);
-    sa_len = sizeof(struct sockaddr_storage);
-
-    if(getsockname(res, sa_p, &sa_len)) {
-        neb_log(NEB_LOG_DEBUG, "Unable to get remote port in neb_sock_accept().\n");
+    if ( _neb_sock_local_addr(s) ) {
+        neb_log(NEB_LOG_DEBUG,
+                "Unable to get local address in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
     }
-
-    _neb_sock_parse_address(sa_p, &new_s->local_host, &new_s->remote_port);
 
     neb_log(NEB_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
             "remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
@@ -158,8 +147,6 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
                          Sock *binded, sock_type socktype)
 {
     Sock *s;
-    struct sockaddr *sa_p = NULL;
-    socklen_t sa_len = 0;
     int sockfd;
 
     if(binded) {
@@ -183,16 +170,11 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     if ( _neb_sock_setup(s, sockfd, socktype) )
         goto error;
 
-    sa_p = (struct sockaddr *) &(s->remote_stg);
-    sa_len = sizeof(struct sockaddr_storage);
-
-    if(getpeername(s->fd, sa_p, &sa_len)) {
+    if ( _neb_sock_remote_addr(s) ) {
         neb_log(NEB_LOG_DEBUG,
                 "Unable to get remote address in neb_sock_connect().\n");
         goto error;
     }
-
-    _neb_sock_parse_address(sa_p, &s->remote_host, &s->remote_port);
 
     neb_log(NEB_LOG_DEBUG,
             "Socket connected between local=\"%s\":%u and remote=\"%s\":%u.\n",
