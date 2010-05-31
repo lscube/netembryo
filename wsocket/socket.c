@@ -243,8 +243,7 @@ static int _neb_sock_setup(Sock *s, int sd, int socktype)
     if(getsockname(s->fd, sa_p, &sa_len) < 0)
         return -1;
 
-    if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
-        memset(local_host, 0, sizeof(local_host));
+    sock_ntop_host(sa_p, local_host, sizeof(local_host));
 
     if (!(s->local_host = strdup(local_host))) {
         neb_log(NEB_LOG_FATAL,

@@ -43,7 +43,7 @@ void neb_log(NebLogLevel level, const char *fmt, ...);
 /**
  * @return the address in human readable string format
  */
-const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
+void sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
 
 /**
  * @return the port in network byte order (use ntohs to change it)

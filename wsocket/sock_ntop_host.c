@@ -81,12 +81,14 @@ static int inet_pton(int af, const char *src, void *dst)
 #endif
 
 
-const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
+void sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 {
     switch (sa->sa_family) {
     case AF_INET: {
         struct sockaddr_in    *sin = (struct sockaddr_in *) sa;
-        return(inet_ntop(AF_INET, &(sin->sin_addr), str, len));
+        if ( inet_ntop(AF_INET, &(sin->sin_addr), str, len) == NULL )
+            goto error;
+        return;
     }
 
 #ifdef    IPV6
@@ -94,23 +96,24 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
         struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
         int a = 0;
         char *tmp = str;
-        const char *retval = inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len);
-        if (retval) {
-            while ((tmp = strchr(tmp, '.'))) {
-                a++;
-                tmp++;
-            }
-            if (a == 3) {
-                if (!strncmp(str, "::ffff:", 7)) {
-                    //this is an IPv4 address mapped in IPv6 address space
-                    memmove (str, &str[7], strlen(str) - 6); // one char more for trailing NUL char
-                } else {
-                    //this is an IPv6 address containg an IPv4 address (like ::127.0.0.1)
-                    memmove (str, &str[2], strlen(str) - 1);
-                }
+
+        if (inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len) == NULL )
+            goto error;
+
+        while ((tmp = strchr(tmp, '.'))) {
+            a++;
+            tmp++;
+        }
+        if (a == 3) {
+            if (!strncmp(str, "::ffff:", 7)) {
+                //this is an IPv4 address mapped in IPv6 address space
+                memmove (str, &str[7], strlen(str) - 6); // one char more for trailing NUL char
+            } else {
+                //this is an IPv6 address containg an IPv4 address (like ::127.0.0.1)
+                memmove (str, &str[2], strlen(str) - 1);
             }
         }
-        return retval;
+        return;
     }
 #endif
 
@@ -124,14 +127,15 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
             strncpy(str, "(no pathname bound)", len);
         else
             strncpy(str, unp->sun_path, len);
-        return(str);
+
+        return;
     }
 #endif
 
     default:
         break;
     }
-    return (NULL);
+
+ error:
+    memset(str, 0, len);
 }
-
-

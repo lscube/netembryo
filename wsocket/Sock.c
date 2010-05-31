@@ -84,8 +84,7 @@ Sock * neb_sock_accept(Sock *s)
             return NULL;
         }
 
-    if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
-        memset(remote_host, 0, sizeof(remote_host));
+    sock_ntop_host(sa_p, remote_host, sizeof(remote_host));
 
     if (!(new_s->remote_host = strdup(remote_host))) {
         neb_log(NEB_LOG_FATAL,
@@ -113,8 +112,7 @@ Sock * neb_sock_accept(Sock *s)
             return NULL;
         }
 
-    if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
-        memset(local_host, 0, sizeof(local_host));
+    sock_ntop_host(sa_p, local_host, sizeof(local_host));
 
     if (!(new_s->local_host = strdup(local_host))) {
         neb_log(NEB_LOG_FATAL,
@@ -235,8 +233,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
         goto error;
     }
 
-    if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
-        memset(remote_host, 0, sizeof(remote_host));
+    sock_ntop_host(sa_p, remote_host, sizeof(remote_host));
 
     if (!(s->remote_host = strdup(remote_host))) {
         neb_log(NEB_LOG_FATAL,
