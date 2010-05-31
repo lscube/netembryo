@@ -89,8 +89,8 @@ Sock * neb_sock_accept(Sock *s)
     if (!s)
         return NULL;
 
-    if ((res = _neb_sock_accept(s->fd)) < 0) {
-        neb_log(NEB_LOG_DEBUG, "System error in _neb_sock_accept().\n");
+    if ((res = accept(s->fd, NULL, 0)) < 0) {
+        neb_log(NEB_LOG_DEBUG, "error in accept().\n");
         return NULL;
     }
 

@@ -34,27 +34,6 @@
 #endif
 
 /**
- * wraps accept
- * @return -1 on error
- * @return the socket descriptor
- * @note doesn't shutdown the listened one
- **/
-
-static int _neb_sock_accept(int sock)
-{
-    int new_fd;
-    struct sockaddr_in their_addr; /* connector's address information */
-    socklen_t sin_size;
-
-    memset(&their_addr, 0, sizeof(struct sockaddr_in));
-
-    sin_size = sizeof(struct sockaddr_in);
-    new_fd = accept(sock,(struct sockaddr *)&their_addr, &sin_size);
-
-    return new_fd;
-}
-
-/**
  * bind wrapper
  */
 
