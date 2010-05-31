@@ -145,10 +145,6 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
 
     Sock *s = NULL;
     int sockfd = -1;
-    struct sockaddr *sa_p;
-    socklen_t sa_len;
-    char local_host[128];
-    int local_port;
 
     if(sock) {
         sockfd = sock->fd;
@@ -159,49 +155,23 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
         return NULL;
     }
 
-    if (!(s = calloc(1, sizeof(Sock)))) {
-        neb_log(NEB_LOG_FATAL,
-                "Unable to allocate a Sock struct in neb_sock_bind().\n");
-        close(sockfd);
-        return NULL;
-    }
+    if ( (s = calloc(1, sizeof(Sock))) == NULL )
+        goto error;
 
-    s->fd = sockfd;
-    s->socktype = socktype;
-    s->flags = 0;
-
-    sa_p = (struct sockaddr *)&(s->local_stg);
-    sa_len = sizeof(struct sockaddr_storage);
-
-    if(getsockname(s->fd, sa_p, &sa_len) < 0) {
-        neb_sock_close(s);
-        return NULL;
-    }
-
-    if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
-        memset(local_host, 0, sizeof(local_host));
-
-    if (!(s->local_host = strdup(local_host))) {
-        neb_log(NEB_LOG_FATAL,
-                "Unable to allocate local host in neb_sock_bind().\n");
-        neb_sock_close(s);
-        return NULL;
-    }
-
-    local_port = sock_get_port(sa_p);
-
-    if(local_port < 0) {
-        neb_log(NEB_LOG_DEBUG, "Unable to get local port in neb_sock_bind().\n");
-        neb_sock_close(s);
-        return NULL;
-    } else
-        s->local_port = ntohs(local_port);
+    if ( _neb_sock_setup(s, sockfd, socktype) )
+        goto error;
 
     neb_log(NEB_LOG_DEBUG,
             "Socket bound with addr=\"%s\" and port=\"%u\".\n",
             s->local_host, s->local_port);
 
     return s;
+ error:
+    if ( s != NULL )
+        neb_sock_close(s);
+    else
+        close(sockfd);
+    return NULL;
 }
 
 /**
@@ -230,11 +200,9 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
 {
     Sock *s;
     char remote_host[128]; /*Unix Domain is largest*/
-    char local_host[128]; /*Unix Domain is largest*/
     int sockfd = -1;
     struct sockaddr *sa_p = NULL;
     socklen_t sa_len = 0;
-    int local_port;
     int remote_port;
 
     if(binded) {
@@ -252,57 +220,20 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
         s->local_host = NULL;
         free(s->remote_host);
         s->remote_host = NULL;
-    } else if (!(s = calloc(1, sizeof(Sock)))) {
-        neb_log(NEB_LOG_FATAL, "Unable to allocate a Sock struct in neb_sock_connect().\n");
-        close (sockfd);
-        return NULL;
-    }
+    } else if ( (s = calloc(1, sizeof(Sock))) == NULL )
+        goto error;
 
-    s->fd = sockfd;
-    s->socktype = socktype;
-    s->flags = 0;
-
-    sa_p = (struct sockaddr *) &(s->local_stg);
-    sa_len = sizeof(struct sockaddr_storage);
-
-    if(getsockname(s->fd, sa_p, &sa_len))
-        {
-            neb_log(NEB_LOG_DEBUG,
-                    "Unable to get remote port in neb_sock_connect().\n");
-            neb_sock_close(s);
-            return NULL;
-        }
-
-    if(!sock_ntop_host(sa_p, local_host, sizeof(local_host)))
-        memset(local_host, 0, sizeof(local_host));
-
-    if (!(s->local_host = strdup(local_host))) {
-        neb_log(NEB_LOG_FATAL,
-                "Unable to allocate local host in neb_sock_connect().\n");
-        neb_sock_close(s);
-        return NULL;
-    }
-
-    local_port = sock_get_port(sa_p);
-
-    if(local_port < 0) {
-        neb_log(NEB_LOG_DEBUG,
-                "Unable to get local port in neb_sock_connect().\n");
-        neb_sock_close(s);
-        return NULL;
-    } else
-        s->local_port = ntohs(local_port);
+    if ( _neb_sock_setup(s, sockfd, socktype) )
+        goto error;
 
     sa_p = (struct sockaddr *) &(s->remote_stg);
     sa_len = sizeof(struct sockaddr_storage);
 
-    if(getpeername(s->fd, sa_p, &sa_len))
-        {
-            neb_log(NEB_LOG_DEBUG,
-                    "Unable to get remote address in neb_sock_connect().\n");
-            neb_sock_close(s);
-            return NULL;
-        }
+    if(getpeername(s->fd, sa_p, &sa_len)) {
+        neb_log(NEB_LOG_DEBUG,
+                "Unable to get remote address in neb_sock_connect().\n");
+        goto error;
+    }
 
     if(!sock_ntop_host(sa_p, remote_host, sizeof(remote_host)))
         memset(remote_host, 0, sizeof(remote_host));
@@ -310,16 +241,14 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     if (!(s->remote_host = strdup(remote_host))) {
         neb_log(NEB_LOG_FATAL,
                 "Unable to allocate remote host in neb_sock_connect().\n");
-        neb_sock_close(s);
-        return NULL;
+        goto error;
     }
 
     remote_port = sock_get_port(sa_p);
     if(remote_port < 0) {
         neb_log(NEB_LOG_DEBUG,
                 "Unable to get remote port in neb_sock_connect().\n");
-        neb_sock_close(s);
-        return NULL;
+        goto error;
     } else
         s->remote_port = ntohs(remote_port);
 
@@ -327,7 +256,12 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
             "Socket connected between local=\"%s\":%u and remote=\"%s\":%u.\n",
             s->local_host, s->local_port, s->remote_host, s->remote_port);
 
-    return s;
+ error:
+    if ( s != NULL )
+        neb_sock_close(s);
+    else
+        close(sockfd);
+    return NULL;
 }
 
 int neb_sock_listen(Sock *s, int backlog)
