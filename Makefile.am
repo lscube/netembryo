@@ -25,7 +25,6 @@ libnetembryo_la_SOURCES = \
 			utils/log.c \
 			\
 			wsocket/wsocket-internal.h \
-			wsocket/multicast.c \
 			wsocket/sock_ntop_host.c \
 			wsocket/get_info.c \
 			wsocket/Sock.c

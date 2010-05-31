@@ -32,16 +32,6 @@
 #include <netinet/sctp.h>
 #endif
 
-#ifndef IN_IS_ADDR_MULTICAST
-#define IN_IS_ADDR_MULTICAST(a)    ((((in_addr_t)(a)) & 0xf0000000) == 0xe0000000)
-#endif
-
-#if IPV6
-#ifndef IN6_IS_ADDR_MULTICAST
-#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
-#endif
-#endif //IPV6
-
 void neb_log(NebLogLevel level, const char *fmt, ...);
 
 /**
@@ -59,16 +49,6 @@ const char *sock_ntop_host(const struct sockaddr *sa, char *str, size_t len);
  * @return the port in network byte order (use ntohs to change it)
  */
 int sock_get_port(const struct sockaddr *sa);
-
-/**
- * @defgroup multicast Multicast related functions
- * @brief join and leave facilities
- * @{
- */
-
-int mcast_join (int sockfd, const struct sockaddr *sa);
-
-int mcast_leave(int sockfd, const struct sockaddr *sa);
 
 /**
  * @}

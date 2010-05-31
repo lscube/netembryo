@@ -43,38 +43,6 @@
 
 #include "socket.c"
 
-/**
- * Tell if an address is multicast
- */
-
-static int is_multicast_address(const struct sockaddr *stg, sa_family_t family)
-{
-    switch (family) {
-    case AF_INET: {
-        struct in_addr *in;
-        in = &(((struct sockaddr_in *) stg)->sin_addr);
-        return IN_IS_ADDR_MULTICAST(ntohl(in->s_addr));
-    }
-#ifdef  IPV6
-    case AF_INET6: {
-        struct in6_addr *in6;
-        in6 = &(((struct sockaddr_in6 *) stg)->sin6_addr);
-        return IN6_IS_ADDR_MULTICAST(in6);
-    }
-#endif
-#ifdef  AF_UNIX
-    case AF_UNIX:
-        return -1;
-#endif
-#ifdef  HAVE_SOCKADDR_DL_STRUCT
-    case AF_LINK:
-        return -1;
-#endif
-    default:
-        return -1;
-    }
-}
-
 Sock * neb_sock_accept(Sock *s)
 {
     int res = -1;
@@ -233,14 +201,6 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
             "Socket bound with addr=\"%s\" and port=\"%u\".\n",
             s->local_host, s->local_port);
 
-    if(is_multicast_address(sa_p, s->local_stg.ss_family)) {
-        if(mcast_join(s->fd, sa_p)) {
-            neb_sock_close(s);
-            return NULL;
-        }
-        s->flags |= IS_MULTICAST;
-    }
-
     return s;
 }
 
@@ -255,13 +215,6 @@ int neb_sock_close(Sock *s)
 
     if (!s)
         return -1;
-
-    if(s->flags & IS_MULTICAST) {
-        if (s->remote_host)
-            mcast_leave(s->fd,(struct sockaddr *) &(s->remote_stg));
-        else
-            mcast_leave(s->fd,(struct sockaddr *) &(s->local_stg));
-    }
 
     res = close(s->fd);
 
@@ -373,15 +326,6 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     neb_log(NEB_LOG_DEBUG,
             "Socket connected between local=\"%s\":%u and remote=\"%s\":%u.\n",
             s->local_host, s->local_port, s->remote_host, s->remote_port);
-
-    if(is_multicast_address(sa_p, s->remote_stg.ss_family)) {
-        //fprintf(stderr,"IS MULTICAST\n");
-        if(mcast_join(s->fd, sa_p)!=0) {
-            neb_sock_close(s);
-            return NULL;
-        }
-        s->flags |= IS_MULTICAST;
-    }
 
     return s;
 }

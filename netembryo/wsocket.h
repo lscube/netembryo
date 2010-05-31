@@ -62,8 +62,6 @@ typedef enum {
     /** ssl flags */
     IS_SSL = 0x1,
     IS_TLS = 0x3, /**< setting this will also set IS_SSL */
-    /** multicast flags */
-    IS_MULTICAST = 0x4
 } sock_flags;
 
 /** socket type definition */
@@ -86,7 +84,6 @@ typedef struct {
     int fd;    ///< low level socket file descriptor
     struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
     struct sockaddr_storage remote_stg;    ///< low level address storage from getpeername
-    struct sockaddr_storage multicast_stg; ///< multicast address storage
     /** flags */
     sock_flags flags;
     /** human readable data */
