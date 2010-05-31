@@ -75,7 +75,6 @@ typedef enum {
 typedef struct {
     sock_type socktype; ///< socket type
     int fd;    ///< low level socket file descriptor
-    struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
     struct sockaddr_storage remote_stg;    ///< low level address storage from getpeername
     /** human readable data */
     char *remote_host; ///< remote host stored as dinamic string

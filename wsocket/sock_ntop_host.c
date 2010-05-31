@@ -193,13 +193,13 @@ int _neb_sock_remote_addr(Sock *s)
 
 int _neb_sock_local_addr(Sock *s)
 {
-    struct sockaddr *sa_p = (struct sockaddr *) &(s->local_stg);
+    struct sockaddr_storage sa;
     socklen_t sa_len = sizeof(struct sockaddr_storage);
 
-    if ( getsockname(s->fd, sa_p, &sa_len) )
+    if ( getsockname(s->fd, (struct sockaddr *)&sa, &sa_len) )
         return -1;
 
-    _neb_sock_parse_address(sa_p, &s->local_host, &s->local_port);
+    _neb_sock_parse_address((struct sockaddr *)&sa, &s->local_host, &s->local_port);
 
     return 0;
 }
