@@ -30,45 +30,20 @@
 
 const char *neb_sock_remote_host(Sock *s)
 {
-    char str[128];
-
-    if(!(s->remote_host)) {
-        sock_ntop_host((struct sockaddr *)&(s->remote_stg),str,sizeof(str));
-        s->remote_host = strdup(str);
-    }
     return s->remote_host;
 }
 
 const char *neb_sock_local_host(Sock *s)
 {
-    char str[128]; /*Unix domain is largest*/
-
-    if(!(s->local_host)) {
-        sock_ntop_host((struct sockaddr *)&(s->local_stg),str,sizeof(str));
-        s->local_host = strdup(str);
-    }
     return s->local_host;
 }
 
 in_port_t neb_sock_remote_port(Sock *s)
 {
-    int32_t port;
-    if(!(s->remote_port)) {
-        if((port = sock_get_port((struct sockaddr *)&(s->remote_stg))) < 0)
-            return 0;
-        s->remote_port = ntohs(port);
-    }
     return s->remote_port;
 }
 
 in_port_t neb_sock_local_port(Sock *s)
 {
-    int32_t port;
-
-    if(!(s->local_port)) {
-        if((port = sock_get_port((struct sockaddr *)&(s->local_stg))) < 0)
-            return 0;
-        s->local_port = ntohs(port);
-    }
     return s->local_port;
 }
