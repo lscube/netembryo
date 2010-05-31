@@ -226,12 +226,6 @@ int neb_sock_write_stream(Sock *s, const void *buffer, size_t nbytes, int flags,
 
 int neb_sock_close(Sock *s);
 
-/*get_info.c*/
-const char *neb_sock_remote_host(Sock *);
-const char *neb_sock_local_host(Sock *);
-in_port_t neb_sock_remote_port(Sock *);
-in_port_t neb_sock_local_port(Sock *);
-
 /**
  * @}
  */

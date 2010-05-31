@@ -26,7 +26,6 @@ libnetembryo_la_SOURCES = \
 			\
 			wsocket/wsocket-internal.h \
 			wsocket/sock_ntop_host.c \
-			wsocket/get_info.c \
 			wsocket/Sock.c
 
 EXTRA_DIST += wsocket/socket.c
