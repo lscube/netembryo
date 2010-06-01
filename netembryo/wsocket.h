@@ -190,7 +190,7 @@ int neb_sock_listen(Sock *s, int backlog);
  *        suitable default value will be used.
  * @param flags Flags to be passed to posix recv() function.
  */
-int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags);
+int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags);
 
 /**
  * @brief Send data to a socket

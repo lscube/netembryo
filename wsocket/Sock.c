@@ -202,38 +202,17 @@ int neb_sock_listen(Sock *s, int backlog)
     return listen(s->fd, backlog);
 }
 
-int neb_sock_read(Sock *s, void *buffer, int nbytes, void *protodata, int flags)
+int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags)
 {
-
-    socklen_t sa_len = sizeof(struct sockaddr_storage);
-
-    if(!s)
-        return -1;
+    assert(s != NULL);
 
     switch(s->socktype) {
     case UDP:
-        if (!protodata) {
-            protodata = &s->remote_stg;
-        }
         return recvfrom(s->fd, buffer, nbytes, flags,
-                        (struct sockaddr *) protodata, &sa_len);
+                        NULL, 0);
         break;
     case TCP:
         return recv(s->fd, buffer, nbytes, flags);
-        break;
-    case SCTP:
-#ifdef ENABLE_SCTP
-        if (!protodata) {
-            return -1;
-        }
-        return sctp_recvmsg(s->fd, buffer, nbytes, NULL,
-                            0, (struct sctp_sndrcvinfo *) protodata, &flags);
-        /* flags is discarted: usage may include detection of
-         * incomplete packet due to small buffer or detection of
-         * notification data (this last should be probably
-         * handled inside netembryo).
-         */
-#endif
         break;
     case LOCAL:
         return recv(s->fd, buffer, nbytes, flags);
