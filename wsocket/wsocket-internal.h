@@ -28,13 +28,6 @@
 #ifndef WSOCKET_INTERNAL_H
 #define WSOCKET_INTERNAL_H
 
-#ifdef ENABLE_SCTP
-#include <netinet/sctp.h>
-#endif
-
 void neb_log(NebLogLevel level, const char *fmt, ...);
-
-int _neb_sock_remote_addr(Sock *s);
-int _neb_sock_local_addr(Sock *s);
 
 #endif // WSOCKET_INTERNAL_H

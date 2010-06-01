@@ -34,13 +34,19 @@
 
 #include <assert.h>
 
-#include "netembryo/wsocket.h"
-#include "wsocket-internal.h"
+#ifdef ENABLE_SCTP
+#include <netinet/sctp.h>
+#endif
+
 
 #ifndef WIN32
 # include <sys/ioctl.h>
 #endif
 
+#include "netembryo/wsocket.h"
+#include "wsocket-internal.h"
+
+#include "sock_ntop_host.c"
 #include "socket.c"
 
 Sock * neb_sock_accept(Sock *s)

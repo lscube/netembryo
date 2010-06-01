@@ -25,10 +25,9 @@ libnetembryo_la_SOURCES = \
 			utils/log.c \
 			\
 			wsocket/wsocket-internal.h \
-			wsocket/sock_ntop_host.c \
 			wsocket/Sock.c
 
-EXTRA_DIST += wsocket/socket.c
+EXTRA_DIST += wsocket/socket.c wsocket/sock_ntop_host.c
 
 libnetembryo_la_CFLAGS = $(GLIB_CFLAGS)
 libnetembryo_la_LIBADD = $(GLIB_LIBS)

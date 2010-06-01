@@ -21,14 +21,9 @@
  * this piece of code is taken from NeMeSI
  * */
 
-#include "netembryo/wsocket.h"
-
 #if !defined(WIN32) && defined(AF_UNIX)
 # include <sys/un.h>
 #endif
-
-#include <string.h>
-#include <assert.h>
 
 #ifdef WIN32
 static const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
@@ -174,7 +169,7 @@ static void _neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in
     assert(*host_p != NULL);
 }
 
-int _neb_sock_remote_addr(Sock *s)
+static int _neb_sock_remote_addr(Sock *s)
 {
     struct sockaddr *sa_p = (struct sockaddr *) &(s->remote_stg);
     socklen_t sa_len = sizeof(struct sockaddr_storage);
@@ -187,7 +182,7 @@ int _neb_sock_remote_addr(Sock *s)
     return 0;
 }
 
-int _neb_sock_local_addr(Sock *s)
+static int _neb_sock_local_addr(Sock *s)
 {
     struct sockaddr_storage sa;
     socklen_t sa_len = sizeof(struct sockaddr_storage);
