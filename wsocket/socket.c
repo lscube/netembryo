@@ -199,14 +199,3 @@ static int _neb_sock_connect(const char const *host, const char const *port, int
 
     return WSOCK_OK;
 }
-
-static int _neb_sock_setup(Sock *s, int sd, int socktype)
-{
-    s->fd = sd;
-    s->socktype = socktype;
-
-    if ( _neb_sock_local_addr(s) )
-        return -1;
-
-    return 0;
-}

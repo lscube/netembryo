@@ -112,7 +112,10 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
     if ( (s = calloc(1, sizeof(Sock))) == NULL )
         goto error;
 
-    if ( _neb_sock_setup(s, sockfd, socktype) )
+    s->fd = sd;
+    s->socktype = socktype;
+
+    if ( _neb_sock_local_addr(s) )
         goto error;
 
     neb_log(NEB_LOG_DEBUG,
@@ -173,7 +176,10 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     } else if ( (s = calloc(1, sizeof(Sock))) == NULL )
         goto error;
 
-    if ( _neb_sock_setup(s, sockfd, socktype) )
+    s->fd = sd;
+    s->socktype = socktype;
+
+    if ( _neb_sock_local_addr(s) )
         goto error;
 
     if ( _neb_sock_remote_addr(s) ) {
