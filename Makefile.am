@@ -15,11 +15,9 @@ distcheck-hook:
 
 lib_LTLIBRARIES = libnetembryo.la
 
-pkginclude_HEADERS =    netembryo/wsocket.h \
-			netembryo/url.h
+pkginclude_HEADERS =    netembryo/wsocket.h
 
 libnetembryo_la_SOURCES = \
-			utils/url.c \
 			utils/log.c \
 			\
 			wsocket/wsocket-internal.h \
@@ -59,7 +57,6 @@ BUILT_SOURCES = tests/gtestmain.c
 endif
 
 tests_testsuite_SOURCES = \
-	tests/test_url.c \
 	tests/test_sock.c \
 	tests/utils.c \
 	tests/gtest-extra.h
