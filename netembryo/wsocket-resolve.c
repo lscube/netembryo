@@ -97,3 +97,36 @@ int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *
     return -1;
 }
 
+in_port_t neb_sa_get_port(struct sockaddr *sa)
+{
+    switch (sa->sa_family) {
+    case AF_INET:
+        {
+            struct sockaddr_in *sin = (struct sockaddr_in *) sa;
+            return ntohs(sin->sin_port);
+        }
+    case AF_INET6:
+        {
+            struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
+            return ntohs(sin6->sin6_port);
+        }
+    default:
+        return -1;
+    }
+}
+
+void neb_sa_set_port(struct sockaddr *sa, in_port_t port)
+{
+    switch (sa->sa_family) {
+    case AF_INET:
+        {
+            struct sockaddr_in *sin = (struct sockaddr_in *) sa;
+            sin->sin_port = htons(port);
+        }
+    case AF_INET6:
+        {
+            struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
+            sin6->sin6_port = htons(port);
+        }
+    }
+}

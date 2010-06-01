@@ -195,4 +195,7 @@ int neb_sock_close(Sock *s);
  * @}
  */
 
+in_port_t neb_sa_get_port(struct sockaddr *sa);
+void neb_sa_set_port(struct sockaddr *sa, in_port_t port);
+
 #endif // NETEMBRYO_WSOCKET_H
