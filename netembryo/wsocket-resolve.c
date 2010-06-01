@@ -41,29 +41,7 @@ static const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
     }
     return NULL;
 }
-
-static int inet_pton(int af, const char *src, void *dst)
-{
-    struct addrinfo hints, *res, *ressave;
-
-    memset(&hints, 0, sizeof(struct addrinfo));
-    hints.ai_family = af;
-
-    if (getaddrinfo(src, NULL, &hints, &res) != 0)
-        return -1;
-
-    ressave = res;
-
-    while (res) {
-        memcpy(dst, res->ai_addr, res->ai_addrlen);
-        res = res->ai_next;
-    }
-
-    freeaddrinfo(ressave);
-    return 0;
-}
 #endif
-
 
 static void _neb_sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
 {
