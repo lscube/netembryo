@@ -154,6 +154,20 @@ Sock * neb_sock_connect(const char const *host,
                         sock_type socktype);
 
 /**
+ * @brief Parse a sockaddr structure into mnemonic host and numeric port values
+ *
+ * @param sa The sockaddr structure to fetch the address from
+ * @param[out] host_p A pointer to the pointer where to duplicate the
+ *                    hostname string
+ * @param[out] port_p A pointer to the variable to save the port to
+ *
+ * @retval 0 No error, @p host_p and @p port_p parameters are set.
+ * @retval -1 Error deep within the parsing
+ */
+int neb_sock_parse_address(const struct sockaddr *sa,
+                           char **host_p, in_port_t *port_p);
+
+/**
  * Create a new socket and binds it to an address/port.
  * @param host Local address to be used by this socket, if NULL the socket will
  *        be bound to all interfaces.

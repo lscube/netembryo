@@ -21,108 +21,69 @@
  * this piece of code is taken from NeMeSI
  * */
 
-#ifdef WIN32
-static const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
+int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p)
 {
-    if (af == AF_INET) {
-        struct sockaddr_in in;
-        memset(&in, 0, sizeof(in));
-        in.sin_family = AF_INET;
-        memcpy(&in.sin_addr, src, sizeof(struct in_addr));
-        getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), dst, cnt, NULL, 0, NI_NUMERICHOST);
-        return dst;
-    } else if (af == AF_INET6) {
-        struct sockaddr_in6 in;
-        memset(&in, 0, sizeof(in));
-        in.sin6_family = AF_INET6;
-        memcpy(&in.sin6_addr, src, sizeof(struct in_addr6));
-        getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in6), dst, cnt, NULL, 0, NI_NUMERICHOST);
-        return dst;
-    }
-    return NULL;
-}
-#endif
-
-static void _neb_sock_ntop_host(const struct sockaddr *sa, char *str, size_t len)
-{
+    char host[128] = { 0, };
     switch (sa->sa_family) {
-    case AF_INET: {
-        struct sockaddr_in    *sin = (struct sockaddr_in *) sa;
-        if ( inet_ntop(AF_INET, &(sin->sin_addr), str, len) == NULL )
-            goto error;
-        return;
-    }
-
-#ifdef IPV6
-    case AF_INET6: {
-        struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
-        int a = 0;
-        char *tmp = str;
-
-        if (inet_ntop(AF_INET6, &(sin6->sin6_addr), str, len) == NULL )
-            goto error;
-
-        while ((tmp = strchr(tmp, '.'))) {
-            a++;
-            tmp++;
-        }
-        if (a == 3) {
-            if (!strncmp(str, "::ffff:", 7)) {
-                //this is an IPv4 address mapped in IPv6 address space
-                memmove (str, &str[7], strlen(str) - 6); // one char more for trailing NUL char
-            } else {
-                //this is an IPv6 address containg an IPv4 address (like ::127.0.0.1)
-                memmove (str, &str[2], strlen(str) - 1);
-            }
-        }
-        return;
-    }
+    case AF_INET:
+        {
+            struct sockaddr_in *sin = (struct sockaddr_in *) sa;
+#ifdef HAVE_INET_NTOP
+            if ( inet_ntop(AF_INET, &(sin->sin_addr), host, sizeof(host)-1) == NULL )
+                goto error;
+#else
+            if ( getnameinfo(sa, sizeof(struct sockaddr_in), host, sizeof(host)-1,
+                             NULL, 0, NI_NUMERICHOST) )
+                goto error;
 #endif
 
-    default:
+            *port_p = ntohs(sin->sin_port);
+        }
         break;
-    }
+    case AF_INET6:
+        {
+            struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
+            int a = 0;
+            char *tmp = host;
 
- error:
-    memset(str, 0, len);
-}
-
-/**
- * get the port from a sockaddr
- * @return the port or -1 on error
- */
-static int _neb_sock_get_port(const struct sockaddr *sa)
-{
-    switch (sa->sa_family) {
-    case AF_INET: {
-        struct sockaddr_in *sin = (struct sockaddr_in *) sa;
-
-        return(sin->sin_port);
-    }
-
-#ifdef IPV6
-    case AF_INET6: {
-        struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *) sa;
-
-        return(sin6->sin6_port);
-    }
+#ifdef HAVE_INET_NTOP
+            if ( inet_ntop(AF_INET6, &(sin6->sin6_addr), host, sizeof(host)-1) == NULL )
+                goto error;
+#else
+            if ( getnameinfo(sa, sizeof(struct sockaddr_in6), host, sizeof(host)-1,
+                             NULL, 0, NI_NUMERICHOST) )
+                goto error;
 #endif
+
+            while ((tmp = strchr(tmp, '.'))) {
+                a++;
+                tmp++;
+            }
+
+            if (a == 3) {
+                if (!strncmp(host, "::ffff:", 7)) {
+                    //this is an IPv4 address mapped in IPv6 address space
+                    memmove (host, &host[7], strlen(host) - 6); // one char more for trailing NUL char
+                } else {
+                    //this is an IPv6 address containg an IPv4 address (like ::127.0.0.1)
+                    memmove (host, &host[2], strlen(host) - 1);
+                }
+            }
+
+            *port_p = ntohs(sin6->sin6_port);
+        }
+        break;
     default:
-        assert(0);
-        return -1;
+        goto error;
     }
-}
-
-static void _neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p)
-{
-    char host[128];
-
-    _neb_sock_ntop_host(sa, host, sizeof(host));
 
     *host_p = strdup(host);
-    *port_p = ntohs(_neb_sock_get_port(sa));
+    return 0;
 
-    assert(*host_p != NULL);
+ error:
+    *host_p = NULL;
+    *port_p = 0;
+    return -1;
 }
 
 static int _neb_sock_remote_addr(Sock *s)
@@ -133,7 +94,7 @@ static int _neb_sock_remote_addr(Sock *s)
     if ( getpeername(s->fd, sa_p, &sa_len) )
         return -1;
 
-    _neb_sock_parse_address(sa_p, &s->remote_host, &s->remote_port);
+    neb_sock_parse_address(sa_p, &s->remote_host, &s->remote_port);
 
     return 0;
 }
@@ -146,7 +107,7 @@ static int _neb_sock_local_addr(Sock *s)
     if ( getsockname(s->fd, (struct sockaddr *)&sa, &sa_len) )
         return -1;
 
-    _neb_sock_parse_address((struct sockaddr *)&sa, &s->local_host, &s->local_port);
+    neb_sock_parse_address((struct sockaddr *)&sa, &s->local_host, &s->local_port);
 
     return 0;
 }
