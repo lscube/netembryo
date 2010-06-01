@@ -153,7 +153,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
                          Sock *binded, sock_type socktype)
 {
     Sock *s;
-    int sockfd;
+    int sockfd = -1;
 
     if(binded) {
         sockfd = binded->fd;
@@ -186,6 +186,7 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
             "Socket connected between local=\"%s\":%u and remote=\"%s\":%u.\n",
             s->local_host, s->local_port, s->remote_host, s->remote_port);
 
+    return s;
  error:
     if ( s != NULL )
         neb_sock_close(s);
