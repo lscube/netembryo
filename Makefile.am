@@ -18,8 +18,7 @@ lib_LTLIBRARIES = libnetembryo.la
 pkginclude_HEADERS =    netembryo/wsocket.h
 
 libnetembryo_la_SOURCES = \
-			utils/log.c \
-			\
+			netembryo/log.c \
 			netembryo/wsocket-internal.h \
 			netembryo/wsocket.c
 
