@@ -66,9 +66,6 @@ static struct addrinfo *_neb_sock_getaddrinfo(const char const *host,
     case TCP:
         hints.ai_socktype = SOCK_STREAM;
         break;
-    case UDP:
-        hints.ai_socktype = SOCK_DGRAM;
-        break;
     default:
         neb_log(NEB_LOG_ERR, "Unknown socket type specified\n");
         return NULL;
@@ -155,47 +152,4 @@ static int _neb_sock_bind(const char const *host, const char const *port, int *s
         return WSOCK_ERROR;
 
     return 0;
-}
-
-/**
- * wraps connect
- */
-
-static int _neb_sock_connect(const char const *host, const char const *port, int *sock, sock_type socktype)
-{
-    int connect_new;
-    struct addrinfo *res, *ressave;
-
-    if ( (ressave = res = _neb_sock_getaddrinfo(host, port, socktype)) == NULL ) {
-        return WSOCK_ERRADDR;
-    }
-
-    connect_new = (*sock < 0);
-
-    do {
-        if (connect_new && (*sock = socket(res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)
-            continue;
-
-        if ( socktype == SCTP &&
-             _neb_sock_sctp_setparams(*sock) < 0 )
-            continue;
-
-        if (connect(*sock, res->ai_addr, res->ai_addrlen) == 0)
-            break;
-
-        if (connect_new) {
-            if (close(*sock) < 0)
-                return WSOCK_ERROR;
-            else
-                *sock = -1;
-        }
-
-    } while ((res = res->ai_next) != NULL);
-
-    freeaddrinfo(ressave);
-
-    if ( !res )
-        return WSOCK_ERROR;
-
-    return WSOCK_OK;
 }

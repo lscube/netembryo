@@ -142,19 +142,6 @@ void neb_vlog(NebLogLevel level, const char *fmt, va_list args);
  */
 
 /**
- * Establish a connection to a remote host.
- * @param host Remote host to connect to (may be a hostname).
- * @param port Remote port to connect to.
- * @param binded Pointer to a pre-binded socket (useful for connect from
- *        a specific interface/port), if NULL a new socket will be created.
- * @param socktype The type of socket to be created.
- */
-Sock * neb_sock_connect(const char const *host,
-                        const char const *port,
-                        Sock *binded,
-                        sock_type socktype);
-
-/**
  * @brief Parse a sockaddr structure into mnemonic host and numeric port values
  *
  * @param sa The sockaddr structure to fetch the address from
