@@ -72,14 +72,14 @@ Sock * neb_sock_accept(Sock *s)
     new_s->fd = res;
     new_s->socktype = s->socktype;
 
-    if ( _neb_sock_remote_addr(s) ) {
+    if ( _neb_sock_remote_addr(new_s) ) {
         neb_log(NEB_LOG_DEBUG,
                 "Unable to get remote address in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
     }
 
-    if ( _neb_sock_local_addr(s) ) {
+    if ( _neb_sock_local_addr(new_s) ) {
         neb_log(NEB_LOG_DEBUG,
                 "Unable to get local address in neb_sock_accept().\n");
         neb_sock_close(new_s);
