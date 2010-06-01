@@ -41,9 +41,8 @@ void test_connect_lscube()
 void test_remote_host_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
-  const char *remote_host = neb_sock_remote_host(socket);
 
-  g_assert_cmpstr(remote_host, ==, test_ipv4);
+  g_assert_cmpstr(socket->remote_host, ==, test_ipv4);
 
   neb_sock_close(socket);
 }
@@ -51,9 +50,8 @@ void test_remote_host_lscube()
 void test_remote_port_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
-  in_port_t remote_port = neb_sock_remote_port(socket);
 
-  g_assert_cmpint(remote_port, ==, 80);
+  g_assert_cmpint(socket->remote_port, ==, 80);
 
   neb_sock_close(socket);
 }
@@ -61,9 +59,8 @@ void test_remote_port_lscube()
 void test_local_port_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
-  in_port_t local_port = neb_sock_local_port(socket);
 
-  g_assert_cmpint(local_port, !=, 0);
+  g_assert_cmpint(socket->local_port, !=, 0);
 
   neb_sock_close(socket);
 }
