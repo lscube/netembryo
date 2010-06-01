@@ -20,10 +20,12 @@ pkginclude_HEADERS =    netembryo/wsocket.h
 libnetembryo_la_SOURCES = \
 			utils/log.c \
 			\
-			wsocket/wsocket-internal.h \
-			wsocket/Sock.c
+			netembryo/wsocket-internal.h \
+			netembryo/wsocket.c
 
-EXTRA_DIST += wsocket/socket.c wsocket/sock_ntop_host.c
+EXTRA_DIST += \
+	netembryo/wsocket-lowlevel.c \
+	netembryo/wsocket-resolve_host.c
 
 libnetembryo_la_CFLAGS = $(GLIB_CFLAGS)
 libnetembryo_la_LIBADD = $(GLIB_LIBS)

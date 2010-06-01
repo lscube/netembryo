@@ -46,8 +46,8 @@
 #include "netembryo/wsocket.h"
 #include "wsocket-internal.h"
 
-#include "sock_ntop_host.c"
-#include "socket.c"
+#include "wsocket-resolve.c"
+#include "wsocket-lowlevel.c"
 
 Sock * neb_sock_accept(Sock *s)
 {

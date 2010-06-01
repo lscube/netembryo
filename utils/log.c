@@ -23,7 +23,7 @@
 #include <config.h>
 
 #include "netembryo/wsocket.h"
-#include "wsocket/wsocket-internal.h"
+#include "netembryo/wsocket-internal.h"
 
 void neb_log(NebLogLevel level, const char *fmt, ...)
 {
