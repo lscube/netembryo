@@ -151,13 +151,6 @@ Sock * neb_sock_bind(const char const *host,
                      Sock *sock,
                      sock_type socktype);
 
-/**
- * Create a new socket accepting a new connection from a listening socket.
- * @param s Listening socket.
- * @return the newly allocated Sock
- */
-Sock * neb_sock_accept(Sock *main);
-
 int neb_sock_close(Sock *s);
 
 /**

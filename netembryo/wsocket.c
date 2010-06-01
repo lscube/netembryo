@@ -48,46 +48,6 @@
 
 #include "wsocket-lowlevel.c"
 
-Sock * neb_sock_accept(Sock *s)
-{
-    int res = -1;
-    Sock *new_s = NULL;
-    struct sockaddr *sa_p = NULL;
-    socklen_t sa_len = sizeof(struct sockaddr_storage);
-
-    if (!s)
-        return NULL;
-
-    if ((res = accept(s->fd, NULL, 0)) < 0) {
-        neb_log(NEB_LOG_DEBUG, "error in accept().\n");
-        return NULL;
-    }
-
-    if (!(new_s = calloc(1, sizeof(Sock)))) {
-        neb_log(NEB_LOG_FATAL,
-                "Unable to allocate a Sock struct in neb_sock_accept().\n");
-        close(res);
-        return NULL;
-    }
-
-    new_s->fd = res;
-    new_s->socktype = s->socktype;
-
-    /* Avoid fetching it again, we know what it is already! */
-    memcpy(&new_s->local_stg, &s->local_stg, sizeof(struct sockaddr_storage));
-
-    sa_p = (struct sockaddr *) &(new_s->remote_stg);
-
-    if ( getpeername(new_s->fd, sa_p, &sa_len) ) {
-        neb_log(NEB_LOG_DEBUG,
-                "Unable to get remote address in neb_sock_accept().\n");
-        neb_sock_close(new_s);
-        return NULL;
-    }
-
-    return new_s;
-}
-
 Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
                      sock_type socktype)
 {
