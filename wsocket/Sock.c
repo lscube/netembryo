@@ -194,36 +194,3 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
         close(sockfd);
     return NULL;
 }
-
-int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags)
-{
-    assert(s != NULL);
-    assert(s->socktype != SCTP);
-
-    return recv(s->fd, buffer, nbytes, flags);
-}
-
-/**
- * Convenience function to alias to tcp and local cases.
- *
- */
-int neb_sock_write(Sock *s,
-                   const void *buffer,
-                   size_t nbytes,
-                   int flags) {
-    assert(s != NULL);
-
-    switch(s->socktype) {
-    case TCP:
-    case LOCAL:
-        return send(s->fd, buffer, nbytes, flags);
-    case UDP:
-        return sendto(s->fd, buffer, nbytes, flags,
-                      (struct sockaddr*)&s->remote_stg,
-                      sizeof(struct sockaddr_storage));
-
-    default:
-        assert(1 == 0);
-        return -1;
-    }
-}

@@ -174,34 +174,6 @@ Sock * neb_sock_bind(const char const *host,
  */
 Sock * neb_sock_accept(Sock *main);
 
-/**
- * Put a socket in listening state.
- * @param s Existing socket.
- * @param backlog Number of connection that may wait to be accepted.
- */
-int neb_sock_listen(Sock *s, int backlog);
-
-/**
- * Read data from a socket.
- * @param s Existing socket.
- * @param buffer Buffer reserved for receiving data.
- * @param nbytes Size of the buffer.
- * @param protodata Pointer to data depending from socket protocol, if NULL a
- *        suitable default value will be used.
- * @param flags Flags to be passed to posix recv() function.
- */
-int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags);
-
-/**
- * @brief Send data to a socket
- *
- * @param s The existing socket
- * @param buffer Buffer of data to be sent
- * @param nbytes Size of data to be sent
- * @param flags Flags to use during write operationg
- */
-int neb_sock_write(Sock *s, const void *buffer, size_t nbytes, int flags);
-
 int neb_sock_close(Sock *s);
 
 /**
