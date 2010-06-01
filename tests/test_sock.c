@@ -27,6 +27,7 @@
 /* Change this if the lscube.org server changes */
 static const char test_host[] = "www.lscube.org";
 static const char test_port[] = "80";
+static const char test_port_name[] = "http";
 static const char test_ipv4[] = "194.116.73.70";
 
 void test_connect_lscube()
@@ -50,6 +51,15 @@ void test_remote_host_lscube()
 void test_remote_port_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
+
+  g_assert_cmpint(socket->remote_port, ==, 80);
+
+  neb_sock_close(socket);
+}
+
+void test_remote_port_name_lscube()
+{
+  Sock *socket = neb_sock_connect(test_host, test_port_name, NULL, TCP);
 
   g_assert_cmpint(socket->remote_port, ==, 80);
 
