@@ -23,10 +23,6 @@
 
 #include "netembryo/wsocket.h"
 
-#ifdef HAVE_SOCKADDR_DL_STRUCT
-#include <net/if_dl.h>
-#endif
-
 #if !defined(WIN32) && defined(AF_UNIX)
 # include <sys/un.h>
 #endif
