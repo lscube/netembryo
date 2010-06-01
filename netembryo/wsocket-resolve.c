@@ -133,9 +133,10 @@ static int _neb_sock_get_port(const struct sockaddr *sa)
         return(sin6->sin6_port);
     }
 #endif
+    default:
+        assert(0);
+        return -1;
     }
-
-    assert(0);
 }
 
 static void _neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p)
