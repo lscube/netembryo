@@ -21,10 +21,6 @@
  * this piece of code is taken from NeMeSI
  * */
 
-#if !defined(WIN32) && defined(AF_UNIX)
-# include <sys/un.h>
-#endif
-
 #ifdef WIN32
 static const char *inet_ntop(int af, const void *src, char *dst, unsigned cnt)
 {
@@ -105,21 +101,6 @@ static void _neb_sock_ntop_host(const struct sockaddr *sa, char *str, size_t len
                 memmove (str, &str[2], strlen(str) - 1);
             }
         }
-        return;
-    }
-#endif
-
-#if !defined(WIN32) && defined(AF_UNIX)
-    case AF_UNIX: {
-        struct sockaddr_un *unp = (struct sockaddr_un *) sa;
-
-            /* OK to have no pathname bound to the socket: happens on
-               every connect() unless client calls bind() first. */
-        if (unp->sun_path[0] == '\0')
-            strncpy(str, "(no pathname bound)", len);
-        else
-            strncpy(str, unp->sun_path, len);
-
         return;
     }
 #endif
