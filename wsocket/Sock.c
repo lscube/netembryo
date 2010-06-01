@@ -195,13 +195,6 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
     return NULL;
 }
 
-int neb_sock_listen(Sock *s, int backlog)
-{
-    if (!s)
-        return -1;
-    return listen(s->fd, backlog);
-}
-
 int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags)
 {
     assert(s != NULL);
