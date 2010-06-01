@@ -198,23 +198,9 @@ Sock * neb_sock_connect(const char const *host, const char const *port,
 int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags)
 {
     assert(s != NULL);
+    assert(s->socktype != SCTP);
 
-    switch(s->socktype) {
-    case UDP:
-        return recvfrom(s->fd, buffer, nbytes, flags,
-                        NULL, 0);
-        break;
-    case TCP:
-        return recv(s->fd, buffer, nbytes, flags);
-        break;
-    case LOCAL:
-        return recv(s->fd, buffer, nbytes, flags);
-        break;
-    default:
-        break;
-    }
-
-    return -1;
+    return recv(s->fd, buffer, nbytes, flags);
 }
 
 /**
