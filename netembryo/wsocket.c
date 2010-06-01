@@ -46,7 +46,32 @@
 #include "netembryo/wsocket.h"
 #include "wsocket-internal.h"
 
-#include "wsocket-resolve.c"
+static int _neb_sock_remote_addr(Sock *s)
+{
+    struct sockaddr *sa_p = (struct sockaddr *) &(s->remote_stg);
+    socklen_t sa_len = sizeof(struct sockaddr_storage);
+
+    if ( getpeername(s->fd, sa_p, &sa_len) )
+        return -1;
+
+    neb_sock_parse_address(sa_p, &s->remote_host, &s->remote_port);
+
+    return 0;
+}
+
+static int _neb_sock_local_addr(Sock *s)
+{
+    struct sockaddr *sa_p = (struct sockaddr *) &(s->local_stg);
+    socklen_t sa_len = sizeof(struct sockaddr_storage);
+
+    if ( getsockname(s->fd, sa_p, &sa_len) )
+        return -1;
+
+    neb_sock_parse_address(sa_p, &s->local_host, &s->local_port);
+
+    return 0;
+}
+
 #include "wsocket-lowlevel.c"
 
 Sock * neb_sock_accept(Sock *s)

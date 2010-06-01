@@ -21,6 +21,17 @@
  * this piece of code is taken from NeMeSI
  * */
 
+#include <config.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <string.h>
+
+#if HAVE_INET_NTOP
+# include <arpa/inet.h>
+#endif
+
 int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p)
 {
     char host[128] = { 0, };
@@ -86,28 +97,3 @@ int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *
     return -1;
 }
 
-static int _neb_sock_remote_addr(Sock *s)
-{
-    struct sockaddr *sa_p = (struct sockaddr *) &(s->remote_stg);
-    socklen_t sa_len = sizeof(struct sockaddr_storage);
-
-    if ( getpeername(s->fd, sa_p, &sa_len) )
-        return -1;
-
-    neb_sock_parse_address(sa_p, &s->remote_host, &s->remote_port);
-
-    return 0;
-}
-
-static int _neb_sock_local_addr(Sock *s)
-{
-    struct sockaddr *sa_p = (struct sockaddr *) &(s->local_stg);
-    socklen_t sa_len = sizeof(struct sockaddr_storage);
-
-    if ( getsockname(s->fd, sa_p, &sa_len) )
-        return -1;
-
-    neb_sock_parse_address(sa_p, &s->local_host, &s->local_port);
-
-    return 0;
-}
