@@ -222,32 +222,8 @@ int neb_sock_write(Sock *s,
                       (struct sockaddr*)&s->remote_stg,
                       sizeof(struct sockaddr_storage));
 
-#ifdef ENABLE_SCTP
-    case SCTP:
-        return neb_sock_write_stream(s,
-                                     buffer, nbytes,
-                                     flags, 0);
-#endif
-
     default:
         assert(1 == 0);
         return -1;
     }
 }
-
-#ifdef ENABLE_SCTP
-int neb_sock_write_stream(Sock *s,
-                          const void *buffer, size_t nbytes,
-                          int flags, int stream)
-{
-    const struct sctp_sndrcvinfo sctp_info = {
-        .sinfo_stream = stream
-    };
-
-    assert(s != NULL && s->socktype == SCTP);
-
-    return sctp_send(s->fd,
-                     buffer, nbytes,
-                     &sctp_info, flags);
-}
-#endif

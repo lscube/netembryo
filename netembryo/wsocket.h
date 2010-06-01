@@ -202,17 +202,6 @@ int neb_sock_read(Sock *s, void *buffer, int nbytes, int flags);
  */
 int neb_sock_write(Sock *s, const void *buffer, size_t nbytes, int flags);
 
-/**
- * @brief Send data to an open multiplexed socket
- *
- * @param s The existing socket
- * @param buffer Buffer of data to be sent
- * @param nbytes Size of data to be sent
- * @param flags Flags to use during write operation
- * @param stream SCTP stream to send the data to
- */
-int neb_sock_write_stream(Sock *s, const void *buffer, size_t nbytes, int flags, int stream);
-
 int neb_sock_close(Sock *s);
 
 /**
