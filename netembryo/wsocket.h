@@ -78,10 +78,6 @@ typedef struct {
     struct sockaddr_storage remote_stg;    ///< low level address storage from getpeername
     struct sockaddr_storage local_stg;    ///< low level address storage from getsockname
     /** human readable data */
-    char *remote_host; ///< remote host stored as dinamic string
-    char *local_host; ///< local host stored as dinamic string
-    in_port_t remote_port;    ///< remote port stored in host order
-    in_port_t local_port;    ///< local port stored in host order
     void *data; ///< user data
 } Sock;
 
@@ -142,20 +138,6 @@ void neb_vlog(NebLogLevel level, const char *fmt, va_list args);
  */
 
 /**
- * @brief Parse a sockaddr structure into mnemonic host and numeric port values
- *
- * @param sa The sockaddr structure to fetch the address from
- * @param[out] host_p A pointer to the pointer where to duplicate the
- *                    hostname string
- * @param[out] port_p A pointer to the variable to save the port to
- *
- * @retval 0 No error, @p host_p and @p port_p parameters are set.
- * @retval -1 Error deep within the parsing
- */
-int neb_sock_parse_address(const struct sockaddr *sa,
-                           char **host_p, in_port_t *port_p);
-
-/**
  * Create a new socket and binds it to an address/port.
  * @param host Local address to be used by this socket, if NULL the socket will
  *        be bound to all interfaces.
@@ -182,6 +164,7 @@ int neb_sock_close(Sock *s);
  * @}
  */
 
+char *neb_sa_get_host(const struct sockaddr *sa);
 in_port_t neb_sa_get_port(struct sockaddr *sa);
 void neb_sa_set_port(struct sockaddr *sa, in_port_t port);
 

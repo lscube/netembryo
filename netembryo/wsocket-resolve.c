@@ -32,7 +32,7 @@
 # include <arpa/inet.h>
 #endif
 
-int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *port_p)
+char *neb_sa_get_host(const struct sockaddr *sa)
 {
     char host[128] = { 0, };
     switch (sa->sa_family) {
@@ -47,8 +47,6 @@ int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *
                              NULL, 0, NI_NUMERICHOST) )
                 goto error;
 #endif
-
-            *port_p = ntohs(sin->sin_port);
         }
         break;
     case AF_INET6:
@@ -80,21 +78,16 @@ int neb_sock_parse_address(const struct sockaddr *sa, char **host_p, in_port_t *
                     memmove (host, &host[2], strlen(host) - 1);
                 }
             }
-
-            *port_p = ntohs(sin6->sin6_port);
         }
         break;
     default:
         goto error;
     }
 
-    *host_p = strdup(host);
-    return 0;
+    return strdup(host);
 
  error:
-    *host_p = NULL;
-    *port_p = 0;
-    return -1;
+    return NULL;
 }
 
 in_port_t neb_sa_get_port(struct sockaddr *sa)

@@ -46,38 +46,14 @@
 #include "netembryo/wsocket.h"
 #include "wsocket-internal.h"
 
-static int _neb_sock_remote_addr(Sock *s)
-{
-    struct sockaddr *sa_p = (struct sockaddr *) &(s->remote_stg);
-    socklen_t sa_len = sizeof(struct sockaddr_storage);
-
-    if ( getpeername(s->fd, sa_p, &sa_len) )
-        return -1;
-
-    neb_sock_parse_address(sa_p, &s->remote_host, &s->remote_port);
-
-    return 0;
-}
-
-static int _neb_sock_local_addr(Sock *s)
-{
-    struct sockaddr *sa_p = (struct sockaddr *) &(s->local_stg);
-    socklen_t sa_len = sizeof(struct sockaddr_storage);
-
-    if ( getsockname(s->fd, sa_p, &sa_len) )
-        return -1;
-
-    neb_sock_parse_address(sa_p, &s->local_host, &s->local_port);
-
-    return 0;
-}
-
 #include "wsocket-lowlevel.c"
 
 Sock * neb_sock_accept(Sock *s)
 {
     int res = -1;
     Sock *new_s = NULL;
+    struct sockaddr *sa_p = NULL;
+    socklen_t sa_len = sizeof(struct sockaddr_storage);
 
     if (!s)
         return NULL;
@@ -97,23 +73,17 @@ Sock * neb_sock_accept(Sock *s)
     new_s->fd = res;
     new_s->socktype = s->socktype;
 
-    if ( _neb_sock_remote_addr(new_s) ) {
+    /* Avoid fetching it again, we know what it is already! */
+    memcpy(&new_s->local_stg, &s->local_stg, sizeof(struct sockaddr_storage));
+
+    sa_p = (struct sockaddr *) &(new_s->remote_stg);
+
+    if ( getpeername(new_s->fd, sa_p, &sa_len) ) {
         neb_log(NEB_LOG_DEBUG,
                 "Unable to get remote address in neb_sock_accept().\n");
         neb_sock_close(new_s);
         return NULL;
     }
-
-    if ( _neb_sock_local_addr(new_s) ) {
-        neb_log(NEB_LOG_DEBUG,
-                "Unable to get local address in neb_sock_accept().\n");
-        neb_sock_close(new_s);
-        return NULL;
-    }
-
-    neb_log(NEB_LOG_DEBUG, "Socket accepted between local=\"%s\":%u and "
-            "remote=\"%s\":%u.\n", new_s->local_host, new_s->local_port,
-            new_s->remote_host, new_s->remote_port);
 
     return new_s;
 }
@@ -124,6 +94,8 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
 
     Sock *s = NULL;
     int sockfd = -1;
+    struct sockaddr *sa_p = NULL;
+    socklen_t sa_len = sizeof(struct sockaddr_storage);
 
     if(sock) {
         sockfd = sock->fd;
@@ -140,14 +112,13 @@ Sock * neb_sock_bind(const char const *host, const char const *port, Sock *sock,
     s->fd = sockfd;
     s->socktype = socktype;
 
-    if ( _neb_sock_local_addr(s) )
+    sa_p = (struct sockaddr *) &(s->local_stg);
+
+    if ( getsockname(s->fd, sa_p, &sa_len) )
         goto error;
 
-    neb_log(NEB_LOG_DEBUG,
-            "Socket bound with addr=\"%s\" and port=\"%u\".\n",
-            s->local_host, s->local_port);
-
     return s;
+
  error:
     if ( s != NULL )
         neb_sock_close(s);
@@ -170,8 +141,6 @@ int neb_sock_close(Sock *s)
 
     res = close(s->fd);
 
-    free(s->remote_host);
-    free(s->local_host);
     free(s);
 
     return res;

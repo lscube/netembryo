@@ -52,7 +52,7 @@ void test_remote_port_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
 
-  g_assert_cmpint(socket->remote_port, ==, 80);
+  g_assert_cmpint(neb_sa_get_port((struct sockaddr*)&socket->remote_stg), ==, 80);
 
   neb_sock_close(socket);
 }
@@ -61,7 +61,7 @@ void test_remote_port_name_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port_name, NULL, TCP);
 
-  g_assert_cmpint(socket->remote_port, ==, 80);
+  g_assert_cmpint(neb_sa_get_port((struct sockaddr*)&socket->remote_stg), ==, 80);
 
   neb_sock_close(socket);
 }
@@ -70,7 +70,7 @@ void test_local_port_lscube()
 {
   Sock *socket = neb_sock_connect(test_host, test_port, NULL, TCP);
 
-  g_assert_cmpint(socket->local_port, !=, 0);
+  g_assert_cmpint(neb_sa_get_port((struct sockaddr*)&socket->local_stg), !=, 0);
 
   neb_sock_close(socket);
 }
@@ -89,7 +89,7 @@ void test_random_port()
     Sock *sock = neb_sock_bind("localhost", NULL, NULL, TCP);
     g_assert(sock);
 
-    g_assert_cmpuint(sock->local_port, !=, 0);
+    g_assert_cmpuint(neb_sa_get_port((struct sockaddr*)&socket->local_stg), !=, 0);
 
     neb_sock_close(sock);
 }
